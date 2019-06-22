@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Anything</string>
+    <string name="please_input_amount">test</string>
+    <string name="please_input_order_no">please_input_order_no</string>
+    <string name="please_input_admin_password">please_input_admin_password</string>
+    <string name="please_input_user_name">please_input_user_name</string>
 </resources>
