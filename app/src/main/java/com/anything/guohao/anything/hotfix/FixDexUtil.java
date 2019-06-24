@@ -58,16 +58,20 @@ public class FixDexUtil {
      *@time 2018/6/25 0025 15:51
      *@desc 验证是否需要热修复
      */
-    public static boolean isGoingToFix(@NonNull Context context) {
+    public static boolean isGoingToFix(@NonNull Context context,File fileDir) {
         boolean canFix = false;
         File externalStorageDirectory = Environment.getExternalStorageDirectory();
 
-        Log.e("guohao","externalStorageDirectory = " + externalStorageDirectory.getPath());
+        //Log.e("guohao","externalStorageDirectory = " + externalStorageDirectory.getPath());
+        //Log.e("guohao","context.getFilesDir() = " + context.getFilesDir());
+        Log.e("guohao","fileDir.getPath() = " + fileDir.getPath());
 
         // 遍历所有的修复dex , 因为可能是多个dex修复包
-        File fileDir = externalStorageDirectory != null ?
-                externalStorageDirectory :
-                new File(context.getFilesDir(), DEX_DIR);// data/data/包名/files/odex（这个可以任意位置）
+//        File fileDir = externalStorageDirectory != null ?
+//                externalStorageDirectory :
+//                new File(context.getFilesDir(), DEX_DIR);// data/data/包名/files/odex（这个可以任意位置）
+
+
 
         File[] listFiles = fileDir.listFiles();
 
@@ -77,6 +81,7 @@ public class FixDexUtil {
         }
 
         for (File file : listFiles) {
+            Log.e("guohao","file.getName() = " + file.getName());
             if (file.getName().startsWith("classes") &&
                     (file.getName().endsWith(DEX_SUFFIX)
                             || file.getName().endsWith(APK_SUFFIX)

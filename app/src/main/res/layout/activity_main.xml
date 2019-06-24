@@ -14,17 +14,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
-            android:text="test_1"
+            android:text="test bug"
             android:textSize="15sp"
             android:onClick="test_1" />
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
-            android:text="test_2"
+            android:text="hotfix"
             android:textSize="15sp"
             android:onClick="test_2" />
-
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:text="loadFile"
+            android:textSize="15sp"
+            android:onClick="test_3" />
 
 
     </LinearLayout>
