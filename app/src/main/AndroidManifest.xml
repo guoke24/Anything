@@ -16,11 +16,11 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".CusViewActivity" />
         <activity android:name=".PackagesListActivity" />
-        <activity android:name=".classloader.ClassLoaderActivity"></activity>
-        <activity android:name=".reflect.ReflectTestActivity">
-
-        </activity>
+        <activity android:name=".classloader.ClassLoaderActivity" />
+        <activity android:name=".reflect.ReflectTestActivity"></activity>
         <activity android:name=".signerverify.SignerVerifyActivity">
+        </activity>
+        <activity android:name=".FileOptUtil.FileOptActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
