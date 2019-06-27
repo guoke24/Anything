@@ -19,7 +19,7 @@ public class AssetsUtils {
     public static String fileOpt(String fileName, Context context){
 
         int l = assetsFile2dataFile(fileName,context);
-        Log.e(TAG,"l = " + l);
+        Log.e(TAG,"fileOpt len = " + l);
 
         Log.e(TAG,"getFilesDir() = " + context.getFilesDir() );
         // 输出：/data/user/0/com.anything.guohao.anything/files
@@ -32,7 +32,7 @@ public class AssetsUtils {
             return context.getFilesDir().getPath() +"/" + fileName;
         }
 
-        return null;
+        return "";
     }
 
 
@@ -56,6 +56,7 @@ public class AssetsUtils {
 
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e(TAG,"assetsFile2dataFile Exception = " + e.toString());
         }
         return -1;
     }
@@ -83,6 +84,7 @@ public class AssetsUtils {
 
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e(TAG,"readFileData Exception = " + e.toString());
         }
 
         return  len;

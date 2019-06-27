@@ -65,6 +65,19 @@ public class ConvertUtil {
     }
 
     /**
+     * 大小端序互换
+     * @param a
+     * @return
+     */
+    public static byte[] changeBytesOrder(byte[] a) {
+        byte[] b = new byte[a.length];
+        for (int i = 0; i < b.length; i++) {
+            b[i] = a[b.length - i - 1];
+        }
+        return b;
+    }
+
+    /**
      * 十六进制字符串转换成 byte 数组，十六进制转二进制再转十进制
      *
      * @param srcHexString 待转换的十六进制字符串
