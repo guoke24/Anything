@@ -60,6 +60,22 @@
             android:text="test6"
             android:textSize="15sp" />
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:onClick="test_7"
+            android:text="test7"
+            android:textSize="15sp" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:onClick="test_8"
+            android:text="test8"
+            android:textSize="15sp" />
+
     </LinearLayout>
 
 </LinearLayout>
