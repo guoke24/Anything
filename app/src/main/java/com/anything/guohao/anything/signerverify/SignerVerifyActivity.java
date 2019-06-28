@@ -33,6 +33,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -551,6 +552,12 @@ public class SignerVerifyActivity extends BaseTestActivity {
             work_cert.verify(root_cert.getPublicKey());// 使用 终端保存的根证书 验证 工作证书 的合法性
             work_cert.checkValidity();
 
+            LogUtil.e("getPublicKey str " + work_cert.getPublicKey().toString());
+            LogUtil.e("getPublicKey Algorithm " + work_cert.getPublicKey().getAlgorithm());
+            LogUtil.e("getPublicKey Format " + work_cert.getPublicKey().getFormat());
+            LogUtil.e("getPublicKey byte " + ConvertUtil.bytesToHexString(work_cert.getPublicKey().getEncoded()));
+
+
             // 这样验证不行
 //            root_cert.verify(work_cert.getPublicKey());
 //            root_cert.checkValidity();
@@ -568,6 +575,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
     //农信的签名ID：78 67 64 32 （以此为开头）
     static byte[] jxnxID = new byte[]{0x78, 0x67, 0x64, 0x32};
 
+    // 提取出 jxnx签名块的 三部分：主体，签名数据，证书；且证书验签成功
     public void test_10(View v) {
         byte[] apkBytes = getByteFromFile(SmartPhonePos_apk);
 
@@ -635,7 +643,10 @@ public class SignerVerifyActivity extends BaseTestActivity {
             // 第一步 验证书
             verifyWorkCert(cert,5,cert.length - 5);
 
-            // 第二步
+
+
+            // 第二步 验签名
+
 
             // 第三步
 
@@ -645,6 +656,146 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     }
 
+    // 测试 RSAEncrypt类 和 RSASignature类
+    public void test_11(View v) throws Exception {
+        String filepath= getFilesDir().getPath() + File.separator;
+
+        //生成公钥和私钥文件
+        RSAEncrypt.genKeyPair(filepath);
+
+        System.out.println("--------------公钥加密私钥解密过程-------------------");
+        String plainText="这是一行待用公钥加密的文字";
+        //公钥加密过程
+        byte[] cipherData=RSAEncrypt.encrypt(RSAEncrypt.loadPublicKeyByStr(RSAEncrypt.loadPublicKeyByFile(filepath)),plainText.getBytes());
+        String cipher=Base64.encode(cipherData);
+        //私钥解密过程
+        byte[] res=RSAEncrypt.decrypt(RSAEncrypt.loadPrivateKeyByStr(RSAEncrypt.loadPrivateKeyByFile(filepath)), Base64.decode(cipher));
+        String restr=new String(res);
+        System.out.println("原文："+plainText);
+        System.out.println("加密："+cipher);
+        System.out.println("解密："+restr);
+        System.out.println();
+
+        System.out.println("--------------私钥加密公钥解密过程-------------------");
+        plainText="这是一行待用私钥加密的文字";
+        //私钥加密过程
+        cipherData=RSAEncrypt.encrypt(RSAEncrypt.loadPrivateKeyByStr(RSAEncrypt.loadPrivateKeyByFile(filepath)),plainText.getBytes());
+        cipher=Base64.encode(cipherData);
+        //公钥解密过程
+        res=RSAEncrypt.decrypt(RSAEncrypt.loadPublicKeyByStr(RSAEncrypt.loadPublicKeyByFile(filepath)), Base64.decode(cipher));
+        restr=new String(res);
+        System.out.println("原文："+plainText);
+        System.out.println("加密："+cipher);
+        System.out.println("解密："+restr);
+        System.out.println();
+
+        System.out.println("---------------私钥【签名】过程------------------");
+        String content="这是一行待签名的文字";
+        String signstr=RSASignature.sign(content,RSAEncrypt.loadPrivateKeyByFile(filepath));
+        System.out.println("签名原串："+content);
+        System.out.println("签名串："+signstr);
+        System.out.println();
+
+        System.out.println("---------------公钥【校验签名】------------------");
+        System.out.println("签名原串："+content);
+        System.out.println("签名串："+signstr);
+
+        System.out.println("验签结果：" +
+                RSASignature.doCheck(
+                        content, // 原内容
+                        signstr, // 签名数据
+                        RSAEncrypt.loadPublicKeyByFile(filepath)) // 公钥
+        );
+        System.out.println();
+
+    }
+
+    // 测试 RSAUtils 类
+    public void test_12(View v) throws Exception {
+        test();
+        testSign();
+        testHttpSign();//此处类似 jxnx 的验签
+    }
+
+    static String publicKey;
+    static String privateKey;
+
+    static {
+        try {
+            Map<String, Object> keyMap = RSAUtils.genKeyPair();
+            publicKey = RSAUtils.getPublicKey(keyMap);
+            privateKey = RSAUtils.getPrivateKey(keyMap);
+            System.err.println("公钥: \n\r" + publicKey);
+            System.err.println("私钥： \n\r" + privateKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void test() throws Exception {
+        System.err.println("公钥加密——私钥解密");
+        String source = "这是一行没有任何意义的文字，你看完了等于没看，不是吗？";
+        System.out.println("\r加密前文字：\r\n" + source);
+        byte[] data = source.getBytes();
+        byte[] encodedData = RSAUtils.encryptByPublicKey(data, publicKey);
+        System.out.println("加密后文字：\r\n" + new String(encodedData));
+        byte[] decodedData = RSAUtils.decryptByPrivateKey(encodedData, privateKey);
+        String target = new String(decodedData);
+        System.out.println("解密后文字: \r\n" + target);
+    }
+
+    static void testSign() throws Exception {
+        System.err.println("私钥加密——公钥解密");
+        String source = "这是一行测试RSA数字签名的无意义文字";
+        System.out.println("原文字：\r\n" + source);
+        byte[] data = source.getBytes();
+        byte[] encodedData = RSAUtils.encryptByPrivateKey(data, privateKey);
+        System.out.println("加密后：\r\n" + new String(encodedData));
+        byte[] decodedData = RSAUtils.decryptByPublicKey(encodedData, publicKey);
+        String target = new String(decodedData);
+        System.out.println("解密后: \r\n" + target);
+        System.err.println("私钥签名——公钥验证签名");
+        String sign = RSAUtils.sign(encodedData, privateKey);
+        System.err.println("签名:\r" + sign);
+        boolean status = RSAUtils.verify(encodedData, publicKey, sign);
+        System.err.println("验证结果:\r" + status);
+    }
+
+    static void testHttpSign() {
+
+        try {
+            // A公司的员工，用私钥加密，后用私钥签名
+            String param = "一个hash值";
+            byte[] encodedData = RSAUtils.encryptByPrivateKey(param.getBytes(), privateKey);
+            System.out.println("加密后：" + encodedData);
+
+            String sign = null;
+            sign = RSAUtils.sign(encodedData, privateKey);
+            System.err.println("签名：" + sign);
+
+            // A公司向B公司提供：签名数据：sign；公钥：publicKey；加密后的数据：encodedData
+
+            // 公钥 可以放到工作证书里，工作证书到公证处做公正，产生 根公钥
+
+            // 这时候，A公司向B公司提供的内容变为：
+            // 签名数据：sign；公钥：【工作证书 + 根公钥】加密后的数据：encodedData
+
+            // B公司的员工，先用 根公钥 验证 工作证书，通过后，提取 工作证书 中的 公钥
+
+            // B公司的员工，用公钥验签，后用公钥解密
+            boolean status = RSAUtils.verify(encodedData, publicKey, sign);
+            System.err.println("签名验证结果：" + status);
+
+            byte[] decodedData = RSAUtils.decryptByPublicKey(encodedData, publicKey);
+            System.out.println("解密后：" + new String(decodedData));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Exception：" + e.toString());
+        }
+
+    }
 
 }
 
