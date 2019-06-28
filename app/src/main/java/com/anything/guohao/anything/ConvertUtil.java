@@ -255,4 +255,14 @@ public class ConvertUtil {
         return stringBuilder.toString();
     }
 
+    /**
+     * 16进制的字符串，转为 int
+     * @param hex
+     * @return
+     */
+    public static int hexStr2int(String hex){
+
+        return 0;
+    }
+
 }

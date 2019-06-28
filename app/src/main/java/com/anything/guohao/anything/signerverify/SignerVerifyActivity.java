@@ -12,14 +12,23 @@ import com.anything.guohao.anything.ConvertUtil;
 import com.anything.guohao.anything.LogUtil;
 import com.anything.guohao.anything.R;
 
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Object;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.ASN1SequenceParser;
+import org.bouncycastle.asn1.ASN1String;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.security.GeneralSecurityException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -49,11 +58,67 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     String apkPath = "";
 
-    /**
-     * 从 assets 加载文件到 /data/data/{包名}/files
-     *
-     * @param v
-     */
+    // 获取byte，从应用的本地数据路径下的文件中
+    private byte[] getByteFromFile(String filename) {
+        showMessage("加载文件：" + filename);
+        // 把 assets 的 xxx.apk，copy 到 context.getFilesDir() 的路径下
+        // 即 /data/user/0/com.anything.guohao.anything/files
+        String path = AssetsUtils.fileOpt(SmartPhonePos_apk, this);
+        apkPath = path;
+        if (!path.equals("")) {
+            Toast.makeText(this, "加载完成", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "加载失败", Toast.LENGTH_SHORT).show();
+        }
+
+        if (apkPath.equals("")) {
+            Toast.makeText(this, "文件不存在", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+        InputStream in = null;
+        byte[] buffer;
+
+        try {
+            in = this.openFileInput(filename);
+            int lenght = in.available();
+            buffer = new byte[lenght];
+            in.read(buffer);
+            return buffer;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // 获取byte，从应用的本地数据路径下的文件中，可指定开头和长度
+    private byte[] getByteFromFile(String fileName, int offset, int len) throws IOException {
+        File file = new File(getFilesDir().getPath() + File.separator + fileName);
+        if (!file.exists()) {
+            throw new IOException("file not exists");
+        }
+
+        ByteBuffer mBytes = ByteBuffer.allocate(len);
+        RandomAccessFile rdacFile = new RandomAccessFile(getFilesDir().getPath() + File.separator + fileName, "r");
+        rdacFile.seek(offset);
+        rdacFile.readFully(mBytes.array(), 0, len);
+        //LogUtil.e("getByteFromFile = " + ConvertUtil.bytesToHexString(mBytes.array()));
+        return mBytes.array();
+    }
+
+
+    //从 assets 加载文件到 /data/data/{包名}/files
     public void test_1(View v) {
         showMessage("SignerVerifyActivity");
         // 把 assets 的 xxx.apk，copy 到 context.getFilesDir() 的路径下
@@ -68,11 +133,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
     }
 
 
-    /**
-     * 遍历 apk 内的文件，用 JarFile
-     *
-     * @param v
-     */
+    //遍历 apk 内的文件，用 JarFile
     public void test_2(View v) {
 
         try {
@@ -98,11 +159,8 @@ public class SignerVerifyActivity extends BaseTestActivity {
         }
     }
 
-    /**
-     * 输出apk的字节的16进制字符，通过StringBuilder，报错，说明StringBuilder是有大小限制的
-     *
-     * @param v
-     */
+
+    //输出apk的字节的16进制字符，通过StringBuilder，报错，说明StringBuilder是有大小限制的
     public void test_3(View v) {
         if (apkPath.equals("")) {
             Toast.makeText(this, "apk文件不存在", Toast.LENGTH_SHORT).show();
@@ -180,7 +238,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
         LogUtil.e("result = " + result.toString() + ",len = " + result.length());
     }
 
-
+    // 匹配开头的测试，输出匹配的下标
     public void test_4(View v) {
         if (apkPath.equals("")) {
             Toast.makeText(this, "apk文件不存在", Toast.LENGTH_SHORT).show();
@@ -208,7 +266,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
         }
     }
 
-
+    // 读取整个签名块，3201的字节那种
     public void test_5(View v) {
         if (apkPath.equals("")) {
             Toast.makeText(this, "apk文件不存在", Toast.LENGTH_SHORT).show();
@@ -306,38 +364,10 @@ public class SignerVerifyActivity extends BaseTestActivity {
         }
     }
 
-
-    //String hexStrWorkCert = "96 cb 04 8a 65 90 cc 98 b0 5b 9f 66 74 cc 6d 63 96 4c 39 78 d5 2f b3 e4 48 7a d5 b9 10 51 eb 42 d0 4a dc b1 2b ca 7d fb 93 5d ce 2a 0d 22 bb 6d 41 5e 54 17 6b e0 b9 28 06 4a 1f e6 9c 63 fc f4 aa 8c 4e f1 7d 18 3c 71 c2 98 20 e3 1a e6 e2 f5 c6 41 23 4e 14 0e 0b 13 e2 f2 dc 2c 4a 5f 03 76 2d c3 b9 43 4b 25 21 1b ee d4 c9 ee 79 93 73 ab 44 40 20 eb 63 4a 52 3d 6d ed c4 94 84 75 5c a0 db 6f 84 16 29 41 11 77 4b c4 1b 6a 52 4d 7f f3 45 f0 61 e4 e0 71 f0 7a f3 66 95 a5 6f c9 ad 4c 7f 9a 5d 15 b0 dd 68 4a 7b 96 71 7a 5a 5a 25 9b 31 ca 23 b6 03 52 5d 6b 45 f9 4b a1 be 81 f3 85 52 c8 78 b5 b2 0a 7c 78 34 bb 25 d6 85 d3 75 89 9d d1 e1 e9 6d 65 9e 3f 8a ed ad a8 59 5c 74 bf 62 85 62 a0 73 7c 16 54 93 84 43 5e 6f 2f f8 f6 c2 a9 6e cb a3 01 86 52 7c 04 66 63 7d c2 b3 25"
-    //String hexStrWorkCert = "96 cb 04 8a 65 90 cc 98 b0 5b 9f 66 74 cc 6d 63 96 4c 39 78 d5 2f b3 e4 48 7a d5 b9 10 51 eb 42 d0 4a dc b1 2b ca 7d fb 93 5d ce 2a 0d 22 bb 6d 41 5e 54 17 6b e0 b9 28 06 4a 1f e6 9c 63 fc f4 aa 8c 4e f1 7d 18 3c 71 c2 98 20 e3 1a e6 e2 f5 c6 41 23 4e 14 0e 0b 13 e2 f2 dc 2c 4a 5f 03 76 2d c3 b9 43 4b 25 21 1b ee d4 c9 ee 79 93 73 ab 44 40 20 eb 63 4a 52 3d 6d ed c4 94 84 75 5c a0 db 6f 84 16 29 41 11 77 4b c4 1b 6a 52 4d 7f f3 45 f0 61 e4 e0 71 f0 7a f3 66 95 a5 6f c9 ad 4c 7f 9a 5d 15 b0 dd 68 4a 7b 96 71 7a 5a 5a 25 9b 31 ca 23 b6 03 52 5d 6b 45 f9 4b a1 be 81 f3 85 52 c8 78 b5 b2 0a 7c 78 34 bb 25 d6 85 d3 75 89 9d d1 e1 e9 6d 65 9e 3f 8a ed ad a8 59 5c 74 bf 62 85 62 a0 73 7c 16 54 93 84 43 5e 6f 2f f8 f6 c2 a9 6e cb a3 01 86 52 7c 04 66 63 7d c2 b3 25"
-    //String hexStrWorkCert = "03 4b 20 30 82 03 46 30 82 02 2e 02 01 01 30 0d 06 09 2a 86 48 86 f7 0d 01 01 0b 05 20 30 71 31 0b 30 09 06 03 55 04 06 13 02 43 4e 31 18 30 16 06 03 55 04 08 13 0f 4a 69 61 6e 67 58 69 4e 61 6e 43 68 61 6e 67 31 11 30 0f 06 03 55 04 07 13 08 6e 61 6e 63 68 61 6e 67 31 12 30 10 06 03 55 04 0a 0c 09 6a 78 6e 78 5f 62 61 6e 6b 31 12 30 10 06 03 55 04 0b 0c 09 6a 78 6e 78 5f 62 61 6e 6b 31 0d 30 0b 06 03 55 04 03 13 04 6a 78 6e 78 30 20 17 0d 31 38 30 35 31 37 30 33 35 34 35 35 5a 18 0f 32 31 31 38 30 34 32 33 30 33 35 34 35 35 5a 30 5f 31 0b 30 09 06 03 55 04 06 13 02 43 4e 31 10 30 0e 06 03 55 04 08 0c 07 4a 69 61 6e 67 58 69 31 11 30 0f 06 03 55 04 07 0c 08 4e 61 6e 43 68 61 6e 67 31 0d 30 0b 06 03 55 04 0a 0c 04 6a 78 6e 78 31 0d 30 0b 06 03 55 04 0b 0c 04 6a 78 6e 78 31 0d 30 0b 06 03 55 04 03 0c 04 6a 78 6e 78 30 82 01 22 30 0d 06 09 2a 86 48 86 f7 0d 01 01 01 05 20 03 82 01 0f 20 30 82 01 0a 02 82 01 01 20 ea d3 1d 28 98 31 ee ee c3 5b 37 0a 36 62 4d e8 c6 50 cd 9b 74 03 8a fa 39 19 8d 2e ee be dd 09 55 9e 96 38 83 ec eb 4e e0 f2 ed 53 42 39 29 b7 e3 91 65 41 55 50 98 1f c4 56 b6 42 99 0f 0c c5 04 ab 6e e6 0d 55 bb 64 52 b6 d0 7f a4 18 1c a9 72 59 fa ce a5 93 5b 0f d4 98 72 de b3 65 46 b6 04 ce ee 0d 0f 2a 25 b3 cd b1 31 93 b7 87 92 2b e5 b2 8b 60 6e da 41 2d 38 45 5d 41 79 ee 9d b5 f8 04 7d b4 f2 9e df 46 e1 61 49 cc f0 80 45 96 5e 87 2a d1 49 4c 2a dc b1 cd 9f 2b 9c 8c 4b a7 0d 44 07 34 16 af 45 fe f4 e1 94 6c 9c 57 a0 5d 33 89 b5 ed 43 9c fa 98 f7 b3 ff b4 c0 b6 a2 eb 21 de 50 24 66 8f 4b f8 0a 80 17 8c 3a 5b 2a f4 fb 99 4e b7 ad 48 81 6f 77 89 88 1d e2 24 13 36 d6 d9 e7 5b 54 dc 01 e0 78 7f e4 20 d6 2c fe 23 e7 99 39 73 3b bf b8 8b c6 48 f8 45 7a 92 ea 35 02 03 01 20 01 30 0d 06 09 2a 86 48 86 f7 0d 01 01 0b 05 20 03 82 01 01 20 96 cb 04 8a 65 90 cc 98 b0 5b 9f 66 74 cc 6d 63 96 4c 39 78 d5 2f b3 e4 48 7a d5 b9 10 51 eb 42 d0 4a dc b1 2b ca 7d fb 93 5d ce 2a 0d 22 bb 6d 41 5e 54 17 6b e0 b9 28 06 4a 1f e6 9c 63 fc f4 aa 8c 4e f1 7d 18 3c 71 c2 98 20 e3 1a e6 e2 f5 c6 41 23 4e 14 0e 0b 13 e2 f2 dc 2c 4a 5f 03 76 2d c3 b9 43 4b 25 21 1b ee d4 c9 ee 79 93 73 ab 44 40 20 eb 63 4a 52 3d 6d ed c4 94 84 75 5c a0 db 6f 84 16 29 41 11 77 4b c4 1b 6a 52 4d 7f f3 45 f0 61 e4 e0 71 f0 7a f3 66 95 a5 6f c9 ad 4c 7f 9a 5d 15 b0 dd 68 4a 7b 96 71 7a 5a 5a 25 9b 31 ca 23 b6 03 52 5d 6b 45 f9 4b a1 be 81 f3 85 52 c8 78 b5 b2 0a 7c 78 34 bb 25 d6 85 d3 75 89 9d d1 e1 e9 6d 65 9e 3f 8a ed ad a8 59 5c 74 bf 62 85 62 a0 73 7c 16 54 93 84 43 5e 6f 2f f8 f6 c2 a9 6e cb a3 01 86 52 7c 04 66 63 7d c2 b3 25"
-    String hexStrWorkCert = "03 82 03 4b 20 30 82 03 46 30 82 02 2e 02 01 01 30 0d 06 09 2a 86 48 86 f7 0d 01 01 0b 05 20 30 71 31 0b 30 09 06 03 55 04 06 13 02 43 4e 31 18 30 16 06 03 55 04 08 13 0f 4a 69 61 6e 67 58 69 4e 61 6e 43 68 61 6e 67 31 11 30 0f 06 03 55 04 07 13 08 6e 61 6e 63 68 61 6e 67 31 12 30 10 06 03 55 04 0a 0c 09 6a 78 6e 78 5f 62 61 6e 6b 31 12 30 10 06 03 55 04 0b 0c 09 6a 78 6e 78 5f 62 61 6e 6b 31 0d 30 0b 06 03 55 04 03 13 04 6a 78 6e 78 30 20 17 0d 31 38 30 35 31 37 30 33 35 34 35 35 5a 18 0f 32 31 31 38 30 34 32 33 30 33 35 34 35 35 5a 30 5f 31 0b 30 09 06 03 55 04 06 13 02 43 4e 31 10 30 0e 06 03 55 04 08 0c 07 4a 69 61 6e 67 58 69 31 11 30 0f 06 03 55 04 07 0c 08 4e 61 6e 43 68 61 6e 67 31 0d 30 0b 06 03 55 04 0a 0c 04 6a 78 6e 78 31 0d 30 0b 06 03 55 04 0b 0c 04 6a 78 6e 78 31 0d 30 0b 06 03 55 04 03 0c 04 6a 78 6e 78 30 82 01 22 30 0d 06 09 2a 86 48 86 f7 0d 01 01 01 05 20 03 82 01 0f 20 30 82 01 0a 02 82 01 01 20 ea d3 1d 28 98 31 ee ee c3 5b 37 0a 36 62 4d e8 c6 50 cd 9b 74 03 8a fa 39 19 8d 2e ee be dd 09 55 9e 96 38 83 ec eb 4e e0 f2 ed 53 42 39 29 b7 e3 91 65 41 55 50 98 1f c4 56 b6 42 99 0f 0c c5 04 ab 6e e6 0d 55 bb 64 52 b6 d0 7f a4 18 1c a9 72 59 fa ce a5 93 5b 0f d4 98 72 de b3 65 46 b6 04 ce ee 0d 0f 2a 25 b3 cd b1 31 93 b7 87 92 2b e5 b2 8b 60 6e da 41 2d 38 45 5d 41 79 ee 9d b5 f8 04 7d b4 f2 9e df 46 e1 61 49 cc f0 80 45 96 5e 87 2a d1 49 4c 2a dc b1 cd 9f 2b 9c 8c 4b a7 0d 44 07 34 16 af 45 fe f4 e1 94 6c 9c 57 a0 5d 33 89 b5 ed 43 9c fa 98 f7 b3 ff b4 c0 b6 a2 eb 21 de 50 24 66 8f 4b f8 0a 80 17 8c 3a 5b 2a f4 fb 99 4e b7 ad 48 81 6f 77 89 88 1d e2 24 13 36 d6 d9 e7 5b 54 dc 01 e0 78 7f e4 20 d6 2c fe 23 e7 99 39 73 3b bf b8 8b c6 48 f8 45 7a 92 ea 35 02 03 01 20 01 30 0d 06 09 2a 86 48 86 f7 0d 01 01 0b 05 20 03 82 01 01 20 96 cb 04 8a 65 90 cc 98 b0 5b 9f 66 74 cc 6d 63 96 4c 39 78 d5 2f b3 e4 48 7a d5 b9 10 51 eb 42 d0 4a dc b1 2b ca 7d fb 93 5d ce 2a 0d 22 bb 6d 41 5e 54 17 6b e0 b9 28 06 4a 1f e6 9c 63 fc f4 aa 8c 4e f1 7d 18 3c 71 c2 98 20 e3 1a e6 e2 f5 c6 41 23 4e 14 0e 0b 13 e2 f2 dc 2c 4a 5f 03 76 2d c3 b9 43 4b 25 21 1b ee d4 c9 ee 79 93 73 ab 44 40 20 eb 63 4a 52 3d 6d ed c4 94 84 75 5c a0 db 6f 84 16 29 41 11 77 4b c4 1b 6a 52 4d 7f f3 45 f0 61 e4 e0 71 f0 7a f3 66 95 a5 6f c9 ad 4c 7f 9a 5d 15 b0 dd 68 4a 7b 96 71 7a 5a 5a 25 9b 31 ca 23 b6 03 52 5d 6b 45 f9 4b a1 be 81 f3 85 52 c8 78 b5 b2 0a 7c 78 34 bb 25 d6 85 d3 75 89 9d d1 e1 e9 6d 65 9e 3f 8a ed ad a8 59 5c 74 bf 62 85 62 a0 73 7c 16 54 93 84 43 5e 6f 2f f8 f6 c2 a9 6e cb a3 01 86 52 7c 04 66 63 7d c2 b3 25"
-            .replace(" ", "");
-
-    public void test_6(View v) {
-//        byte[] bytes = ConvertUtil.hexStringToBytes(hexStrWorkCert);
-//        LogUtil.e(ConvertUtil.bytesToHexString(bytes));
-        // 字节转换没问题
-
-        //byte[] bytes = new byte[257];
-
-//        X509Certificate work_cert = null;
-//        CertificateFactory certFactory;
-//        try {
-//            certFactory = CertificateFactory.getInstance("X.509"); // 获取根证书
-//
-//            InputStream input = new ByteArrayInputStream(ConvertUtil.hexStringToBytes(hexStrWorkCert));
-//
-//            //从工作公钥证书的流中提取出工作公钥
-//            work_cert = (X509Certificate) certFactory.generateCertificate(input);
-//
-//            showMessage("ok");
-//        } catch (CertificateException e) {
-//            throw new RuntimeException("Failed to obtain X.509 CertificateFactory", e);
-//        }
-    }
-
     static byte[] endByteV2 = new byte[]{0x41, 0x50, 0x4B, 0x20, 0x53, 0x69, 0x67, 0x20, 0x42, 0x6C, 0x6F, 0x63, 0x6B, 0x20, 0x34, 0x32};
     static byte[] beginByte = new byte[]{0x13, 0x11, 0x41, 0x43, 0x51, 0x55, 0x49, 0x52, 0x45, 0x52, 0x2d, 0x53, 0x47, 0x4e, 0x2d, 0x49, 0x4e, 0x46, 0x4f};
+
+    // 匹配一段字节
     public void test_7(View v) {
         if (apkPath.equals("")) {
             Toast.makeText(this, "apk文件不存在", Toast.LENGTH_SHORT).show();
@@ -351,10 +381,10 @@ public class SignerVerifyActivity extends BaseTestActivity {
             byte[] buffer = new byte[lenght];
             in.read(buffer);
 
-            int pos = SignerVerifyUtils.matchBytes(buffer,endByteV2);
+            int pos = SignerVerifyUtils.matchBytes(buffer, endByteV2);
             LogUtil.e("pos:" + pos);
 
-            int pos2 = SignerVerifyUtils.matchBytes(buffer,beginByte);
+            int pos2 = SignerVerifyUtils.matchBytes(buffer, beginByte);
             LogUtil.e("pos2:" + pos2);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -364,7 +394,8 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     }
 
-    public void test_8(View v){
+    // 匹配一段字节，并且可以选取第n次的匹配
+    public void test_8(View v) {
         if (apkPath.equals("")) {
             Toast.makeText(this, "apk文件不存在", Toast.LENGTH_SHORT).show();
             return;
@@ -378,10 +409,10 @@ public class SignerVerifyActivity extends BaseTestActivity {
             byte[] buffer = new byte[lenght];
             in.read(buffer);
 
-            int pos = SignerVerifyUtils.matchBytesBySelect(buffer,ConvertUtil.hexStringToBytes("810C000000000000"),1);
+            int pos = SignerVerifyUtils.matchBytesBySelect(buffer, ConvertUtil.hexStringToBytes("810C000000000000"), 1);
             LogUtil.e("pos: " + pos);
 
-            int pos2 = SignerVerifyUtils.matchBytesBySelect(buffer,ConvertUtil.hexStringToBytes("810C000000000000"),2);
+            int pos2 = SignerVerifyUtils.matchBytesBySelect(buffer, ConvertUtil.hexStringToBytes("810C000000000000"), 2);
             LogUtil.e("pos2: " + pos2);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -392,6 +423,228 @@ public class SignerVerifyActivity extends BaseTestActivity {
             LogUtil.e("Exception: " + e.toString());
         }
     }
+
+    // 静态的工作证书，偏移5个字节 : 03 82 03 4B 00
+    String hex = "308203463082022E020101300D06092A864886F70D01010B05003071310B300906035504061302434E311830160603550408130F4A69616E6758694E616E4368616E673111300F060355040713086E616E6368616E6731123010060355040A0C096A786E785F62616E6B31123010060355040B0C096A786E785F62616E6B310D300B060355040313046A786E783020170D3138303531373033353435355A180F32313138303432333033353435355A305F310B300906035504061302434E3110300E06035504080C074A69616E6758693111300F06035504070C084E616E4368616E67310D300B060355040A0C046A786E78310D300B060355040B0C046A786E78310D300B06035504030C046A786E7830820122300D06092A864886F70D01010105000382010F003082010A0282010100EAD31D289831EEEEC35B370A36624DE8C650CD9B74038AFA39198D2EEEBEDD09559E963883ECEB4EE0F2ED53423929B7E39165415550981FC456B642990F0CC504AB6EE60D55BB6452B6D07FA4181CA97259FACEA5935B0FD49872DEB36546B604CEEE0D0F2A25B3CDB13193B787922BE5B28B606EDA412D38455D4179EE9DB5F8047DB4F29EDF46E16149CCF08045965E872AD1494C2ADCB1CD9F2B9C8C4BA70D44073416AF45FEF4E1946C9C57A05D3389B5ED439CFA98F7B3FFB4C0B6A2EB21DE5024668F4BF80A80178C3A5B2AF4FB994EB7AD48816F7789881DE2241336D6D9E75B54DC01E0787FE420D62CFE23E79939733BBFB88BC648F8457A92EA350203010001300D06092A864886F70D01010B0500038201010096CB048A6590CC98B05B9F6674CC6D63964C3978D52FB3E4487AD5B91051EB42D04ADCB12BCA7DFB935DCE2A0D22BB6D415E54176BE0B928064A1FE69C63FCF4AA8C4EF17D183C71C29820E31AE6E2F5C641234E140E0B13E2F2DC2C4A5F03762DC3B9434B25211BEED4C9EE799373AB444000EB634A523D6DEDC49484755CA0DB6F8416294111774BC41B6A524D7FF345F061E4E071F07AF36695A56FC9AD4C7F9A5D15B0DD684A7B96717A5A5A259B31CA23B603525D6B45F94BA1BE81F38552C878B5B20A7C7834BB25D685D375899DD1E1E96D659E3F8AEDADA8595C74BF628562A0737C16549384435E6F2FF8F6C2A96ECBA30186527C0466637DC2B325";
+
+    // 静态的工作证书验证ok
+    public void test_6(View v) {
+        //byte[] bytes = ConvertUtil.hexStringToBytes(hexStrWorkCert);
+        //LogUtil.e(ConvertUtil.bytesToHexString(bytes));
+        // 字节转换没问题
+
+        X509Certificate work_cert = null;
+        X509Certificate root_cert = null;
+        CertificateFactory certFactory;
+        try {
+            certFactory = CertificateFactory.getInstance("X.509"); // 获取根证书
+
+            InputStream input = new ByteArrayInputStream(ConvertUtil.hexStringToBytes(hex));
+
+            //从工作公钥证书的流中提取出工作公钥
+            work_cert = (X509Certificate) certFactory.generateCertificate(input);
+            root_cert = get_RootCert_fromFile();
+
+            work_cert.verify(root_cert.getPublicKey());// 使用 终端保存的根证书 验证 工作证书 的合法性
+            work_cert.checkValidity();
+
+            // 这样验证不行
+//            root_cert.verify(work_cert.getPublicKey());
+//            root_cert.checkValidity();
+
+            showMessage("ok");
+            LogUtil.e("verify ok");
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.e(e.toString());
+        }
+    }
+
+    static String rootCert = "jxnx_root_smartpos.x509.pem";
+
+    private X509Certificate get_RootCert_fromFile()
+            throws IOException, GeneralSecurityException {
+
+        InputStream in = getAssets().open(rootCert);
+        try {
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            return (X509Certificate) cf.generateCertificate(in);
+        } finally {
+            in.close();
+        }
+    }
+
+
+    // 倒序去读,匹配出证书内容,并提取验证ok
+    public void test_9(View v) {
+        //
+        if (apkPath.equals("")) {
+            Toast.makeText(this, "apk文件不存在", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        InputStream in = null;
+
+        try {
+            in = this.openFileInput(SmartPhonePos_apk);
+            int lenght = in.available();
+            byte[] buffer = new byte[lenght];
+            in.read(buffer);
+
+            // 以 0382034B 片段匹配，临时的
+            int certOffSet = SignerVerifyUtils.matchBytesBySelect(buffer, ConvertUtil.hexStringToBytes("0382034B"), 1);
+            LogUtil.e("certOffSet: " + certOffSet);
+
+            int certSizeOffset = certOffSet + 2;
+
+            // 读取apk 到 RandomAccessFile
+            RandomAccessFile raf = new RandomAccessFile(getFilesDir().getPath() + File.separator + SmartPhonePos_apk, "r");
+
+            //先读取证书的大小 2个字节
+            ByteBuffer certSizeBytes = ByteBuffer.allocate(4);
+            certSizeBytes.put((byte) 0x00); // 不影响 certSizeBytes.arrayOffset()
+            certSizeBytes.put((byte) 0x00);
+            LogUtil.e("certSizeBytes Offset:" + certSizeBytes.arrayOffset());
+            raf.seek(certSizeOffset);
+            raf.readFully(certSizeBytes.array(), 2, 2);
+            LogUtil.e("certSizeBytes:" + ConvertUtil.bytesToHexString(certSizeBytes.array()));
+            certSizeBytes.rewind();//倒带
+            int certSize = certSizeBytes.getInt();
+            LogUtil.e("certSize:" + certSize);
+
+
+            //再读取证书的字节
+            ByteBuffer certBytes = ByteBuffer.allocate(certSize);
+            //certBytes.order(ByteOrder.LITTLE_ENDIAN); // 设置为 小端排序
+            raf.seek(certSizeOffset + 2);
+            raf.readFully(certBytes.array()/*获取底层byte[]*/, certBytes.arrayOffset()/*0*/, certBytes.capacity());
+            LogUtil.e("certBytes:" + ConvertUtil.bytesToHexString(certBytes.array()));
+
+
+            verifyWorkCert(certBytes.array(),1,certSizeBytes.array().length - 1);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.e("Exception: " + e.toString());
+        }
+    }
+
+    public void verifyWorkCert(byte[] bytes,int offset,int len) {
+        byte[] workCertBytes = bytes;
+
+        X509Certificate work_cert = null;
+        X509Certificate root_cert = null;
+        CertificateFactory certFactory;
+        try {
+            certFactory = CertificateFactory.getInstance("X.509"); // 获取根证书
+
+            InputStream input = new ByteArrayInputStream(workCertBytes, offset, len);
+
+            //从工作公钥证书的流中提取出工作公钥
+            work_cert = (X509Certificate) certFactory.generateCertificate(input);
+            root_cert = get_RootCert_fromFile();
+
+            work_cert.verify(root_cert.getPublicKey());// 使用 终端保存的根证书 验证 工作证书 的合法性
+            work_cert.checkValidity();
+
+            // 这样验证不行
+//            root_cert.verify(work_cert.getPublicKey());
+//            root_cert.checkValidity();
+
+            showMessage("verify ok");
+            LogUtil.e("verify ok");
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.e(e.toString());
+        }
+
+    }
+
+
+    //农信的签名ID：78 67 64 32 （以此为开头）
+    static byte[] jxnxID = new byte[]{0x78, 0x67, 0x64, 0x32};
+
+    public void test_10(View v) {
+        byte[] apkBytes = getByteFromFile(SmartPhonePos_apk);
+
+        try {
+            // 计算偏移量
+            int jxnxIDOffSet = SignerVerifyUtils.matchBytesBySelect(apkBytes, jxnxID, 1);
+            int magicOffSet = SignerVerifyUtils.matchBytesBySelect(apkBytes, endByteV2, 1);
+
+            LogUtil.e("jxnxIDOffSet:" + jxnxIDOffSet);
+            LogUtil.e("magicOffSet:" + magicOffSet);
+
+            // 取 江西农信的签名块ID之后 到 尾块长度之前 的字节
+            // 即 ID-value 块
+            int begin = jxnxIDOffSet + 4;/*开始下标移动到农信的签名块ID的结尾*/
+            int len = (magicOffSet - 8) - begin;
+            byte[] jxnxBytes = getByteFromFile(SmartPhonePos_apk, begin, len);
+            LogUtil.e("jxnjSigBlocBytes = " + ConvertUtil.bytesToHexString(jxnxBytes));
+            LogUtil.e("jxnjSigBlocBytes.size = " + jxnxBytes.length);
+
+            // ID-value块 转 ASN1流
+            InputStream in = new ByteArrayInputStream(jxnxBytes);
+            ASN1InputStream asn1InputStream = new ASN1InputStream(in);
+
+            //
+            ASN1Object asn1Primitive = null;
+
+            byte[] firstPartBytes = null;
+            byte[] orighash = new byte[32];
+            byte[] sigData = null;
+            byte[] cert = null;
+
+            while ((asn1Primitive = asn1InputStream.readObject()) != null) {
+                if (asn1Primitive instanceof ASN1Sequence) {
+                    ASN1Sequence asn1Sequence = (ASN1Sequence) asn1Primitive;
+                    ASN1SequenceParser asn1SequenceParser = asn1Sequence.parser();
+                    ASN1Encodable asn1Encodable = null;
+                    int n = 0;
+                    while ((asn1Encodable = asn1SequenceParser.readObject()) != null) {
+                        LogUtil.e("-------------parse result -------------- n" + n);
+                        asn1Primitive = asn1Encodable.toASN1Primitive();
+                        LogUtil.e("asn1String: " + ConvertUtil.bytesToHexString(asn1Primitive.getEncoded()));
+                        if(n == 0){
+                            firstPartBytes = asn1Primitive.getEncoded();
+                        }else if(n == 1){
+                            sigData = asn1Primitive.getEncoded();
+                        }else if(n == 2){
+                            cert = asn1Primitive.getEncoded();
+                        }
+                        n++;
+                    }
+                }
+            }
+            // 把原始apk的hash值
+            byte[] hashId = new byte[]{0x02,0x20};
+            int hashOffset = SignerVerifyUtils.matchBytesBySelect(firstPartBytes,hashId,1);
+            // 拷贝数组
+            System.arraycopy(firstPartBytes,hashOffset + 2 ,orighash,0,32);
+
+            LogUtil.e("orighash = " + ConvertUtil.bytesToHexString(orighash));
+
+            LogUtil.e("sigData = " + ConvertUtil.bytesToHexString(sigData));
+
+            LogUtil.e("cert = " + ConvertUtil.bytesToHexString(cert));
+
+            // 第一步 验证书
+            verifyWorkCert(cert,5,cert.length - 5);
+
+            // 第二步
+
+            // 第三步
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
 }
 

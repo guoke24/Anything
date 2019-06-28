@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -15,13 +16,16 @@ public class AssetsUtils {
 
     /**
      * 把 assets 目录的 fileName文件 写入到 /data/data/{包名}/files
+     * @param fileName
+     * @param context
+     * @return
      */
     public static String fileOpt(String fileName, Context context){
 
         int l = assetsFile2dataFile(fileName,context);
-        Log.e(TAG,"fileOpt len = " + l);
+        LogUtil.e("fileOpt len = " + l);
 
-        Log.e(TAG,"getFilesDir() = " + context.getFilesDir() );
+        LogUtil.e("getFilesDir() = " + context.getFilesDir() );
         // 输出：/data/user/0/com.anything.guohao.anything/files
         // 等价与 /data/data/com.anything.guohao.anything/files
 
@@ -36,13 +40,19 @@ public class AssetsUtils {
     }
 
 
-    // 向指定的文件中写入指定的数据
-    // 创建的文件保存在/data/data/<package name>/files目录
-    public static int assetsFile2dataFile(String filename, Context context){
 
+    /**
+     * 向指定的文件中写入指定的数据
+     * 创建的文件保存在/data/data/<package name>/files目录
+     * @param filename
+     * @param context
+     * @return
+     */
+    private static int assetsFile2dataFile(String filename, Context context){
+        InputStream in = null;
         try {
             //读取 assets 目录下的文件
-            InputStream in = context.getAssets().open(filename);
+            in = context.getAssets().open(filename);
 
 
             FileOutputStream fos = context.openFileOutput(filename, MODE_PRIVATE);//获得FileOutputStream
@@ -57,18 +67,33 @@ public class AssetsUtils {
         } catch (Exception e) {
             e.printStackTrace();
             Log.e(TAG,"assetsFile2dataFile Exception = " + e.toString());
+        }finally {
+            if(in != null){
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return -1;
     }
 
-    //打开指定文件，读取其数据，返回字符串对象
-    public static int readFileData(String fileName, Context context){
+
+
+    /**
+     * 打开指定文件，读取其数据，返回字符串对象
+     * @param fileName
+     * @param context
+     * @return
+     */
+    private static int readFileData(String fileName, Context context){
 
         int len = -1;
-
+        FileInputStream fis = null;
         try{
 
-            FileInputStream fis = context.openFileInput(fileName);
+            fis = context.openFileInput(fileName);
 
             //获取文件长度
             int lenght = fis.available();
@@ -84,9 +109,28 @@ public class AssetsUtils {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Log.e(TAG,"readFileData Exception = " + e.toString());
+            LogUtil.e("readFileData Exception = " + e.toString());
+        }finally {
+            if(fis != null){
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         return  len;
+    }
+
+    /**
+     * 从 assets 打开文件的流并返回
+     * @param filename
+     * @param context
+     * @return
+     * @throws IOException
+     */
+    public static InputStream getInputStream(String filename, Context context) throws IOException {
+        return context.getAssets().open(filename);
     }
 }
