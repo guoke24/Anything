@@ -1,7 +1,14 @@
 package com.anything.guohao.anything.FileOptUtil;
 
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.content.FileProvider;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -39,6 +46,22 @@ import android.util.Pair;
  * rws：以读取、写入方式打开指定文件。相对于rw模式，还要求对文件的内容或元数据的每个更新都同步写入到底层存储设备，默认情形下(rw模式下),是使用buffer的,只有cache满的或者使用RandomAccessFile.close()关闭流的时候儿才真正的写到文件
  * rwd：与rws类似，只是仅对文件的内容同步更新到磁盘，而不修改文件的元数据
  */
+
+/**
+ * 代码中获取到的手机路径：
+ *
+ * getDataDirectory = /data
+ * getRootDirectory = /system
+ * getDownloadCacheDirectory = /data/cache
+ * getExternalStorageDirectory = /storage/emulated/0
+ * /storage/emulated/0 对应手机文件管理器中的 sdacrd 的路径， 一些常见的文件夹 /sdcard/Music /sdcard/Pictures /sdcard/Download
+ * 如果要在代码中 获取文件管理器 的/sdcard/Download 的路径，代码这样写：
+ * Environment.getExternalStorageDirectory().getPath() + "/Download"
+ *
+ * data/data/{包名}/files 这个路径的第一个data，是跟 sdcard 平级的
+ *
+ */
+
 public class FileOptActivity extends BaseTestActivity {
 
     String SmartPhonePos_apk = "SmartPhonePos_new_20190612_2_0_3_release.apk";
@@ -277,9 +300,111 @@ public class FileOptActivity extends BaseTestActivity {
     }
 
 
+    // 安装 jxnx 测试ok
     public void test_7(View v){
+        AssetsUtils.fileOpt(SmartPhonePos_apk,this);
+        install(getApplication(),getFilesDir().getPath() +"/" +SmartPhonePos_apk);
+        //install(getApplication(),s);
+
+        LogUtil.e("getExternalStorageDirectory = " + Environment.getExternalStorageDirectory().getPath());//这个会取到sdcard的路径
+        LogUtil.e("getDataDirectory = " +Environment.getDataDirectory().getPath());
+        LogUtil.e("getRootDirectory = " +Environment.getRootDirectory().getPath());
+        LogUtil.e("getDownloadCacheDirectory = " +Environment.getDownloadCacheDirectory().getPath());
+        //LogUtil.e(Environment.getExternalStoragePublicDirectory().getPath());
+
 
     }
 
+    String TAG = "guohao";
+
+    // 等于 文件管理器的 /sdcard/Download/weixin_1400.apk
+    String s = Environment.getExternalStorageDirectory().getPath() + "/Download/weixin_1400.apk";
+
+    public static boolean install(Context con, String filePath) {
+        try {
+            if(TextUtils.isEmpty(filePath))
+                return false;
+            File file = new File(filePath);
+            if(!file.exists()){
+                Toast.makeText(con, "不存在", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);//增加读写权限
+            }
+            intent.setDataAndType(getPathUri(con, filePath), "application/vnd.android.package-archive");
+            con.startActivity(intent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(con, "安装失败，请重新下载", Toast.LENGTH_LONG).show();
+            return false;
+        } catch (Error error) {
+            error.printStackTrace();
+            Toast.makeText(con, "安装失败，请重新下载", Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
+
+    // /sdcard/Download/translator_union7.apk
+    public static Uri getPathUri(Context context, String filePath) {
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            String packageName = context.getPackageName();
+            uri = FileProvider.getUriForFile(context, packageName + ".fileProvider", new File(filePath));
+        } else {
+            uri = Uri.fromFile(new File(filePath));
+        }
+        return uri;
+    }
+
+    static byte[] endByteV2 = new byte[]{0x41, 0x50, 0x4B, 0x20, 0x53, 0x69, 0x67, 0x20, 0x42, 0x6C, 0x6F, 0x63, 0x6B, 0x20, 0x34, 0x32};
+    // 去处签名块
+    public void test_8(View view){
+        String apkPath = AssetsUtils.fileOpt(SmartPhonePos_apk,this);
+
+
+
+        try {
+            byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
+            // 计算偏移量
+            int magicOffSet = SignerVerifyUtils.matchBytesBySelect(apkBytes, endByteV2, 1);
+            int sizeInFooter = magicOffSet - 8;
+
+            ByteBuffer sizeInFooterBuffer = getByteBufferFormFile(apkPath,sizeInFooter,8);
+            LogUtil.e("sizeInFooterBytes = " + ConvertUtil.bytesToHexString(sizeInFooterBuffer.array()));
+            LogUtil.e("sizeInFooter = " + sizeInFooterBuffer.getInt());
+
+            byte[] bigSizeInFooter = changeBytes(sizeInFooterBuffer.array());
+            LogUtil.e("bigSizeInFooter = " + ConvertUtil.bytesToHexString(bigSizeInFooter));
+            ByteBuffer sizeInFooterBufferBig = ByteBuffer.allocate(8);
+            sizeInFooterBufferBig.put(bigSizeInFooter);
+            sizeInFooterBufferBig.rewind();
+            LogUtil.e("getInt = " + sizeInFooterBufferBig.getInt());
+            int sizeOfSigBlock = sizeInFooterBufferBig.getInt();
+            LogUtil.e("getInt = " + sizeOfSigBlock);//3201
+
+            int sizeInHead = magicOffSet + 16 - sizeOfSigBlock - 8;
+            ByteBuffer sizeInHeadBuffer = getByteBufferFormFile(apkPath,sizeInHead,8);
+            LogUtil.e("sizeInHeadBuffer = " + ConvertUtil.bytesToHexString(sizeInHeadBuffer.array()));
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private ByteBuffer getByteBufferFormFile(String fileName,int offset ,int len) throws IOException {
+        RandomAccessFile randomAccessFile = new RandomAccessFile(fileName,"r");
+        ByteBuffer byteBuffer = ByteBuffer.allocate(len);
+        randomAccessFile.seek(offset);
+        randomAccessFile.readFully(byteBuffer.array(),0,len);
+        return byteBuffer;
+    }
 
 }

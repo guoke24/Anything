@@ -649,12 +649,23 @@ public class SignerVerifyActivity extends BaseTestActivity {
             PublicKey publicKey = verifyWorkCert(cert,5,cert.length - 5);
 
             // 第二步 验签名
-            byte[] hash = SignerVerifyUtils.calHash(firstPartBytes,4,firstPartBytes.length-4);
+            byte[] hash = SignerVerifyUtils.calHash(firstPartBytes,0,firstPartBytes.length);
+            LogUtil.e("hash = " + ConvertUtil.bytesToHexString(hash));
+            LogUtil.e("hash len = " + hash.length);
+
 
             // 公钥：publicKey
             // 签名数据：sigData
-            // 原数据：hash
-            boolean res = RSAUtils.verify(hash,publicKey,sigData);
+            // 原数据：hash 32
+
+            byte[] hash32 ;
+            if(hash.length > 32){
+                hash32 = new byte[32];
+                System.arraycopy(hash,0 ,hash32,0,32);
+            }else{
+                hash32 = hash;
+            }
+            boolean res = RSAUtils.verify(hash32,publicKey,sigData);
             LogUtil.e("res = " + res);
 
             // 第三步

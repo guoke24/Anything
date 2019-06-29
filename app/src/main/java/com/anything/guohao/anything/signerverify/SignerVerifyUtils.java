@@ -188,7 +188,7 @@ public class SignerVerifyUtils {
 
         MessageDigest messagedigest;
         try {
-            messagedigest = MessageDigest.getInstance("SHA1");
+            messagedigest = MessageDigest.getInstance("SHA256");
 
             messagedigest.update(src,offset,len);
 
