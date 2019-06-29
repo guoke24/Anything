@@ -17,11 +17,9 @@ import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Object;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1SequenceParser;
-import org.bouncycastle.asn1.ASN1String;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +27,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.GeneralSecurityException;
-import java.security.cert.CertificateException;
+import java.security.PublicKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
@@ -60,7 +58,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
     String apkPath = "";
 
     // 获取byte，从应用的本地数据路径下的文件中
-    private byte[] getByteFromFile(String filename) {
+    private byte[] getByteFromAssetsAndCopyToData(String filename) {
         showMessage("加载文件：" + filename);
         // 把 assets 的 xxx.apk，copy 到 context.getFilesDir() 的路径下
         // 即 /data/user/0/com.anything.guohao.anything/files
@@ -534,7 +532,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
         }
     }
 
-    public void verifyWorkCert(byte[] bytes,int offset,int len) {
+    public PublicKey verifyWorkCert(byte[] bytes, int offset, int len) {
         byte[] workCertBytes = bytes;
 
         X509Certificate work_cert = null;
@@ -564,11 +562,14 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
             showMessage("verify ok");
             LogUtil.e("verify ok");
+
+            return work_cert.getPublicKey();
         } catch (Exception e) {
             e.printStackTrace();
             LogUtil.e(e.toString());
         }
 
+        return null;
     }
 
 
@@ -577,7 +578,11 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     // 提取出 jxnx签名块的 三部分：主体，签名数据，证书；且证书验签成功
     public void test_10(View v) {
-        byte[] apkBytes = getByteFromFile(SmartPhonePos_apk);
+        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
+
+        if(apkBytes == null){
+            return;
+        }
 
         try {
             // 计算偏移量
@@ -641,12 +646,16 @@ public class SignerVerifyActivity extends BaseTestActivity {
             LogUtil.e("cert = " + ConvertUtil.bytesToHexString(cert));
 
             // 第一步 验证书
-            verifyWorkCert(cert,5,cert.length - 5);
-
-
+            PublicKey publicKey = verifyWorkCert(cert,5,cert.length - 5);
 
             // 第二步 验签名
+            byte[] hash = SignerVerifyUtils.calHash(firstPartBytes,4,firstPartBytes.length-4);
 
+            // 公钥：publicKey
+            // 签名数据：sigData
+            // 原数据：hash
+            boolean res = RSAUtils.verify(hash,publicKey,sigData);
+            LogUtil.e("res = " + res);
 
             // 第三步
 

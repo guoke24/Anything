@@ -1,9 +1,17 @@
 package com.anything.guohao.anything.signerverify;
 
+import android.content.Context;
 import android.util.Log;
 
+import com.anything.guohao.anything.AssetsUtils;
 import com.anything.guohao.anything.ConvertUtil;
 import com.anything.guohao.anything.LogUtil;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class SignerVerifyUtils {
     // 匹配因子
@@ -171,5 +179,24 @@ public class SignerVerifyUtils {
                 break;
             }
         }
+    }
+
+    // hash
+    public static byte[] calHash(byte[] src,int offset,int len) throws IOException
+    {
+
+
+        MessageDigest messagedigest;
+        try {
+            messagedigest = MessageDigest.getInstance("SHA1");
+
+            messagedigest.update(src,offset,len);
+
+            return (messagedigest.digest());
+
+        } catch (Exception e) {
+            LogUtil.e(e.toString());
+        }
+        return null;
     }
 }

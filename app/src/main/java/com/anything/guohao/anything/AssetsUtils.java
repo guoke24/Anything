@@ -2,8 +2,10 @@ package com.anything.guohao.anything;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -132,5 +134,46 @@ public class AssetsUtils {
      */
     public static InputStream getInputStream(String filename, Context context) throws IOException {
         return context.getAssets().open(filename);
+    }
+
+    // 获取byte，从应用的本地数据路径下的文件中
+    public static byte[] getByteFromAssetsAndCopyToData(String filename, Context context) {
+        //showMessage("加载文件：" + filename);
+        // 把 assets 的 xxx.apk，copy 到 context.getFilesDir() 的路径下
+        // 即 /data/user/0/com.anything.guohao.anything/files
+        String path = AssetsUtils.fileOpt(filename, context);
+
+        if (!path.equals("")) {
+            Toast.makeText(context, "加载完成", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "加载失败", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+
+
+        InputStream in = null;
+        byte[] buffer;
+
+        try {
+            in = context.openFileInput(filename);
+            int lenght = in.available();
+            buffer = new byte[lenght];
+            in.read(buffer);
+            return buffer;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return null;
     }
 }
