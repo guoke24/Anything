@@ -365,76 +365,78 @@ public class FileOptActivity extends BaseTestActivity {
     public void test_8(View view){
         String apkPath = AssetsUtils.fileOpt(SmartPhonePos_apk,this);
 
-
-
         try {
             byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
             // 计算偏移量
-            int magicOffSet = SignerVerifyUtils.matchBytesBySelect(apkBytes, endByteV2, 1);
+            int magicOffSet = BytesOptUtil.matchBytesBySelect(apkBytes, endByteV2, 1);
             int sizeInFooter = magicOffSet - 8;
 
-            ByteBuffer sizeInFooterBuffer = getByteBufferFormFile(apkPath,sizeInFooter,8);
+            // 尾长度
+            ByteBuffer sizeInFooterBuffer = BytesOptUtil.getByteBufferFormFile(apkPath,sizeInFooter,8);
             LogUtil.e("sizeInFooterBytes = " + ConvertUtil.bytesToHexString(sizeInFooterBuffer.array()));
-            LogUtil.e("sizeInFooter = " + sizeInFooterBuffer.getInt());
+            //LogUtil.e("sizeInFooter = " + sizeInFooterBuffer.getInt());
 
+            // begin 转大端序，读出后四个字节的int数值，即整签名块的长度
             byte[] bigSizeInFooter = changeBytes(sizeInFooterBuffer.array());
             LogUtil.e("bigSizeInFooter = " + ConvertUtil.bytesToHexString(bigSizeInFooter));
-            ByteBuffer sizeInFooterBufferBig = ByteBuffer.allocate(8);
-            sizeInFooterBufferBig.put(bigSizeInFooter);
-            sizeInFooterBufferBig.rewind();
-            LogUtil.e("getInt = " + sizeInFooterBufferBig.getInt());
-            int sizeOfSigBlock = sizeInFooterBufferBig.getInt();
+            ByteBuffer sizeInFooterBufferBig = BytesOptUtil.byteToBuffer(bigSizeInFooter);
+            int sizeOfSigBlock = sizeInFooterBufferBig.getInt(4);
             LogUtil.e("getInt = " + sizeOfSigBlock);//3201
+            // end 转大端序，读出后四个字节的int数值，即整签名块的长度
 
+            // 头长度的偏移量
             int sizeInHead = magicOffSet + 16 - sizeOfSigBlock - 8;
-            ByteBuffer sizeInHeadBuffer = getByteBufferFormFile(apkPath,sizeInHead,8);
+            ByteBuffer sizeInHeadBuffer = BytesOptUtil.getByteBufferFormFile(apkPath,sizeInHead,8);
             LogUtil.e("sizeInHeadBuffer = " + ConvertUtil.bytesToHexString(sizeInHeadBuffer.array()));
 
-            // 读签名块前的部分
-            int firstPartSize = sizeInHead;
-            ByteBuffer firstPartBuffer = getByteBufferFormFile(apkPath,0,firstPartSize);
 
-            // 输出头尾验证 签名块前的部分
+            // begin 获取 签名块之前的部分
+            int firstPartSize = sizeInHead; // 签名块之前的部分的大小
+            ByteBuffer firstPartBuffer = BytesOptUtil.getByteBufferFormFile(apkPath,0,firstPartSize);
+            // end 获取 签名块之前的部分
+            // begin 头验证 签名块前的部分
             LogUtil.e("签名块前的部分size = " + firstPartBuffer.array().length);
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(firstPartBuffer.get()));
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(firstPartBuffer.get()));
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(firstPartBuffer.get()));
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(firstPartBuffer.get()));
+            // 输出前4个字节
+            LogUtil.e("输出前4个字节");
+            byte[] Bytes4InHead = BytesOptUtil.getSubBytes(firstPartBuffer.array(),0,4);
+            LogUtil.e(ConvertUtil.bytesToHexString(Bytes4InHead));
             LogUtil.e("=====");
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(firstPartBuffer.get(firstPartBuffer.array().length - 4)));
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(firstPartBuffer.get(firstPartBuffer.array().length - 3)));
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(firstPartBuffer.get(firstPartBuffer.array().length - 2)));
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(firstPartBuffer.get(firstPartBuffer.array().length - 1)));
+            // 输出末尾4个字节
+            LogUtil.e("输出末尾4个字节");
+            byte[] Bytes4InFoot = BytesOptUtil.getSubBytes(firstPartBuffer.array(),firstPartBuffer.array().length - 4,4);
+            LogUtil.e(ConvertUtil.bytesToHexString(Bytes4InFoot));
+            // end 头验证 签名块前的部分
 
-            // 读签名块后的部分
-            int secondPartOfApkOffSet = magicOffSet + 16;
+            // begin 获取 签名块之后的部分
+            int secondPartOfApkOffSet = magicOffSet + 16; // 签名块之后的部分的大小
             int secondPartSize = apkBytes.length - secondPartOfApkOffSet  ;
-            ByteBuffer secondPartBuffer = getByteBufferFormFile(apkPath,secondPartOfApkOffSet,secondPartSize);
-
-            // 输出头尾验证 签名块后的部分
+            ByteBuffer secondPartBuffer = BytesOptUtil.getByteBufferFormFile(apkPath,secondPartOfApkOffSet,secondPartSize);
+            // end 获取 签名块之后的部分
+            // begin 验证 签名块之后的部分
             LogUtil.e("签名块后的部分size = " + secondPartBuffer.array().length);
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(secondPartBuffer.get()));
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(secondPartBuffer.get()));
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(secondPartBuffer.get()));
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(secondPartBuffer.get()));
+            byte[] Bytes4InHeadOfSecPart = BytesOptUtil.getSubBytes(secondPartBuffer.array(),0,4);
+            LogUtil.e(ConvertUtil.bytesToHexString(Bytes4InHeadOfSecPart));
             LogUtil.e("=====");
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(secondPartBuffer.get(secondPartBuffer.array().length - 4)));
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(secondPartBuffer.get(secondPartBuffer.array().length - 3)));
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(secondPartBuffer.get(secondPartBuffer.array().length - 2)));
-            LogUtil.e(ConvertUtil.loopLogSingleByteToHexString(secondPartBuffer.get(secondPartBuffer.array().length - 1)));
+            byte[] Bytes4InFootOfSecPart = BytesOptUtil.getSubBytes(secondPartBuffer.array(),secondPartBuffer.array().length - 4,4);
+            LogUtil.e(ConvertUtil.bytesToHexString(Bytes4InFootOfSecPart));
+            // end 验证 签名块之后的部分
+
 
             // 现在取到了 签名块前 和 签名块后 的字节
             // 合并字节
-            byte[] oriApkByte = new byte[firstPartSize + secondPartSize];
-            System.arraycopy(firstPartBuffer.array(),0,oriApkByte,0,firstPartSize);
-            System.arraycopy(secondPartBuffer.array(),0,oriApkByte,firstPartSize,secondPartSize);
-
+            byte[] oriApkByte = BytesOptUtil.mergeBytes(firstPartBuffer.array(),secondPartBuffer.array());
+            LogUtil.e("merge finish " );
             //需要验证一下数据对不对
+            byte[] oriApkByteHead4 = BytesOptUtil.getSubBytes(oriApkByte,0,4);
+            byte[] oriApkByteFoot4 = BytesOptUtil.getSubBytes(oriApkByte,oriApkByte.length - 4,4);
+            LogUtil.e(ConvertUtil.bytesToHexString(oriApkByteHead4));
+            LogUtil.e(ConvertUtil.bytesToHexString(oriApkByteFoot4));
 
-            LogUtil.e("arraycopy finish " );
             // 计算hash值对比一下
             byte[] oriHash = SignerVerifyUtils.calHash(oriApkByte,0,oriApkByte.length);
             LogUtil.e("oriHash = " + ConvertUtil.bytesToHexString(oriHash));
+
+            // 中央尾曲的偏移量，要重新计算
 
         }  catch (Exception e) {
             e.printStackTrace();
@@ -443,12 +445,6 @@ public class FileOptActivity extends BaseTestActivity {
     }
 
 
-    private ByteBuffer getByteBufferFormFile(String fileName,int offset ,int len) throws IOException {
-        RandomAccessFile randomAccessFile = new RandomAccessFile(fileName,"r");
-        ByteBuffer byteBuffer = ByteBuffer.allocate(len);
-        randomAccessFile.seek(offset);
-        randomAccessFile.readFully(byteBuffer.array(),0,len);
-        return byteBuffer;
-    }
+
 
 }

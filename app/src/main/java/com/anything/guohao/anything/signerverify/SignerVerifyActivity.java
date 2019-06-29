@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.anything.guohao.anything.AssetsUtils;
 import com.anything.guohao.anything.BaseTestActivity;
 import com.anything.guohao.anything.ConvertUtil;
+import com.anything.guohao.anything.FileOptUtil.BytesOptUtil;
 import com.anything.guohao.anything.LogUtil;
 import com.anything.guohao.anything.R;
 
@@ -408,10 +409,10 @@ public class SignerVerifyActivity extends BaseTestActivity {
             byte[] buffer = new byte[lenght];
             in.read(buffer);
 
-            int pos = SignerVerifyUtils.matchBytesBySelect(buffer, ConvertUtil.hexStringToBytes("810C000000000000"), 1);
+            int pos = BytesOptUtil.matchBytesBySelect(buffer, ConvertUtil.hexStringToBytes("810C000000000000"), 1);
             LogUtil.e("pos: " + pos);
 
-            int pos2 = SignerVerifyUtils.matchBytesBySelect(buffer, ConvertUtil.hexStringToBytes("810C000000000000"), 2);
+            int pos2 = BytesOptUtil.matchBytesBySelect(buffer, ConvertUtil.hexStringToBytes("810C000000000000"), 2);
             LogUtil.e("pos2: " + pos2);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -491,7 +492,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
             in.read(buffer);
 
             // 以 0382034B 片段匹配，临时的
-            int certOffSet = SignerVerifyUtils.matchBytesBySelect(buffer, ConvertUtil.hexStringToBytes("0382034B"), 1);
+            int certOffSet = BytesOptUtil.matchBytesBySelect(buffer, ConvertUtil.hexStringToBytes("0382034B"), 1);
             LogUtil.e("certOffSet: " + certOffSet);
 
             int certSizeOffset = certOffSet + 2;
@@ -586,8 +587,8 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
         try {
             // 计算偏移量
-            int jxnxIDOffSet = SignerVerifyUtils.matchBytesBySelect(apkBytes, jxnxID, 1);
-            int magicOffSet = SignerVerifyUtils.matchBytesBySelect(apkBytes, endByteV2, 1);
+            int jxnxIDOffSet = BytesOptUtil.matchBytesBySelect(apkBytes, jxnxID, 1);
+            int magicOffSet = BytesOptUtil.matchBytesBySelect(apkBytes, endByteV2, 1);
 
             LogUtil.e("jxnxIDOffSet:" + jxnxIDOffSet);
             LogUtil.e("magicOffSet:" + magicOffSet);
@@ -635,7 +636,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
             }
             // 把原始apk的hash值
             byte[] hashId = new byte[]{0x02,0x20};
-            int hashOffset = SignerVerifyUtils.matchBytesBySelect(firstPartBytes,hashId,1);
+            int hashOffset = BytesOptUtil.matchBytesBySelect(firstPartBytes,hashId,1);
             // 拷贝数组
             System.arraycopy(firstPartBytes,hashOffset + 2 ,orighash,0,32);
 
@@ -649,7 +650,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
             PublicKey publicKey = verifyWorkCert(cert,5,cert.length - 5);
 
             // 第二步 验签名
-            byte[] hash = SignerVerifyUtils.calHash(firstPartBytes,0,firstPartBytes.length);
+            byte[] hash = SignerVerifyUtils.calHash(firstPartBytes,4,firstPartBytes.length - 4); // 偏离4个字节，SHA256
             LogUtil.e("hash = " + ConvertUtil.bytesToHexString(hash));
             LogUtil.e("hash len = " + hash.length);
 
@@ -665,8 +666,10 @@ public class SignerVerifyActivity extends BaseTestActivity {
             }else{
                 hash32 = hash;
             }
-            boolean res = RSAUtils.verify(hash32,publicKey,sigData);
+            boolean res = RSAUtils.verify(hash32,publicKey,sigData); // SHA256withRSA
             LogUtil.e("res = " + res);
+
+            //publicKey.
 
             // 第三步
 

@@ -53,14 +53,14 @@ public class SignerVerifyUtils {
     }
 
     /**
-     *
+     * 取消该函数，转移到 BytesOptUtil
      * @param src  源字节
      * @param des  目标字节
      * @param matchSelect 取第几次的匹配
      * @return
      */
 
-    public static int matchBytesBySelect(byte[] src, byte[] des,int matchSelect) throws Exception {
+    public static int matchBytesBySelectClose(byte[] src, byte[] des,int matchSelect) throws Exception {
         LogUtil.e("取第" + matchSelect + "次的匹配");
         int srclen = src.length;
         int deslen = des.length;
@@ -72,7 +72,7 @@ public class SignerVerifyUtils {
         }
 
         if(des.length > src.length){
-            throw new Exception("src.length must less than or equal to des.length");
+            throw new Exception("des.length must less than or equal to src.length ");
         }
 
         for (int i = srclen - 1; i >= 0; --i) {//倒序遍历

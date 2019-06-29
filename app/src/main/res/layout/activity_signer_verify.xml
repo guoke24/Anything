@@ -89,14 +89,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
-            android:onClick="test_10"
-            android:text="test10"
-            android:textSize="15sp" />
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="8dp"
             android:onClick="test_11"
             android:text="test11"
             android:textSize="15sp" />
@@ -107,6 +99,14 @@
             android:layout_marginRight="8dp"
             android:onClick="test_12"
             android:text="test12"
+            android:textSize="15sp" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:onClick="test_10"
+            android:text="test10"
             android:textSize="15sp" />
 
     </LinearLayout>
