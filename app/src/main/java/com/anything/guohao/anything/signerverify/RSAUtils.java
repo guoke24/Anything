@@ -31,7 +31,9 @@ public class RSAUtils {
     /**
      * 签名算法
      */
-    public static final String SIGNATURE_ALGORITHM = "MD5withRSA";
+    //public static final String SIGNATURE_ALGORITHM = "MD5withRSA";
+    public static final String SIGNATURE_ALGORITHM = "SHA256withRSA";
+    //public static final String SIGNATURE_ALGORITHM = "NONEwithRSA";
 
     /**
      * 获取公钥的key
