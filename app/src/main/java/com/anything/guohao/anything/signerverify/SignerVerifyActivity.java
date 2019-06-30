@@ -48,7 +48,9 @@ import java.util.jar.JarFile;
 public class SignerVerifyActivity extends BaseTestActivity {
 
     String jxnx_acquire_apk = "jxnx_acquire_22_2_9_03_release_20190520.apk";
+    //String SmartPhonePos_apk = "SmartPhonePos_new_20190612_2_0_3_release.apk";
     String SmartPhonePos_apk = "SmartPhonePos_new_20190612_2_0_3_release.apk";
+    String verify_apk = "jxnx_acquire_22_2_9_03_release_20190520.apk";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -556,13 +558,17 @@ public class SignerVerifyActivity extends BaseTestActivity {
             LogUtil.e("getPublicKey Format " + work_cert.getPublicKey().getFormat());
             LogUtil.e("getPublicKey byte " + ConvertUtil.bytesToHexString(work_cert.getPublicKey().getEncoded()));
 
+            LogUtil.e("getSignature byte " + ConvertUtil.bytesToHexString(work_cert.getSignature()));
+
 
             // 这样验证不行
 //            root_cert.verify(work_cert.getPublicKey());
 //            root_cert.checkValidity();
 
-            showMessage("verify ok");
-            LogUtil.e("verify ok");
+            showMessage("证书验证 ok");
+            LogUtil.e("verify cert ok");
+
+            //work_cert.get
 
             return work_cert.getPublicKey();
         } catch (Exception e) {
@@ -625,10 +631,13 @@ public class SignerVerifyActivity extends BaseTestActivity {
                         LogUtil.e("asn1String: " + ConvertUtil.bytesToHexString(asn1Primitive.getEncoded()));
                         if(n == 0){
                             firstPartBytes = asn1Primitive.getEncoded();
+                            LogUtil.e("firstPartBytes size = " + firstPartBytes.length);
                         }else if(n == 1){
                             sigData = asn1Primitive.getEncoded();
+                            LogUtil.e("sigData size = " + sigData.length);
                         }else if(n == 2){
                             cert = asn1Primitive.getEncoded();
+                            LogUtil.e("cert size = " + cert.length);
                         }
                         n++;
                     }
@@ -650,7 +659,9 @@ public class SignerVerifyActivity extends BaseTestActivity {
             PublicKey publicKey = verifyWorkCert(cert,5,cert.length - 5);
 
             // 第二步 验签名
-            byte[] hash = SignerVerifyUtils.calHash(firstPartBytes,4,firstPartBytes.length - 4); // 偏离4个字节，SHA256
+            byte[] subSigdata = BytesOptUtil.getSubBytes(sigData,4,sigData.length-4);
+
+            byte[] hash = SignerVerifyUtils.calHash(firstPartBytes,0,firstPartBytes.length ); // SHA256
             LogUtil.e("hash = " + ConvertUtil.bytesToHexString(hash));
             LogUtil.e("hash len = " + hash.length);
 
@@ -666,10 +677,14 @@ public class SignerVerifyActivity extends BaseTestActivity {
             }else{
                 hash32 = hash;
             }
-            boolean res = RSAUtils.verify(hash32,publicKey,sigData); // SHA256withRSA
-            LogUtil.e("res = " + res);
+            boolean res = RSAUtils.verify(hash32,publicKey,subSigdata); // SHA256withRSA
+            LogUtil.e("verify sign res = " + res);
 
-            //publicKey.
+            if(res){
+                showMessage("签名验证 ok");
+            }else{
+                showMessage("签名验证 fail");
+            }
 
             // 第三步
 

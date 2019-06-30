@@ -1,6 +1,9 @@
 package com.anything.guohao.anything.signerverify;
 
+import com.anything.guohao.anything.LogUtil;
+
 import java.io.ByteArrayOutputStream;
+import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -76,9 +79,8 @@ public class RSAUtils {
     /**
      * 用私钥对信息生成数字签名
      *
-     * @param data 已加密数据
+     * @param data       已加密数据
      * @param privateKey 私钥(BASE64编码)
-     *
      * @return
      * @throws Exception
      */
@@ -96,13 +98,11 @@ public class RSAUtils {
     /**
      * 校验数字签名
      *
-     * @param data 已加密数据
+     * @param data      已加密数据
      * @param publicKey 公钥(BASE64编码)
-     * @param sign 数字签名
-     *
+     * @param sign      数字签名
      * @return
      * @throws Exception
-     *
      */
     public static boolean verify(byte[] data, String publicKey, String sign)
             throws Exception {
@@ -125,20 +125,27 @@ public class RSAUtils {
      * @return
      * @throws Exception
      */
-    public static boolean verify(byte[] data, PublicKey publicKey, byte[] sign)
-            throws Exception{
-        PublicKey publicK = publicKey;
-        Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
-        signature.initVerify(publicK);
-        signature.update(data);
-        return signature.verify(sign);
+    public static boolean verify(byte[] data, PublicKey publicKey, byte[] sign) {
+
+        try {
+            PublicKey publicK = publicKey;
+            Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
+            signature.initVerify(publicK);
+            signature.update(data);
+            return signature.verify(sign);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.e("verify sign Exception " + e.toString());
+        }
+        return false;
+
     }
 
     /**
      * 私钥解密
      *
      * @param encryptedData 已加密数据
-     * @param privateKey 私钥(BASE64编码)
+     * @param privateKey    私钥(BASE64编码)
      * @return
      * @throws Exception
      */
@@ -175,7 +182,7 @@ public class RSAUtils {
      * 公钥解密
      *
      * @param encryptedData 已加密数据
-     * @param publicKey 公钥(BASE64编码)
+     * @param publicKey     公钥(BASE64编码)
      * @return
      * @throws Exception
      */
@@ -211,7 +218,7 @@ public class RSAUtils {
     /**
      * 公钥加密
      *
-     * @param data 源数据
+     * @param data      源数据
      * @param publicKey 公钥(BASE64编码)
      * @return
      * @throws Exception
@@ -249,7 +256,7 @@ public class RSAUtils {
     /**
      * 私钥加密
      *
-     * @param data 源数据
+     * @param data       源数据
      * @param privateKey 私钥(BASE64编码)
      * @return
      * @throws Exception
