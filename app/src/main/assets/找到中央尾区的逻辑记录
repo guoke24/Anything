@@ -1,0 +1,232 @@
+Pair<ByteBuffer, Long> eocdAndOffsetInFile = getEocd(apk);
+
+该函数定义在：/frameworks/base/core/java/android/util/apk/ApkSignatureSchemeV2Verifier.java
+代码段1:
+private static Pair<ByteBuffer, Long> getEocd(RandomAccessFile apk) throws IOException, SignatureNotFoundException{
+        Pair<ByteBuffer, Long> eocdAndOffsetInFile =
+                ZipUtils.findZipEndOfCentralDirectoryRecord(apk);
+        if (eocdAndOffsetInFile == null) {
+            throw new SignatureNotFoundException(
+                    "Not an APK file: ZIP End of Central Directory record not found");
+        }
+        return eocdAndOffsetInFile;
+
+}
+
+上述函数，调用了ZipUtils类的findZipEndOfCentralDirectoryRecord函数进行下一步操作。
+
+ZipUtils.findZipEndOfCentralDirectoryRecord(apk);
+
+该函数定义在：/frameworks/base/core/java/android/util/apk/ZipUtils.java
+代码段2:
+static Pair<ByteBuffer, Long> findZipEndOfCentralDirectoryRecord(RandomAccessFile zip)
+            throws IOException {
+        // ZIP End of Central Directory (EOCD) record is located at the very end of the ZIP archive.
+        // The record can be identified by its 4-byte signature/magic which is located at the very
+        // beginning of the record. A complication is that the record is variable-length because of
+        // the comment field.
+        // The algorithm for locating the ZIP EOCD record is as follows. We search backwards from
+        // end of the buffer for the EOCD record signature. Whenever we find a signature, we check
+        // the candidate record's comment length is such that the remainder of the record takes up
+        // exactly the remaining bytes in the buffer. The search is bounded because the maximum
+        // size of the comment field is 65535 bytes because the field is an unsigned 16-bit number.
+
+        long fileSize = zip.length();
+        if (fileSize < ZIP_EOCD_REC_MIN_SIZE) {
+            return null;
+        }
+
+        // Optimization: 99.99% of APKs have a zero-length comment field in the EoCD record and thus
+        // the EoCD record offset is known in advance. Try that offset first to avoid unnecessarily
+        // reading more data.
+        Pair<ByteBuffer, Long> result = findZipEndOfCentralDirectoryRecord(zip, 0);
+        if (result != null) {
+            return result;
+        }
+
+        // EoCD does not start where we expected it to. Perhaps it contains a non-empty comment
+        // field. Expand the search. The maximum size of the comment field in EoCD is 65535 because
+        // the comment length field is an unsigned 16-bit number.
+        return findZipEndOfCentralDirectoryRecord(zip, UINT16_MAX_VALUE);//UINT16_MAX_VALUE = 0xffff = 65535
+    }
+
+上述函数，先后两次，调用了函数findZipEndOfCentralDirectoryRecord，但是传参不一样。第一次参数(zip, 0)，
+如果没找到，再进行调用，第二次参数(zip, UINT16_MAX_VALUE)。其中，UINT16_MAX_VALUE = 0xffff。
+
+findZipEndOfCentralDirectoryRecord函数，
+定义在：/frameworks/base/core/java/android/util/apk/ZipUtils.java
+代码段3:
+private static Pair<ByteBuffer, Long> findZipEndOfCentralDirectoryRecord(
+            RandomAccessFile zip, int maxCommentSize) throws IOException{
+	......
+	long fileSize = zip.length();
+	......
+        // Lower maxCommentSize if the file is too small.
+        maxCommentSize = (int) Math.min(maxCommentSize, fileSize - ZIP_EOCD_REC_MIN_SIZE);//ZIP_EOCD_REC_MIN_SIZE = 22
+	
+	ByteBuffer buf = ByteBuffer.allocate(ZIP_EOCD_REC_MIN_SIZE + maxCommentSize);//第一次调用，maxCommentSize = 0，buf的大小就是22 
+                                                                                     // 第二次调用，maxCommentSize = 65535，buf的大小就是22+65535
+                                                                                                        
+        buf.order(ByteOrder.LITTLE_ENDIAN);
+        long bufOffsetInFile = fileSize - buf.capacity();//将要读取的buf在zip中的偏移量，其实就是读取apk最后的bufOffsetInFile个字节
+        zip.seek(bufOffsetInFile);
+        zip.readFully(buf.array(), buf.arrayOffset(), buf.capacity());//buf.capacity() = 22 或者 22+65535
+        int eocdOffsetInBuf = findZipEndOfCentralDirectoryRecord(buf);//3-1在buf里找到oecd的偏移量
+        if (eocdOffsetInBuf == -1) {
+            // No EoCD record found in the buffer
+            return null;
+        }
+        // EoCD found
+        buf.position(eocdOffsetInBuf);//3-2
+        ByteBuffer eocd = buf.slice();
+        eocd.order(ByteOrder.LITTLE_ENDIAN);
+        return Pair.create(eocd, bufOffsetInFile + eocdOffsetInBuf);/bufOffsetInFile + eocdOffsetInBuf表示eocd在zip文件中的偏移量
+
+}
+
+上述函数，3-1处调用了 findZipEndOfCentralDirectoryRecord 函数去在入参的buf里找oecd的偏移量
+
+findZipEndOfCentralDirectoryRecord(buf)，该函数定义在：
+/frameworks/base/core/java/android/util/apk/ZipUtils.java
+代码段4:
+    /**
+     * Returns the position at which ZIP End of Central Directory record starts in the provided
+     * buffer or {@code -1} if the record is not present.
+     *
+     * <p>NOTE: Byte order of {@code zipContents} must be little-endian.
+     */
+    private static int findZipEndOfCentralDirectoryRecord(ByteBuffer zipContents) {
+        assertByteOrderLittleEndian(zipContents);
+
+        // ZIP End of Central Directory (EOCD) record is located at the very end of the ZIP archive.
+        // The record can be identified by its 4-byte signature/magic which is located at the very
+        // beginning of the record. A complication is that the record is variable-length because of
+        // the comment field.
+        // The algorithm for locating the ZIP EOCD record is as follows. We search backwards from
+        // end of the buffer for the EOCD record signature. Whenever we find a signature, we check
+        // the candidate record's comment length is such that the remainder of the record takes up
+        // exactly the remaining bytes in the buffer. The search is bounded because the maximum
+        // size of the comment field is 65535 bytes because the field is an unsigned 16-bit number.
+
+        int archiveSize = zipContents.capacity();
+        if (archiveSize < ZIP_EOCD_REC_MIN_SIZE) {
+            return -1;
+        }
+        int maxCommentLength = Math.min(archiveSize - ZIP_EOCD_REC_MIN_SIZE, UINT16_MAX_VALUE);
+        int eocdWithEmptyCommentStartPosition = archiveSize - ZIP_EOCD_REC_MIN_SIZE;
+        
+        //循环地去4个字节的int值，判断是否匹配 0x06054b50，匹配到之后，返回偏移量
+        for (int expectedCommentLength = 0; expectedCommentLength < maxCommentLength;
+                expectedCommentLength++) {
+            int eocdStartPos = eocdWithEmptyCommentStartPosition - expectedCommentLength;
+            if (zipContents.getInt(eocdStartPos) == ZIP_EOCD_REC_SIG) { // ZIP_EOCD_REC_SIG = 0x06054b50
+                int actualCommentLength =
+                        getUnsignedInt16(
+                                zipContents, eocdStartPos + ZIP_EOCD_COMMENT_LENGTH_FIELD_OFFSET);
+                if (actualCommentLength == expectedCommentLength) {
+                    return eocdStartPos;//返回偏移量
+                }
+            }
+        }
+
+        return -1;
+    }
+
+上述函数，在找到ZIP_EOCD_REC_SIG = 0x06054b50的位置后，返回该位置，该位置表示入参的zipContents的eocd的偏移量。
+
+在找到eocd的偏移量之后，可以跳过中间逻辑，直接看 代码段1:
+代码段1:
+private static Pair<ByteBuffer, Long> getEocd(RandomAccessFile apk) throws IOException, SignatureNotFoundException{
+        Pair<ByteBuffer, Long> eocdAndOffsetInFile =
+                ZipUtils.findZipEndOfCentralDirectoryRecord(apk);
+        if (eocdAndOffsetInFile == null) {
+            throw new SignatureNotFoundException(
+                    "Not an APK file: ZIP End of Central Directory record not found");
+        }
+        return eocdAndOffsetInFile;
+
+}
+可知，该函数，返回了一个键值对，eocd的字节buf和eocd的偏移量。
+
+接着看怎么找到cd的偏移量：
+代码段5:
+//该函数定义在：{sourceCodeRootPath}/frameworks/base/core/java/android/util/apk/ApkSignatureSchemeV2Verifier.java
+    private static SignatureInfo findSignature(RandomAccessFile apk)
+            throws IOException, SignatureNotFoundException {
+        // Find the ZIP End of Central Directory (EoCD) record.
+        Pair<ByteBuffer, Long> eocdAndOffsetInFile = getEocd(apk);// 先找到中央区尾部
+	......
+
+        // Find the APK Signing Block. The block immediately(立即;紧接) precedes(走在…前面) the Central Directory.
+        long centralDirOffset = getCentralDirOffset(eocd, eocdOffset); // 中央区偏移量
+
+	......
+    }
+在跟代码段1的 getEocd 函数 的同一个调用函数内，调用了该函数 getCentralDirOffset，去获取中央区偏移量
+
+接着进入：getCentralDirOffset(eocd, eocdOffset)
+代码段6:
+//该函数定义在：{sourceCodeRootPath}/frameworks/base/core/java/android/util/apk/ApkSignatureSchemeV2Verifier.java
+    private static long getCentralDirOffset(ByteBuffer eocd, long eocdOffset)
+            throws SignatureNotFoundException {
+        // Look up the offset of ZIP Central Directory.
+        long centralDirOffset = ZipUtils.getZipEocdCentralDirectoryOffset(eocd);//6-1
+        if (centralDirOffset >= eocdOffset) {
+            throw new SignatureNotFoundException(
+                    "ZIP Central Directory offset out of range: " + centralDirOffset
+                    + ". ZIP End of Central Directory offset: " + eocdOffset);
+        }
+        long centralDirSize = ZipUtils.getZipEocdCentralDirectorySizeBytes(eocd);//6-2
+        if (centralDirOffset + centralDirSize != eocdOffset) {
+            throw new SignatureNotFoundException(
+                    "ZIP Central Directory is not immediately followed by End of Central"
+                    + " Directory");
+        }
+        return centralDirOffset;
+    }
+
+分析，先6-1处调用 getZipEocdCentralDirectoryOffset 获取 cd 的偏移量，然后6-2处，调用 getZipEocdCentralDirectorySizeBytes 获取 cd 的大小
+
+接着进入：：ZipUtils.getZipEocdCentralDirectoryOffset(eocd)，
+代码段7:
+//frameworks/base/core/java/android/util/apk/ZipUtils.java
+    public static long getZipEocdCentralDirectoryOffset(ByteBuffer zipEndOfCentralDirectory) {
+        assertByteOrderLittleEndian(zipEndOfCentralDirectory);
+        return getUnsignedInt32(
+                zipEndOfCentralDirectory,
+                zipEndOfCentralDirectory.position() + ZIP_EOCD_CENTRAL_DIR_OFFSET_FIELD_OFFSET);//7-1，ZIP_EOCD_CENTRAL_DIR_SIZE_FIELD_OFFSET = 12
+    }
+
+//进入函数：getUnsignedInt32（... , ...）
+    private static long getUnsignedInt32(ByteBuffer buffer, int offset) {
+        return buffer.getInt(offset) & 0xffffffffL;//7-2
+    }
+
+结合7-1和7-2来看，此处的代码逻辑就是在入参的字节中，获取偏移量处起的4个字节的int值，并且与 0xffffffffL 做了一次 & 运算。
+换句话来说，就是在eocd的字节段中，获取cd的偏移量。
+小细节：
+7-1处的代码中，zipEndOfCentralDirectory.position() 是代表什么？
+答:代表该 byteBuffer 的当前下标的位置，该下标是移动过的，追溯到代码段3的3-2处：
+buf.position(eocdOffsetInBuf);//3-2
+该 buf 就是 zipEndOfCentralDirectory，表示的是eocd的字节buffer，在代码段3的3-2处，会把 buf 的下标移到 eocdOffsetInBuf，
+即表示 eocd 的 偏移量的开头，而 zipEndOfCentralDirectory.position() + ZIP_EOCD_CENTRAL_DIR_OFFSET_FIELD_OFFSET 表示的是：
+buf中 cd 的偏移量的开头。
+
+回到主题，代码段7，作用就是返回 cd 在 apk文件中的 偏移量。
+接下来的逻辑，回到 代码段5 中继续...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

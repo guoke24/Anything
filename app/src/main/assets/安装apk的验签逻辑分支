@@ -1,0 +1,57 @@
+系统安装和第三方安装走的逻辑不同
+
+第三方apk安装，会走 
+
+第三方调用：pm.installPackage // -- 内部跨进程通信 --
+#
+pms.installPackageAsUser
+pms.processPendingInstall
+pms.doHandleMessage
+pms.installPackageLI // -- 签名验证逻辑，安装系统apk不走该逻辑，所以不用签名验证 --
+#
+PackageParser.collectCertificates(pkg, parseFlags);
+PackageParser.collectCertificatesInternal(pkg, parseFlags);
+PackageParser.collectCertificates(pkg, new File(pkg.baseCodePath), parseFlags);
+{
+	# 先看v2验签
+	ApkSignatureSchemeV2Verifier.verify(apkPath);
+	
+	--> SignatureInfo signatureInfo = findSignature(apk);
+	---> 
+	---> {
+		//1 计算出 中央区尾部，中央区，签名块的偏移量和各部的字节块	
+		......		
+	
+		//2 关键点：签名块里的V2签名的字节,会拆分字节
+		findApkSignatureSchemeV2Block(apkSigningBlock)
+
+		//3 返回签名信息，
+		return new SignatureInfo(
+                apkSignatureSchemeV2Block,//由注释1处获得的v2签名块的bytes，SignatureInfo内部，用属性 signatureBlock 引用
+                apkSigningBlockOffset,// 签名块偏移量
+                centralDirOffset,// 中央区偏移量
+                eocdOffset,// 中央区末尾偏移量
+                eocd);// // 中央区末尾的bytes
+	     }
+	--> return verify(apk.getFD(), signatureInfo); // 取到签名信息，去验证
+}
+collectCertificates(pkg, new File(pkg.baseCodePath), parseFlags)
+这个函数定义在：/frameworks/base/core/java/android/content/pm/PackageParser.java
+该函数属于安装apk的过程中的一个逻辑分支，用于验证apk的签名。如果验签失败，则抛出与异常；如果验签通过，则这场执行下去。
+注释1处的函数，会去拆分v2签名块的字节，解析出证书。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

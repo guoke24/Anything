@@ -10,6 +10,7 @@ import com.anything.guohao.anything.AssetsUtils;
 import com.anything.guohao.anything.BaseTestActivity;
 import com.anything.guohao.anything.ConvertUtil;
 import com.anything.guohao.anything.FileOptUtil.BytesOptUtil;
+import com.anything.guohao.anything.FileOptUtil.FileOptUtil;
 import com.anything.guohao.anything.LogUtil;
 import com.anything.guohao.anything.R;
 
@@ -833,6 +834,39 @@ public class SignerVerifyActivity extends BaseTestActivity {
             System.err.println("Exception：" + e.toString());
         }
 
+    }
+
+    public void test_13(View v){
+        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
+        //byte[] eocdID = new byte[]{0x06,0x05,0x4b,0x50};
+        byte[] eocdID = new byte[]{0x50,0x4b,0x05,0x06,};
+        try {
+            int eocdOffSet = BytesOptUtil.matchBytesBySelect(apkBytes,eocdID,1);
+            //int eocdOffSet = BytesOptUtil.matchBytesBySelect(apkBytes,jxnxID,1);
+            LogUtil.e("eocdOffSet = " + eocdOffSet);
+
+            int magicOffSet = BytesOptUtil.matchBytesBySelect(apkBytes, endByteV2, 1);
+
+            // 中央区的偏移量
+            int cdOffSet = magicOffSet + 16;
+            LogUtil.e("cdOffSet = " + cdOffSet);
+            byte[] test = new byte[]{0x00,(byte) 0xc3,(byte) 0xda,0x0f};
+            int test2 = BytesOptUtil.matchBytesBySelect(apkBytes, test, 1);
+            LogUtil.e("test2 = " +  test2);// 找不到记录
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.e("Exception " + e.toString());
+        }
+    }
+
+    public void test_14(View v){
+        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
+        String apkString = ConvertUtil.bytesToHexString(apkBytes);
+
+        FileOptUtil.writeStringToFileInData(apkString,"apkHex.txt",this);
     }
 
 }

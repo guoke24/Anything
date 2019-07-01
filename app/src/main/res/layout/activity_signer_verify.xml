@@ -13,6 +13,7 @@
         android:orientation="vertical">
 
         <Button
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
@@ -21,6 +22,7 @@
             android:textSize="15sp" />
 
         <Button
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
@@ -29,6 +31,7 @@
             android:textSize="15sp" />
 
         <Button
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
@@ -37,6 +40,7 @@
             android:textSize="15sp" />
 
         <Button
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
@@ -45,6 +49,7 @@
             android:textSize="15sp" />
 
         <Button
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
@@ -55,6 +60,7 @@
 
 
         <Button
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
@@ -63,6 +69,7 @@
             android:textSize="15sp" />
 
         <Button
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
@@ -70,6 +77,7 @@
             android:text="test8"
             android:textSize="15sp" />
         <Button
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
@@ -78,6 +86,7 @@
             android:textSize="15sp" />
 
         <Button
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
@@ -86,6 +95,7 @@
             android:textSize="15sp" />
 
         <Button
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
@@ -94,6 +104,7 @@
             android:textSize="15sp" />
 
         <Button
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
@@ -102,11 +113,27 @@
             android:textSize="15sp" />
 
         <Button
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:onClick="test_10"
             android:text="test10"
+            android:textSize="15sp" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:onClick="test_13"
+            android:text="test13"
+            android:textSize="15sp" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:onClick="test_14"
+            android:text="test14"
             android:textSize="15sp" />
 
     </LinearLayout>

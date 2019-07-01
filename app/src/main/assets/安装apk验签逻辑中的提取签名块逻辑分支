@@ -1,0 +1,212 @@
+v2验签开始：
+ApkSignatureSchemeV2Verifier.verify(apkPath);
+
+该函数定义在：{sourceCodeRootPath}/frameworks/base/core/java/android/util/apk/ApkSignatureSchemeV2Verifier.java
+代码段1:
+public static X509Certificate[][] verify(String apkFile)
+            throws SignatureNotFoundException, SecurityException, IOException {
+        try (RandomAccessFile apk = new RandomAccessFile(apkFile, "r")) { //1-1
+            return verify(apk);
+        }
+    }
+
+上述函数verify(String apkFile)，在注释1-1处做了一个转换，根据入参的apk路径，创建RandomAccessFile类的对象apk，RandomAccessFile是一个任意访问文件类，可以移动指针到任意一个字节的位置，并从该位置开始读取字节。
+注释2，继续下一步，调用同名函数verify(apk)
+
+
+该函数定义在：{sourceCodeRootPath}/frameworks/base/core/java/android/util/apk/ApkSignatureSchemeV2Verifier.java 同上
+代码段2:
+private static X509Certificate[][] verify(RandomAccessFile apk)
+            throws SignatureNotFoundException, SecurityException, IOException {
+        SignatureInfo signatureInfo = findSignature(apk); //2-1 获取签名信息集
+        return verify(apk.getFD(), signatureInfo); //2-2 验证签名信息集
+    }
+
+上述函数verify(RandomAccessFile apk)，在注释2-1处,调用了函数：findSignature(apk)，并返回了签名信息类：SignatureInfo。
+查看其代码发现不多，如下：
+该类是ApkSignatureSchemeV2Verifier的内部类，
+定义在：{sourceCodeRootPath}/frameworks/base/core/java/android/util/apk/ApkSignatureSchemeV2Verifier.java 同上
+代码段3:
+    private static class SignatureInfo {
+        /** Contents of APK Signature Scheme v2 block.（签名块的字节buffer） */
+        private final ByteBuffer signatureBlock; 
+
+        /** Position of the APK Signing Block in the file. （签名块的偏移量）*/
+        private final long apkSigningBlockOffset;
+
+        /** Position of the ZIP Central Directory in the file.（中央目录的偏移量） */
+        private final long centralDirOffset;
+
+        /** Position of the ZIP End of Central Directory (EoCD) in the file. （中央区尾的偏移量）*/
+        private final long eocdOffset;
+
+        /** Contents of ZIP End of Central Directory (EoCD) of the file. （中央区尾的字节buffer）*/
+        private final ByteBuffer eocd;
+
+        private SignatureInfo(
+                ByteBuffer signatureBlock,
+                long apkSigningBlockOffset,
+                long centralDirOffset,
+                long eocdOffset,
+                ByteBuffer eocd) {
+            this.signatureBlock = signatureBlock;
+            this.apkSigningBlockOffset = apkSigningBlockOffset;
+            this.centralDirOffset = centralDirOffset;
+            this.eocdOffset = eocdOffset;
+            this.eocd = eocd;
+        }
+    }
+由此可以得出：在注释1处的函数：findSignature(apk)，会解析出：签名块的字节buffer、签名块的偏移量等信息。
+现在去查看findSignature(apk)的源码：
+
+该函数定义在：{sourceCodeRootPath}/frameworks/base/core/java/android/util/apk/ApkSignatureSchemeV2Verifier.java 同上
+代码段4:
+    private static SignatureInfo findSignature(RandomAccessFile apk)
+            throws IOException, SignatureNotFoundException {
+        // Find the ZIP End of Central Directory (EoCD) record.
+        Pair<ByteBuffer, Long> eocdAndOffsetInFile = getEocd(apk);// 先找到中央区尾部
+        ByteBuffer eocd = eocdAndOffsetInFile.first;  // 中央区尾部字节
+        long eocdOffset = eocdAndOffsetInFile.second; // 中央区尾部偏移量
+        if (ZipUtils.isZip64EndOfCentralDirectoryLocatorPresent(apk, eocdOffset)) {
+            throw new SignatureNotFoundException("ZIP64 APK not supported");
+        }
+
+        // Find the APK Signing Block. The block immediately(立即;紧接) precedes(走在…前面) the Central Directory.
+        long centralDirOffset = getCentralDirOffset(eocd, eocdOffset); // 中央区偏移量
+
+        Pair<ByteBuffer, Long> apkSigningBlockAndOffsetInFile =
+                findApkSigningBlock(apk, centralDirOffset); //3-1 根据中央区偏移量，找出签名块和其偏移量，构成键值对，一起返回
+
+        ByteBuffer apkSigningBlock = apkSigningBlockAndOffsetInFile.first;  // 签名块的字节
+        long apkSigningBlockOffset = apkSigningBlockAndOffsetInFile.second; // 签名块的偏移量
+
+        // Find the APK Signature Scheme v2 Block inside the APK Signing Block.
+        ByteBuffer apkSignatureSchemeV2Block = findApkSignatureSchemeV2Block(apkSigningBlock); // 返回的是原声签名块里的ID-Value块
+
+        return new SignatureInfo(
+                apkSignatureSchemeV2Block,// ID-Value块
+                apkSigningBlockOffset,
+                centralDirOffset,
+                eocdOffset,
+                eocd);
+    }
+
+由此可知，上上述函数verify(RandomAccessFile apk)，在注释2-1处,调用了函数：findSignature(apk)，并返回的SignatureInfo，携带原生签名块里的ID-Value块。
+接着在注释2-2处，调用函数 verify(apk.getFD(), signatureInfo)，进行签名验证。
+而在上述函数的注释3-1处，调用的findApkSigningBlock(apk, centralDirOffset)，根据中央区偏移量，找出签名块和其偏移量，详情如下：
+
+该函数定义在：{sourceCodeRootPath}/frameworks/base/core/java/android/util/apk/ApkSignatureSchemeV2Verifier.java 同上
+代码段5:
+    private static Pair<ByteBuffer, Long> findApkSigningBlock(
+            RandomAccessFile apk, long centralDirOffset)
+                    throws IOException, SignatureNotFoundException {
+        // FORMAT:
+        // OFFSET       DATA TYPE  DESCRIPTION
+        // * @+0  bytes uint64:    size in bytes (excluding this field)
+        // * @+8  bytes payload
+        // * @-24 bytes uint64:    size in bytes (same as the one above)
+        // * @-16 bytes uint128:   magic
+
+        // 签名块的结构：前块大小 + 签名信息 + 后块大小 + 魔数
+
+        if (centralDirOffset < APK_SIG_BLOCK_MIN_SIZE) { //此处的偏移量，是相对整个apk的
+            throw new SignatureNotFoundException(
+                    "APK too small for APK Signing Block. ZIP Central Directory offset: "
+                            + centralDirOffset);
+        }
+        // Read the magic and offset in file from the footer section of the block:
+        // * uint64:   size of block
+        // * 16 bytes: magic
+        ByteBuffer footer = ByteBuffer.allocate(24); // 分配24个字节的空间
+        footer.order(ByteOrder.LITTLE_ENDIAN); // 设置为 小端排序
+        apk.seek(centralDirOffset - footer.capacity());//移动指针到 （后面的块大小+魔数）的起始位置
+        apk.readFully(footer.array()/*获取底层byte[]*/, footer.arrayOffset()/*0*/, footer.capacity()); // 读取（后面的块大小+魔数）到 footer
+
+        // 魔数校验
+        if ((footer.getLong(8) != APK_SIG_BLOCK_MAGIC_LO) //从下标8取8个字节的数值
+                || (footer.getLong(16) != APK_SIG_BLOCK_MAGIC_HI)) {//从下标16取8个字节的数值
+            throw new SignatureNotFoundException(
+                    "No APK Signing Block before ZIP Central Directory");
+        }
+        // Read and compare size fields
+        long apkSigBlockSizeInFooter = footer.getLong(0);// 从下标0取8个字节的数值
+                                                         // 该数值，即签名块的长度值
+
+        if ((/*尾部签名块长度的合法校验*/apkSigBlockSizeInFooter < footer.capacity()/*24个字节*/) //尾部签名块长度的数据校验
+                || (apkSigBlockSizeInFooter > Integer.MAX_VALUE - 8)) {
+            throw new SignatureNotFoundException(
+                    "APK Signing Block size out of range: " + apkSigBlockSizeInFooter);
+        }
+
+        // apkSigBlockSizeInFooter 该数值包括： 整个签名块长度 + 后8字节的块长度 + 魔数长度
+        // 8 前8字节的块长度
+        int totalSize = (int) (apkSigBlockSizeInFooter + 8); // 加上前8字节的整个签名块的大小
+        long apkSigBlockOffset = centralDirOffset - totalSize;// 整个签名块的偏移量
+        if (apkSigBlockOffset < 0) {
+            throw new SignatureNotFoundException(
+                    "APK Signing Block offset out of range: " + apkSigBlockOffset);
+        }
+        ByteBuffer apkSigBlock = ByteBuffer.allocate(totalSize);
+        apkSigBlock.order(ByteOrder.LITTLE_ENDIAN);
+        apk.seek(apkSigBlockOffset);
+        apk.readFully(apkSigBlock.array(), apkSigBlock.arrayOffset(), apkSigBlock.capacity());// 将整个签名块，读到 apkSigBlock
+        long apkSigBlockSizeInHeader = apkSigBlock.getLong(0);
+
+        if (apkSigBlockSizeInHeader != apkSigBlockSizeInFooter) { //头部签名块长度的数据校验
+            throw new SignatureNotFoundException(
+                    "APK Signing Block sizes in header and footer do not match: "
+                            + apkSigBlockSizeInHeader + " vs " + apkSigBlockSizeInFooter);
+        }
+
+        // 该段函数 主要使用 RandomAccessFile类、ByteBuffer类 和 计算偏移量 来是实现签名块的提取
+
+        return Pair.create(apkSigBlock/*签名整块*/, apkSigBlockOffset);// 最后构造键值对
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

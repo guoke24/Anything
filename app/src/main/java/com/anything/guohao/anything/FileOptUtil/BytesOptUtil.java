@@ -34,7 +34,7 @@ public class BytesOptUtil {
             throw new Exception("des.length must less than or equal to src.length");
         }
 
-        for (int i = srclen - 1; i >= 0; --i) {//倒序遍历
+        for (int i = srclen - 1; i >= deslen - 1; --i) {//倒序遍历
 
             if( src[i] == des[checkIndex] ){
                 //LogUtil.e("匹配 " + " i = " + i + " checkIndex =  " + checkIndex + " byte =" + ConvertUtil.loopLogSingleByteToHexString(des[checkIndex]) );
