@@ -130,4 +130,17 @@ public class BytesOptUtil {
         return byteBuffer;
     }
 
+    /**
+     * 大小端序转换
+     * @param a
+     * @return
+     */
+    public static byte[] changeBytes(byte[] a) {
+        byte[] b = new byte[a.length];
+        for (int i = 0; i < b.length; i++) {
+            b[i] = a[b.length - i - 1];
+        }
+        return b;
+    }
+
 }

@@ -869,6 +869,69 @@ public class SignerVerifyActivity extends BaseTestActivity {
         FileOptUtil.writeStringToFileInData(apkString,"apkHex.txt",this);
     }
 
+    public void test_15(View v){
+        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
+
+        try {
+            // 第一步，魔数的偏移量
+            int magicOffSet = BytesOptUtil.matchBytesBySelect(apkBytes, endByteV2, 1);
+            LogUtil.e("magicOffSet = " + magicOffSet);
+
+            // 第二步，尾巴块大小的偏移量
+            int sizeInFooterOffset = magicOffSet - 8;
+            LogUtil.e("sizeInFooterOffset = " + sizeInFooterOffset);
+
+            // 第三步，计算 V2签名块 的大小
+            byte[] sigBlockSizeByte = BytesOptUtil.getSubBytes(apkBytes,sizeInFooterOffset,8);
+            byte[] sigBlockSizeByteBig = BytesOptUtil.changeBytes(sigBlockSizeByte);
+            int sigBlockSizeFromFooter = BytesOptUtil.byteToBuffer(sigBlockSizeByteBig).getInt(4);
+            LogUtil.e("sigBlockSizeByte = " + ConvertUtil.bytesToHexString(sigBlockSizeByte));
+            LogUtil.e("sigBlockSizeByteBig = " + ConvertUtil.bytesToHexString(sigBlockSizeByteBig));//0000000000000C81
+            LogUtil.e("sigBlockSize = " + sigBlockSizeFromFooter);
+
+            // 第四步，V2签名块的块头偏移量
+            int sigBlockHeadOffset = magicOffSet + 16 - sigBlockSizeFromFooter;
+            LogUtil.e("sigBlockHeadOffset = " + sigBlockHeadOffset);
+
+            // 第五步，头部大小的偏移量
+            int sizeInHeadOffset = sigBlockHeadOffset - 8;
+            LogUtil.e("sizeInHeadOffset = " + sizeInHeadOffset);
+
+            // 第六步，用头部数据再次计算 V2签名块 的大小，对比第三步，验证数据是否一致
+            byte[] sigBlockSizeByteFromHead = BytesOptUtil.getSubBytes(apkBytes,sizeInHeadOffset,8);
+            byte[] sigBlockSizeByteFromHeadBig = BytesOptUtil.changeBytes(sigBlockSizeByteFromHead);
+            int sigBlockSizeFromHead = BytesOptUtil.byteToBuffer(sigBlockSizeByteFromHeadBig).getInt(4);
+            LogUtil.e("sigBlockSizeByteFromHead = " + ConvertUtil.bytesToHexString(sigBlockSizeByteFromHead));
+            LogUtil.e("sigBlockSizeByteFromHeadBig = " + ConvertUtil.bytesToHexString(sigBlockSizeByteFromHeadBig));//0000000000000C81
+            LogUtil.e("sigBlockSizeFromHead = " + sigBlockSizeFromHead);
+
+            if(sigBlockSizeFromHead == sigBlockSizeFromFooter){
+                LogUtil.e("头尾大小一致，验证ok");
+            }else{
+                showMessage("头尾大小不一致，验证失败");
+                return;
+            }
+
+            // 第七步，jxnx签名块的ID
+            int jxnxSigIDOffset = BytesOptUtil.matchBytesBySelect(apkBytes, jxnxID, 1);
+            LogUtil.e("jxnxSigIDOffset = " + jxnxSigIDOffset);
+            byte[] jxnxSigID = BytesOptUtil.getSubBytes(apkBytes,jxnxSigIDOffset,4);
+            LogUtil.e("jxnxSigID = " + ConvertUtil.bytesToHexString(jxnxSigID));
+            int jxnxSigBlockOffset = jxnxSigIDOffset - 8;
+
+            // 第八步，eocd 的 ID
+            byte[] eocdID = new byte[]{0x50,0x4b,0x05,0x06,};
+            int eocdIDOffset = BytesOptUtil.matchBytesBySelect(apkBytes,eocdID,1);
+            byte[] eocdBytes = BytesOptUtil.getSubBytes(apkBytes,eocdIDOffset,apkBytes.length - eocdIDOffset);
+            LogUtil.e("eocdIDOffset = " + eocdIDOffset);
+            LogUtil.e("eocdBytes = " + ConvertUtil.bytesToHexString(eocdBytes));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
 }
 
 

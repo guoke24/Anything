@@ -264,7 +264,7 @@ public class FileOptActivity extends BaseTestActivity {
 
 
             byte[] smallbytes = rearBytes.array();//不受指针移动的影响
-            byte[] bigbytes = changeBytes(smallbytes);//小端序转大端序
+            byte[] bigbytes = BytesOptUtil.changeBytes(smallbytes);//小端序转大端序
             ByteBuffer bigBuffer = ByteBuffer.allocate(8);
             bigBuffer.put(bigbytes);//指针会移动到末尾
             LogUtil.e(ConvertUtil.bytesToHexString(bigBuffer.array()));
@@ -291,13 +291,7 @@ public class FileOptActivity extends BaseTestActivity {
 
     }
 
-    public static byte[] changeBytes(byte[] a) {
-        byte[] b = new byte[a.length];
-        for (int i = 0; i < b.length; i++) {
-            b[i] = a[b.length - i - 1];
-        }
-        return b;
-    }
+
 
 
     // 安装 jxnx 测试ok
@@ -377,7 +371,7 @@ public class FileOptActivity extends BaseTestActivity {
             //LogUtil.e("sizeInFooter = " + sizeInFooterBuffer.getInt());
 
             // begin 转大端序，读出后四个字节的int数值，即整签名块的长度
-            byte[] bigSizeInFooter = changeBytes(sizeInFooterBuffer.array());
+            byte[] bigSizeInFooter = BytesOptUtil.changeBytes(sizeInFooterBuffer.array());
             LogUtil.e("bigSizeInFooter = " + ConvertUtil.bytesToHexString(bigSizeInFooter));
             ByteBuffer sizeInFooterBufferBig = BytesOptUtil.byteToBuffer(bigSizeInFooter);
             int sizeOfSigBlock = sizeInFooterBufferBig.getInt(4);
