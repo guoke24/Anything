@@ -100,6 +100,21 @@ public class BytesOptUtil {
         return subBytes;
     }
 
+    public static ByteBuffer getSubBytesBuffer(byte[] bytes , int offset , int len) throws Exception {
+
+        if(bytes.length < offset + len){
+            throw new Exception(" bytes.length must greater than (offset + len) ");
+        }
+
+        byte[] subBytes = new byte[len];
+        System.arraycopy(bytes,offset,subBytes,0,len);
+
+        ByteBuffer byteBuffer = ByteBuffer.allocate(subBytes.length);
+        byteBuffer.put(subBytes);
+        byteBuffer.rewind();
+        return byteBuffer;
+    }
+
     /**
      * byte字节 转 byteBuffere
      * @param bytes

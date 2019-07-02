@@ -836,10 +836,11 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     }
 
+    // 查找 eocd 的 ID  0x50,0x4b,0x05,0x06
     public void test_13(View v){
         byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
         //byte[] eocdID = new byte[]{0x06,0x05,0x4b,0x50};
-        byte[] eocdID = new byte[]{0x50,0x4b,0x05,0x06,};
+        byte[] eocdID = new byte[]{0x50,0x4b,0x05,0x06};
         try {
             int eocdOffSet = BytesOptUtil.matchBytesBySelect(apkBytes,eocdID,1);
             //int eocdOffSet = BytesOptUtil.matchBytesBySelect(apkBytes,jxnxID,1);
@@ -862,6 +863,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
         }
     }
 
+    // string 写入文件
     public void test_14(View v){
         byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
         String apkString = ConvertUtil.bytesToHexString(apkBytes);
@@ -869,6 +871,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
         FileOptUtil.writeStringToFileInData(apkString,"apkHex.txt",this);
     }
 
+    // 分离出原生v2 签名的apk ，并验证成功
     public void test_15(View v){
         byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
 
@@ -890,11 +893,11 @@ public class SignerVerifyActivity extends BaseTestActivity {
             LogUtil.e("sigBlockSize = " + sigBlockSizeFromFooter);
 
             // 第四步，V2签名块的块头偏移量
-            int sigBlockHeadOffset = magicOffSet + 16 - sigBlockSizeFromFooter;
-            LogUtil.e("sigBlockHeadOffset = " + sigBlockHeadOffset);
+            int allSigBlockHeadOffset = magicOffSet + 16 - sigBlockSizeFromFooter;
+            LogUtil.e("sigBlockHeadOffset = " + allSigBlockHeadOffset);
 
             // 第五步，头部大小的偏移量
-            int sizeInHeadOffset = sigBlockHeadOffset - 8;
+            int sizeInHeadOffset = allSigBlockHeadOffset - 8;
             LogUtil.e("sizeInHeadOffset = " + sizeInHeadOffset);
 
             // 第六步，用头部数据再次计算 V2签名块 的大小，对比第三步，验证数据是否一致
@@ -917,7 +920,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
             LogUtil.e("jxnxSigIDOffset = " + jxnxSigIDOffset);
             byte[] jxnxSigID = BytesOptUtil.getSubBytes(apkBytes,jxnxSigIDOffset,4);
             LogUtil.e("jxnxSigID = " + ConvertUtil.bytesToHexString(jxnxSigID));
-            int jxnxSigBlockOffset = jxnxSigIDOffset - 8;
+            int jxnxWholeSigBlockOffset = jxnxSigIDOffset - 8;
 
             // 第八步，eocd 的 ID
             byte[] eocdID = new byte[]{0x50,0x4b,0x05,0x06,};
@@ -926,8 +929,102 @@ public class SignerVerifyActivity extends BaseTestActivity {
             LogUtil.e("eocdIDOffset = " + eocdIDOffset);
             LogUtil.e("eocdBytes = " + ConvertUtil.bytesToHexString(eocdBytes));
 
+
+            int cdOffset = magicOffSet + 16;
+
+            LogUtil.e("开始重新构建");
+            // 开始重新构建 原生v2签名apk的字节块
+
+            // 第一部分：coze ： content of zip entry
+            ByteBuffer coznBytes = BytesOptUtil.getSubBytesBuffer(apkBytes,0,sizeInHeadOffset);
+            byte[] coznBytes4BytesInFooter = BytesOptUtil.getSubBytes(coznBytes.array(),coznBytes.array().length - 4,4);
+            LogUtil.e("coznBytes 4 bytes in footer = " + ConvertUtil.bytesToHexString(coznBytes4BytesInFooter));
+
+
+
+            // 原生v2签名部分：origV2sigBlock
+            ByteBuffer origV2sigBlockBytes =   //
+                    BytesOptUtil.getSubBytesBuffer(apkBytes,allSigBlockHeadOffset,jxnxWholeSigBlockOffset - allSigBlockHeadOffset);
+            byte[] origV2sigBlock4BytesInFooter = BytesOptUtil.getSubBytes(origV2sigBlockBytes.array(),origV2sigBlockBytes.array().length - 4 ,4);
+            LogUtil.e("origV2sigBlock 4 bytes in footer = " +ConvertUtil.bytesToHexString(origV2sigBlock4BytesInFooter));
+
+
+            // 魔数块
+            ByteBuffer magicBytes = BytesOptUtil.getSubBytesBuffer(apkBytes,magicOffSet,16);
+            LogUtil.e("magicBytes = " +ConvertUtil.bytesToHexString(magicBytes.array()));
+
+
+            // cd
+            ByteBuffer cdBytes = BytesOptUtil.getSubBytesBuffer(apkBytes,cdOffset,eocdIDOffset - cdOffset);
+            byte[] cd4BytesInFooter = BytesOptUtil.getSubBytes(cdBytes.array(),cdBytes.array().length - 4 ,4);
+            LogUtil.e("cd4BytesInFooter = " +ConvertUtil.bytesToHexString(cd4BytesInFooter));
+
+            // eocd
+            ByteBuffer eocdBytesBuffer = BytesOptUtil.byteToBuffer(eocdBytes);
+            LogUtil.e("eocdBytes = " +ConvertUtil.bytesToHexString(eocdBytesBuffer.array()));
+
+            // 构建完成 原生v2签名apk的字节块
+
+            // 重新计算 原生v2签名块的长度
+
+            int origV2SigBlockSize = origV2sigBlockBytes.array().length;
+            LogUtil.e("origV2SigBlockSize = " + origV2SigBlockSize);
+
+            int origV2SigBlockAndRearSize = origV2sigBlockBytes.array().length + 8 + 16;
+            LogUtil.e("origV2SigBlockAndRearSize = " + origV2SigBlockAndRearSize);
+
+            ByteBuffer origV2SigBlockAndRearSizeBuffer = ByteBuffer.allocate(8);
+            origV2SigBlockAndRearSizeBuffer.order(ByteOrder.LITTLE_ENDIAN);
+            origV2SigBlockAndRearSizeBuffer.putInt(origV2SigBlockAndRearSize);
+            origV2SigBlockAndRearSizeBuffer.rewind();
+            LogUtil.e("wholeSigBlockSizeBuffer = " + ConvertUtil.bytesToHexString(origV2SigBlockAndRearSizeBuffer.array()));
+
+            byte[] sizeInHeadNew = origV2SigBlockAndRearSizeBuffer.array();
+            byte[] sizeInFooterNew = origV2SigBlockAndRearSizeBuffer.array();
+
+            // cd的新偏移量的字节
+            int cdOffsetNew = sizeInHeadOffset + 8 + origV2SigBlockAndRearSize;
+            ByteBuffer cdOffsetNewBuffer = ByteBuffer.allocate(6);
+            cdOffsetNewBuffer.order(ByteOrder.LITTLE_ENDIAN);
+            cdOffsetNewBuffer.putInt(cdOffsetNew);
+            LogUtil.e("cdOffsetNewBuffer = " + ConvertUtil.bytesToHexString(cdOffsetNewBuffer.array()));
+
+            // 原来的eocd的字节
+            LogUtil.e("eocdBytesBuffer = " + ConvertUtil.bytesToHexString(eocdBytesBuffer.array()));
+
+            // 将偏移量插入 eocd 的尾部，字节块内 偏移16个字节开始，替换6个字节。原生代码确认一下
+            byte[] eocdNocdOffset = BytesOptUtil.getSubBytes(eocdBytesBuffer.array(),0,eocdBytesBuffer.array().length - 6);
+            LogUtil.e("eocdNocdOffset = " + ConvertUtil.bytesToHexString(eocdNocdOffset));
+
+            byte[] eocdNewBytes = BytesOptUtil.mergeBytes(eocdNocdOffset,cdOffsetNewBuffer.array());
+            LogUtil.e("eocdNewBytes = " + ConvertUtil.bytesToHexString(eocdNewBytes));
+
+            // 计算新apk的大小
+            int origApkSize = coznBytes.array().length
+                    + origV2SigBlockAndRearSizeBuffer.array().length
+                    + origV2sigBlockBytes.array().length
+                    + origV2SigBlockAndRearSizeBuffer.array().length
+                    + 16
+                    + cdBytes.array().length
+                    + eocdNewBytes.length;
+
+
+            ByteBuffer origApkBytes = ByteBuffer.allocate(origApkSize);
+
+            origApkBytes.put(coznBytes.array())
+                    .put(origV2SigBlockAndRearSizeBuffer.array())
+                    .put(origV2sigBlockBytes.array())
+                    .put(origV2SigBlockAndRearSizeBuffer.array())
+                    .put(endByteV2)
+                    .put(cdBytes.array())
+                    .put(eocdNewBytes);
+
+            byte[] hash = SignerVerifyUtils.calHash(origApkBytes.array(),0,origApkBytes.array().length);
+
+            LogUtil.e("hash = " + ConvertUtil.bytesToHexString(hash));
         } catch (Exception e) {
             e.printStackTrace();
+            LogUtil.e("Exception = " + e.toString());
         }
 
     }
