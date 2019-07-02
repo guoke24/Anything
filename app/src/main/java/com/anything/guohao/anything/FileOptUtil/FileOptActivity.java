@@ -439,6 +439,54 @@ public class FileOptActivity extends BaseTestActivity {
     }
 
 
+    public void test_9(View v){
+        LogUtil.e("" + "1");
+        testByteBuffer();
+        LogUtil.e("" + "2");
+    }
 
+    // 测试 bytebuffer
+    private void testByteBuffer(){
+        ByteBuffer byteBuffer = ByteBuffer.allocate(8);
+        byteBuffer.putInt(1);
+        LogUtil.e("" + ConvertUtil.bytesToHexString(byteBuffer.array()));
+        // 结果：0000000100000000
+        // 说明写入 4个字节的int类型的数据
+
+        ByteBuffer byteBuffer2 = ByteBuffer.allocate(8);
+        byteBuffer2.order(ByteOrder.LITTLE_ENDIAN);
+        byteBuffer2.putInt(1);
+        LogUtil.e("" + ConvertUtil.bytesToHexString(byteBuffer2.array()));
+        // 结果 0100000000000000
+        // 说明，默认大端序，跟人类的直觉一致
+
+        ByteBuffer byteBuffer3 = ByteBuffer.allocate(4);
+        byteBuffer3.order(ByteOrder.LITTLE_ENDIAN);
+        byteBuffer3.putInt(256 + 16 + 1);
+        LogUtil.e("" + ConvertUtil.bytesToHexString(byteBuffer3.array()));
+        // 结果 11010000
+        // 转换成大端序： 00 00 01 11 （符合直觉）
+
+
+        byte[] byte4 = new byte[]{0x1a,0x02,0x03,0x04};
+        LogUtil.e("byte4 = " + byte4);
+        // 直接输出字节数组的结果：[B@e442d66
+        LogUtil.e("byte4 [0] = " + byte4[0]);
+        // 单个字节输出,就会输出int数值
+
+        // 如果想输出 字节数组的 int数值，用 bytebuffer
+        ByteBuffer buffer = ByteBuffer.allocate(byte4.length);
+        buffer.put(byte4);
+        buffer.rewind();
+        LogUtil.e("buffer.getInt() = " + buffer.getInt());//结果：436339460
+        LogUtil.e("buffer = " + ConvertUtil.bytesToHexString(buffer.array()));
+        
+
+        buffer.clear();
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        LogUtil.e("buffer.getInt() = " + buffer.getInt());//结果：67306010
+        LogUtil.e("buffer = " + ConvertUtil.bytesToHexString(buffer.array()));
+        // 同样的字节端，不同的端序，不同的数值
+    }
 
 }

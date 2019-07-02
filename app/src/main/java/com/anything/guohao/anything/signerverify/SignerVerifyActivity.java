@@ -1119,30 +1119,37 @@ public class SignerVerifyActivity extends BaseTestActivity {
     }
 
 
-    public void gotoVerify(String apkFile) throws FileNotFoundException {
+    public void gotoVerify(String apkFile) throws Exception {
         RandomAccessFile apk = new RandomAccessFile(apkFile, "r");
         SignatureInfo signatureInfo = findSignature(apk);
         //verify(signatureInfo);
     }
 
-    private static SignatureInfo findSignature(RandomAccessFile apk) {
+    private SignatureInfo findSignature(RandomAccessFile apk) throws Exception {
         // Find the ZIP End of Central Directory (EoCD) record.
         //Pair<ByteBuffer, Long> eocdAndOffsetInFile = getEocd(apk);// 先找到中央区尾部
         //ByteBuffer eocd = eocdAndOffsetInFile.first;  // 中央区尾部字节
         //long eocdOffset = eocdAndOffsetInFile.second; // 中央区尾部偏移量
 
-//        if (ZipUtils.isZip64EndOfCentralDirectoryLocatorPresent(apk, eocdOffset)) {
-//            throw new SignatureNotFoundException("ZIP64 APK not supported");
-//        }
+        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk, this);
+        byte[] eocdID = new byte[]{0x50, 0x4b, 0x05, 0x06,};
+        int eocdOffset = BytesOptUtil.matchBytesBySelect(apkBytes,eocdID,1);
+        ByteBuffer eocd = BytesOptUtil.getSubBytesBuffer(apkBytes,eocdOffset,apkBytes.length - eocdOffset);
 
-        // Find the APK Signing Block. The block immediately(立即;紧接) precedes(走在…前面) the Central Directory.
 //        long centralDirOffset = getCentralDirOffset(eocd, eocdOffset); // 中央区偏移量
+        int magic = BytesOptUtil.matchBytesBySelect(apkBytes,endByteV2,1);
+        int centralDirOffset = magic + 16;
+
 //
 //        Pair<ByteBuffer, Long> apkSigningBlockAndOffsetInFile =
 //                findApkSigningBlock(apk, centralDirOffset); //3-1 根据中央区偏移量，找出签名块和其偏移量，构成键值对，一起返回
 
 //        ByteBuffer apkSigningBlock = apkSigningBlockAndOffsetInFile.first;  // 签名块的字节
 //        long apkSigningBlockOffset = apkSigningBlockAndOffsetInFile.second; // 签名块的偏移量
+
+        // 尽量不要用遍历字节数组的方法！！！
+        // 通过字节数组转int的方式，获得某一块的size，再结合偏移量，找到每一块的偏移量！！
+        // 源码中，都是确定好偏移量，从RandomAccessFile 读取到 ByteBuffer内的
 
         // Find the APK Signature Scheme v2 Block inside the APK Signing Block.
         //ByteBuffer apkSignatureSchemeV2Block = findApkSignatureSchemeV2Block(apkSigningBlock); // 返回的是原声签名块里的ID-Value块
