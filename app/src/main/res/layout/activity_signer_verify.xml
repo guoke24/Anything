@@ -144,6 +144,22 @@
             android:text="test15"
             android:textSize="15sp" />
 
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:onClick="test_16"
+            android:text="test16"
+            android:textSize="15sp" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:onClick="test_17"
+            android:text="test17"
+            android:textSize="15sp" />
+
     </LinearLayout>
 
 </LinearLayout>

@@ -3,6 +3,7 @@ package com.anything.guohao.anything.signerverify;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.Toast;
 
@@ -138,7 +139,11 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     //遍历 apk 内的文件，用 JarFile
     public void test_2(View v) {
+        apkPath = AssetsUtils.fileOpt(SmartPhonePos_apk, this);
+        readApkWithJarFile(apkPath);
+    }
 
+    private void readApkWithJarFile(String apkPath) {
         try {
             if (apkPath.equals("")) {
                 Toast.makeText(this, "apk文件不存在", Toast.LENGTH_SHORT).show();
@@ -524,7 +529,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
             LogUtil.e("certBytes:" + ConvertUtil.bytesToHexString(certBytes.array()));
 
 
-            verifyWorkCert(certBytes.array(),1,certSizeBytes.array().length - 1);
+            verifyWorkCert(certBytes.array(), 1, certSizeBytes.array().length - 1);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -586,9 +591,9 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     // 提取出 jxnx签名块的 三部分：主体，签名数据，证书；且证书验签成功
     public void test_10(View v) {
-        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
+        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk, this);
 
-        if(apkBytes == null){
+        if (apkBytes == null) {
             return;
         }
 
@@ -630,13 +635,13 @@ public class SignerVerifyActivity extends BaseTestActivity {
                         LogUtil.e("-------------parse result -------------- n" + n);
                         asn1Primitive = asn1Encodable.toASN1Primitive();
                         LogUtil.e("asn1String: " + ConvertUtil.bytesToHexString(asn1Primitive.getEncoded()));
-                        if(n == 0){
+                        if (n == 0) {
                             firstPartBytes = asn1Primitive.getEncoded();
                             LogUtil.e("firstPartBytes size = " + firstPartBytes.length);
-                        }else if(n == 1){
+                        } else if (n == 1) {
                             sigData = asn1Primitive.getEncoded();
                             LogUtil.e("sigData size = " + sigData.length);
-                        }else if(n == 2){
+                        } else if (n == 2) {
                             cert = asn1Primitive.getEncoded();
                             LogUtil.e("cert size = " + cert.length);
                         }
@@ -645,10 +650,10 @@ public class SignerVerifyActivity extends BaseTestActivity {
                 }
             }
             // 把原始apk的hash值
-            byte[] hashId = new byte[]{0x02,0x20};
-            int hashOffset = BytesOptUtil.matchBytesBySelect(firstPartBytes,hashId,1);
+            byte[] hashId = new byte[]{0x02, 0x20};
+            int hashOffset = BytesOptUtil.matchBytesBySelect(firstPartBytes, hashId, 1);
             // 拷贝数组
-            System.arraycopy(firstPartBytes,hashOffset + 2 ,orighash,0,32);
+            System.arraycopy(firstPartBytes, hashOffset + 2, orighash, 0, 32);
 
             LogUtil.e("orighash = " + ConvertUtil.bytesToHexString(orighash));
 
@@ -657,12 +662,12 @@ public class SignerVerifyActivity extends BaseTestActivity {
             LogUtil.e("cert = " + ConvertUtil.bytesToHexString(cert));
 
             // 第一步 验证书
-            PublicKey publicKey = verifyWorkCert(cert,5,cert.length - 5);
+            PublicKey publicKey = verifyWorkCert(cert, 5, cert.length - 5);
 
             // 第二步 验签名
-            byte[] subSigdata = BytesOptUtil.getSubBytes(sigData,4,sigData.length-4);
+            byte[] subSigdata = BytesOptUtil.getSubBytes(sigData, 4, sigData.length - 4);
 
-            byte[] hash = SignerVerifyUtils.calHash(firstPartBytes,0,firstPartBytes.length ); // SHA256
+            byte[] hash = SignerVerifyUtils.calHash(firstPartBytes, 0, firstPartBytes.length); // SHA256
             LogUtil.e("hash = " + ConvertUtil.bytesToHexString(hash));
             LogUtil.e("hash len = " + hash.length);
 
@@ -671,19 +676,19 @@ public class SignerVerifyActivity extends BaseTestActivity {
             // 签名数据：sigData
             // 原数据：hash 32
 
-            byte[] hash32 ;
-            if(hash.length > 32){
+            byte[] hash32;
+            if (hash.length > 32) {
                 hash32 = new byte[32];
-                System.arraycopy(hash,0 ,hash32,0,32);
-            }else{
+                System.arraycopy(hash, 0, hash32, 0, 32);
+            } else {
                 hash32 = hash;
             }
-            boolean res = RSAUtils.verify(hash32,publicKey,subSigdata); // SHA256withRSA
+            boolean res = RSAUtils.verify(hash32, publicKey, subSigdata); // SHA256withRSA
             LogUtil.e("verify sign res = " + res);
 
-            if(res){
+            if (res) {
                 showMessage("签名验证 ok");
-            }else{
+            } else {
                 showMessage("签名验证 fail");
             }
 
@@ -697,47 +702,47 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     // 测试 RSAEncrypt类 和 RSASignature类
     public void test_11(View v) throws Exception {
-        String filepath= getFilesDir().getPath() + File.separator;
+        String filepath = getFilesDir().getPath() + File.separator;
 
         //生成公钥和私钥文件
         RSAEncrypt.genKeyPair(filepath);
 
         System.out.println("--------------公钥加密私钥解密过程-------------------");
-        String plainText="这是一行待用公钥加密的文字";
+        String plainText = "这是一行待用公钥加密的文字";
         //公钥加密过程
-        byte[] cipherData=RSAEncrypt.encrypt(RSAEncrypt.loadPublicKeyByStr(RSAEncrypt.loadPublicKeyByFile(filepath)),plainText.getBytes());
-        String cipher=Base64.encode(cipherData);
+        byte[] cipherData = RSAEncrypt.encrypt(RSAEncrypt.loadPublicKeyByStr(RSAEncrypt.loadPublicKeyByFile(filepath)), plainText.getBytes());
+        String cipher = Base64.encode(cipherData);
         //私钥解密过程
-        byte[] res=RSAEncrypt.decrypt(RSAEncrypt.loadPrivateKeyByStr(RSAEncrypt.loadPrivateKeyByFile(filepath)), Base64.decode(cipher));
-        String restr=new String(res);
-        System.out.println("原文："+plainText);
-        System.out.println("加密："+cipher);
-        System.out.println("解密："+restr);
+        byte[] res = RSAEncrypt.decrypt(RSAEncrypt.loadPrivateKeyByStr(RSAEncrypt.loadPrivateKeyByFile(filepath)), Base64.decode(cipher));
+        String restr = new String(res);
+        System.out.println("原文：" + plainText);
+        System.out.println("加密：" + cipher);
+        System.out.println("解密：" + restr);
         System.out.println();
 
         System.out.println("--------------私钥加密公钥解密过程-------------------");
-        plainText="这是一行待用私钥加密的文字";
+        plainText = "这是一行待用私钥加密的文字";
         //私钥加密过程
-        cipherData=RSAEncrypt.encrypt(RSAEncrypt.loadPrivateKeyByStr(RSAEncrypt.loadPrivateKeyByFile(filepath)),plainText.getBytes());
-        cipher=Base64.encode(cipherData);
+        cipherData = RSAEncrypt.encrypt(RSAEncrypt.loadPrivateKeyByStr(RSAEncrypt.loadPrivateKeyByFile(filepath)), plainText.getBytes());
+        cipher = Base64.encode(cipherData);
         //公钥解密过程
-        res=RSAEncrypt.decrypt(RSAEncrypt.loadPublicKeyByStr(RSAEncrypt.loadPublicKeyByFile(filepath)), Base64.decode(cipher));
-        restr=new String(res);
-        System.out.println("原文："+plainText);
-        System.out.println("加密："+cipher);
-        System.out.println("解密："+restr);
+        res = RSAEncrypt.decrypt(RSAEncrypt.loadPublicKeyByStr(RSAEncrypt.loadPublicKeyByFile(filepath)), Base64.decode(cipher));
+        restr = new String(res);
+        System.out.println("原文：" + plainText);
+        System.out.println("加密：" + cipher);
+        System.out.println("解密：" + restr);
         System.out.println();
 
         System.out.println("---------------私钥【签名】过程------------------");
-        String content="这是一行待签名的文字";
-        String signstr=RSASignature.sign(content,RSAEncrypt.loadPrivateKeyByFile(filepath));
-        System.out.println("签名原串："+content);
-        System.out.println("签名串："+signstr);
+        String content = "这是一行待签名的文字";
+        String signstr = RSASignature.sign(content, RSAEncrypt.loadPrivateKeyByFile(filepath));
+        System.out.println("签名原串：" + content);
+        System.out.println("签名串：" + signstr);
         System.out.println();
 
         System.out.println("---------------公钥【校验签名】------------------");
-        System.out.println("签名原串："+content);
-        System.out.println("签名串："+signstr);
+        System.out.println("签名原串：" + content);
+        System.out.println("签名串：" + signstr);
 
         System.out.println("验签结果：" +
                 RSASignature.doCheck(
@@ -837,12 +842,12 @@ public class SignerVerifyActivity extends BaseTestActivity {
     }
 
     // 查找 eocd 的 ID  0x50,0x4b,0x05,0x06
-    public void test_13(View v){
-        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
+    public void test_13(View v) {
+        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk, this);
         //byte[] eocdID = new byte[]{0x06,0x05,0x4b,0x50};
-        byte[] eocdID = new byte[]{0x50,0x4b,0x05,0x06};
+        byte[] eocdID = new byte[]{0x50, 0x4b, 0x05, 0x06};
         try {
-            int eocdOffSet = BytesOptUtil.matchBytesBySelect(apkBytes,eocdID,1);
+            int eocdOffSet = BytesOptUtil.matchBytesBySelect(apkBytes, eocdID, 1);
             //int eocdOffSet = BytesOptUtil.matchBytesBySelect(apkBytes,jxnxID,1);
             LogUtil.e("eocdOffSet = " + eocdOffSet);
 
@@ -851,10 +856,9 @@ public class SignerVerifyActivity extends BaseTestActivity {
             // 中央区的偏移量
             int cdOffSet = magicOffSet + 16;
             LogUtil.e("cdOffSet = " + cdOffSet);
-            byte[] test = new byte[]{0x00,(byte) 0xc3,(byte) 0xda,0x0f};
+            byte[] test = new byte[]{0x00, (byte) 0xc3, (byte) 0xda, 0x0f};
             int test2 = BytesOptUtil.matchBytesBySelect(apkBytes, test, 1);
-            LogUtil.e("test2 = " +  test2);// 找不到记录
-
+            LogUtil.e("test2 = " + test2);// 找不到记录
 
 
         } catch (Exception e) {
@@ -864,16 +868,16 @@ public class SignerVerifyActivity extends BaseTestActivity {
     }
 
     // string 写入文件
-    public void test_14(View v){
-        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
+    public void test_14(View v) {
+        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk, this);
         String apkString = ConvertUtil.bytesToHexString(apkBytes);
 
-        FileOptUtil.writeStringToFileInData(apkString,"apkHex.txt",this);
+        FileOptUtil.writeStringToFileInData(apkString, "apkHex.txt", this);
     }
 
     // 分离出原生v2 签名的apk ，并验证成功
-    public void test_15(View v){
-        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk,this);
+    public void test_15(View v) {
+        byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk, this);
 
         try {
             // 第一步，魔数的偏移量
@@ -885,7 +889,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
             LogUtil.e("sizeInFooterOffset = " + sizeInFooterOffset);
 
             // 第三步，计算 V2签名块 的大小
-            byte[] sigBlockSizeByte = BytesOptUtil.getSubBytes(apkBytes,sizeInFooterOffset,8);
+            byte[] sigBlockSizeByte = BytesOptUtil.getSubBytes(apkBytes, sizeInFooterOffset, 8);
             byte[] sigBlockSizeByteBig = BytesOptUtil.changeBytes(sigBlockSizeByte);
             int sigBlockSizeFromFooter = BytesOptUtil.byteToBuffer(sigBlockSizeByteBig).getInt(4);
             LogUtil.e("sigBlockSizeByte = " + ConvertUtil.bytesToHexString(sigBlockSizeByte));
@@ -901,16 +905,16 @@ public class SignerVerifyActivity extends BaseTestActivity {
             LogUtil.e("sizeInHeadOffset = " + sizeInHeadOffset);
 
             // 第六步，用头部数据再次计算 V2签名块 的大小，对比第三步，验证数据是否一致
-            byte[] sigBlockSizeByteFromHead = BytesOptUtil.getSubBytes(apkBytes,sizeInHeadOffset,8);
+            byte[] sigBlockSizeByteFromHead = BytesOptUtil.getSubBytes(apkBytes, sizeInHeadOffset, 8);
             byte[] sigBlockSizeByteFromHeadBig = BytesOptUtil.changeBytes(sigBlockSizeByteFromHead);
             int sigBlockSizeFromHead = BytesOptUtil.byteToBuffer(sigBlockSizeByteFromHeadBig).getInt(4);
             LogUtil.e("sigBlockSizeByteFromHead = " + ConvertUtil.bytesToHexString(sigBlockSizeByteFromHead));
             LogUtil.e("sigBlockSizeByteFromHeadBig = " + ConvertUtil.bytesToHexString(sigBlockSizeByteFromHeadBig));//0000000000000C81
             LogUtil.e("sigBlockSizeFromHead = " + sigBlockSizeFromHead);
 
-            if(sigBlockSizeFromHead == sigBlockSizeFromFooter){
+            if (sigBlockSizeFromHead == sigBlockSizeFromFooter) {
                 LogUtil.e("头尾大小一致，验证ok");
-            }else{
+            } else {
                 showMessage("头尾大小不一致，验证失败");
                 return;
             }
@@ -918,14 +922,14 @@ public class SignerVerifyActivity extends BaseTestActivity {
             // 第七步，jxnx签名块的ID
             int jxnxSigIDOffset = BytesOptUtil.matchBytesBySelect(apkBytes, jxnxID, 1);
             LogUtil.e("jxnxSigIDOffset = " + jxnxSigIDOffset);
-            byte[] jxnxSigID = BytesOptUtil.getSubBytes(apkBytes,jxnxSigIDOffset,4);
+            byte[] jxnxSigID = BytesOptUtil.getSubBytes(apkBytes, jxnxSigIDOffset, 4);
             LogUtil.e("jxnxSigID = " + ConvertUtil.bytesToHexString(jxnxSigID));
             int jxnxWholeSigBlockOffset = jxnxSigIDOffset - 8;
 
             // 第八步，eocd 的 ID
-            byte[] eocdID = new byte[]{0x50,0x4b,0x05,0x06,};
-            int eocdIDOffset = BytesOptUtil.matchBytesBySelect(apkBytes,eocdID,1);
-            byte[] eocdBytes = BytesOptUtil.getSubBytes(apkBytes,eocdIDOffset,apkBytes.length - eocdIDOffset);
+            byte[] eocdID = new byte[]{0x50, 0x4b, 0x05, 0x06,};
+            int eocdIDOffset = BytesOptUtil.matchBytesBySelect(apkBytes, eocdID, 1);
+            byte[] eocdBytes = BytesOptUtil.getSubBytes(apkBytes, eocdIDOffset, apkBytes.length - eocdIDOffset);
             LogUtil.e("eocdIDOffset = " + eocdIDOffset);
             LogUtil.e("eocdBytes = " + ConvertUtil.bytesToHexString(eocdBytes));
 
@@ -936,32 +940,31 @@ public class SignerVerifyActivity extends BaseTestActivity {
             // 开始重新构建 原生v2签名apk的字节块
 
             // 第一部分：coze ： content of zip entry
-            ByteBuffer coznBytes = BytesOptUtil.getSubBytesBuffer(apkBytes,0,sizeInHeadOffset);
-            byte[] coznBytes4BytesInFooter = BytesOptUtil.getSubBytes(coznBytes.array(),coznBytes.array().length - 4,4);
+            ByteBuffer coznBytes = BytesOptUtil.getSubBytesBuffer(apkBytes, 0, sizeInHeadOffset);
+            byte[] coznBytes4BytesInFooter = BytesOptUtil.getSubBytes(coznBytes.array(), coznBytes.array().length - 4, 4);
             LogUtil.e("coznBytes 4 bytes in footer = " + ConvertUtil.bytesToHexString(coznBytes4BytesInFooter));
-
 
 
             // 原生v2签名部分：origV2sigBlock
             ByteBuffer origV2sigBlockBytes =   //
-                    BytesOptUtil.getSubBytesBuffer(apkBytes,allSigBlockHeadOffset,jxnxWholeSigBlockOffset - allSigBlockHeadOffset);
-            byte[] origV2sigBlock4BytesInFooter = BytesOptUtil.getSubBytes(origV2sigBlockBytes.array(),origV2sigBlockBytes.array().length - 4 ,4);
-            LogUtil.e("origV2sigBlock 4 bytes in footer = " +ConvertUtil.bytesToHexString(origV2sigBlock4BytesInFooter));
+                    BytesOptUtil.getSubBytesBuffer(apkBytes, allSigBlockHeadOffset, jxnxWholeSigBlockOffset - allSigBlockHeadOffset);
+            byte[] origV2sigBlock4BytesInFooter = BytesOptUtil.getSubBytes(origV2sigBlockBytes.array(), origV2sigBlockBytes.array().length - 4, 4);
+            LogUtil.e("origV2sigBlock 4 bytes in footer = " + ConvertUtil.bytesToHexString(origV2sigBlock4BytesInFooter));
 
 
             // 魔数块
-            ByteBuffer magicBytes = BytesOptUtil.getSubBytesBuffer(apkBytes,magicOffSet,16);
-            LogUtil.e("magicBytes = " +ConvertUtil.bytesToHexString(magicBytes.array()));
+            ByteBuffer magicBytes = BytesOptUtil.getSubBytesBuffer(apkBytes, magicOffSet, 16);
+            LogUtil.e("magicBytes = " + ConvertUtil.bytesToHexString(magicBytes.array()));
 
 
             // cd
-            ByteBuffer cdBytes = BytesOptUtil.getSubBytesBuffer(apkBytes,cdOffset,eocdIDOffset - cdOffset);
-            byte[] cd4BytesInFooter = BytesOptUtil.getSubBytes(cdBytes.array(),cdBytes.array().length - 4 ,4);
-            LogUtil.e("cd4BytesInFooter = " +ConvertUtil.bytesToHexString(cd4BytesInFooter));
+            ByteBuffer cdBytes = BytesOptUtil.getSubBytesBuffer(apkBytes, cdOffset, eocdIDOffset - cdOffset);
+            byte[] cd4BytesInFooter = BytesOptUtil.getSubBytes(cdBytes.array(), cdBytes.array().length - 4, 4);
+            LogUtil.e("cd4BytesInFooter = " + ConvertUtil.bytesToHexString(cd4BytesInFooter));
 
             // eocd
             ByteBuffer eocdBytesBuffer = BytesOptUtil.byteToBuffer(eocdBytes);
-            LogUtil.e("eocdBytes = " +ConvertUtil.bytesToHexString(eocdBytesBuffer.array()));
+            LogUtil.e("eocdBytes = " + ConvertUtil.bytesToHexString(eocdBytesBuffer.array()));
 
             // 构建完成 原生v2签名apk的字节块
 
@@ -993,10 +996,10 @@ public class SignerVerifyActivity extends BaseTestActivity {
             LogUtil.e("eocdBytesBuffer = " + ConvertUtil.bytesToHexString(eocdBytesBuffer.array()));
 
             // 将偏移量插入 eocd 的尾部，字节块内 偏移16个字节开始，替换6个字节。原生代码确认一下
-            byte[] eocdNocdOffset = BytesOptUtil.getSubBytes(eocdBytesBuffer.array(),0,eocdBytesBuffer.array().length - 6);
+            byte[] eocdNocdOffset = BytesOptUtil.getSubBytes(eocdBytesBuffer.array(), 0, eocdBytesBuffer.array().length - 6);
             LogUtil.e("eocdNocdOffset = " + ConvertUtil.bytesToHexString(eocdNocdOffset));
 
-            byte[] eocdNewBytes = BytesOptUtil.mergeBytes(eocdNocdOffset,cdOffsetNewBuffer.array());
+            byte[] eocdNewBytes = BytesOptUtil.mergeBytes(eocdNocdOffset, cdOffsetNewBuffer.array());
             LogUtil.e("eocdNewBytes = " + ConvertUtil.bytesToHexString(eocdNewBytes));
 
             // 计算新apk的大小
@@ -1019,7 +1022,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
                     .put(cdBytes.array())
                     .put(eocdNewBytes);
 
-            byte[] hash = SignerVerifyUtils.calHash(origApkBytes.array(),0,origApkBytes.array().length);
+            byte[] hash = SignerVerifyUtils.calHash(origApkBytes.array(), 0, origApkBytes.array().length);
 
             LogUtil.e("hash = " + ConvertUtil.bytesToHexString(hash));
         } catch (Exception e) {
@@ -1028,6 +1031,134 @@ public class SignerVerifyActivity extends BaseTestActivity {
         }
 
     }
+
+
+    String ruipak = "ruipay_smartpos_app_v0.0.72_2018-09-10_sign.apk";
+
+    public void test_16(View v) {
+        apkPath = AssetsUtils.fileOpt(ruipak, this);
+        readApkWithJarFile(apkPath);
+    }
+
+
+    // 参照源码，重新实现签名块的提取
+    public void test_17(View v) {
+        //gotoVerify();
+    }
+
+    private static class SignatureInfo {
+        private final ByteBuffer cozn;
+
+        private final long sizeInHeadOffset;
+
+        private final ByteBuffer sizeInHead;
+
+        /**
+         * （V2 签名块的字节buffer）
+         */
+        private final ByteBuffer signatureV2Block;
+
+        /**
+         * （V2 签名块的偏移量）
+         */
+        private final long apkSigningV2BlockOffset;
+
+        /**
+         * （Jxnx 签名块的字节buffer）
+         */
+        private final ByteBuffer signatureJxnxBlock;
+
+        /**
+         * （Jxnx 签名块的偏移量）
+         */
+        private final long apkSigningJxnxBlockOffset;
+
+
+        /**
+         * Position of the ZIP Central Directory in the file.（中央目录的偏移量）
+         */
+        private final long centralDirOffset;
+
+        private final ByteBuffer centralDir;
+
+        /**
+         * Position of the ZIP End of Central Directory (EoCD) in the file. （中央区尾的偏移量）
+         */
+        private final long eocdOffset;
+
+        /**
+         * Contents of ZIP End of Central Directory (EoCD) of the file. （中央区尾的字节buffer）
+         */
+        private final ByteBuffer eocd;
+
+        private SignatureInfo(
+                ByteBuffer cozn,
+                long sizeInHeadOffset,
+                ByteBuffer sizeInHead,
+                ByteBuffer signatureBlock,
+                long apkSigningBlockOffset,
+                long apkSigningJxnxBlockOffset,
+                ByteBuffer signatureJxnxBlock,
+                long centralDirOffset,
+                ByteBuffer centralDir,
+                long eocdOffset,
+                ByteBuffer eocd) {
+            this.cozn = cozn;
+            this.sizeInHeadOffset = sizeInHeadOffset;
+            this.sizeInHead = sizeInHead;
+            this.apkSigningV2BlockOffset = apkSigningBlockOffset;
+            this.signatureV2Block = signatureBlock;
+            this.apkSigningJxnxBlockOffset = apkSigningJxnxBlockOffset;
+            this.signatureJxnxBlock = signatureJxnxBlock;
+            this.centralDirOffset = centralDirOffset;
+            this.centralDir = centralDir;
+            this.eocdOffset = eocdOffset;
+            this.eocd = eocd;
+
+        }
+    }
+
+
+    public void gotoVerify(String apkFile) throws FileNotFoundException {
+        RandomAccessFile apk = new RandomAccessFile(apkFile, "r");
+        SignatureInfo signatureInfo = findSignature(apk);
+        //verify(signatureInfo);
+    }
+
+    private static SignatureInfo findSignature(RandomAccessFile apk) {
+        // Find the ZIP End of Central Directory (EoCD) record.
+        //Pair<ByteBuffer, Long> eocdAndOffsetInFile = getEocd(apk);// 先找到中央区尾部
+        //ByteBuffer eocd = eocdAndOffsetInFile.first;  // 中央区尾部字节
+        //long eocdOffset = eocdAndOffsetInFile.second; // 中央区尾部偏移量
+
+//        if (ZipUtils.isZip64EndOfCentralDirectoryLocatorPresent(apk, eocdOffset)) {
+//            throw new SignatureNotFoundException("ZIP64 APK not supported");
+//        }
+
+        // Find the APK Signing Block. The block immediately(立即;紧接) precedes(走在…前面) the Central Directory.
+//        long centralDirOffset = getCentralDirOffset(eocd, eocdOffset); // 中央区偏移量
+//
+//        Pair<ByteBuffer, Long> apkSigningBlockAndOffsetInFile =
+//                findApkSigningBlock(apk, centralDirOffset); //3-1 根据中央区偏移量，找出签名块和其偏移量，构成键值对，一起返回
+
+//        ByteBuffer apkSigningBlock = apkSigningBlockAndOffsetInFile.first;  // 签名块的字节
+//        long apkSigningBlockOffset = apkSigningBlockAndOffsetInFile.second; // 签名块的偏移量
+
+        // Find the APK Signature Scheme v2 Block inside the APK Signing Block.
+        //ByteBuffer apkSignatureSchemeV2Block = findApkSignatureSchemeV2Block(apkSigningBlock); // 返回的是原声签名块里的ID-Value块
+        // 这里需要替换为获取 jxnx 的签名块的逻辑
+        //ByteBuffer apkSignatureJxnxBlock = findApkSignatureJxnxBlock(apkSigningBlock);
+
+//        return new SignatureInfo(
+//                apkSignatureJxnxBlock,// ID-Value块
+//                apkSigningBlockOffset,
+//                centralDirOffset,
+//                eocdOffset,
+//                eocd);
+        return null;
+    }
+
+
 
 }
 

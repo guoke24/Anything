@@ -56,7 +56,7 @@ private static X509Certificate[][] verify(RandomAccessFile apk)
             this.eocd = eocd;
         }
     }
-由此可以得出：在注释1处的函数：findSignature(apk)，会解析出：签名块的字节buffer、签名块的偏移量等信息。
+由此可以得出：在代码段2的注释2-1处的函数：findSignature(apk)，会解析出：签名块的字节buffer、签名块的偏移量等信息。
 现在去查看findSignature(apk)的源码：
 
 该函数定义在：{sourceCodeRootPath}/frameworks/base/core/java/android/util/apk/ApkSignatureSchemeV2Verifier.java 同上
