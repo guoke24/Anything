@@ -1361,7 +1361,10 @@ public class SignerVerifyActivity extends BaseTestActivity {
         //return null;
     }
 
-
+    /**
+     * 输出bytebuffer的头位和长度，用于验证
+     * @param byteBuffer
+     */
     private void checkByteBuffer(ByteBuffer byteBuffer) {
         int pos = byteBuffer.position();
         int limit = byteBuffer.limit();
@@ -1394,6 +1397,13 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     }
 
+    /**
+     * 从文件中提取子字符串，返回byteBuffer
+     * @param zip
+     * @param Offset
+     * @param len
+     * @return
+     */
     private ByteBuffer getSubBytes(RandomAccessFile zip, int Offset, int len) {
 
         ByteBuffer buf = ByteBuffer.allocate(len);
@@ -1539,7 +1549,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     }
 
-    //
+    // 从 bytebuffer中截取子bytebuffer
     private ByteBuffer getNewByteBuffer(ByteBuffer source, int offset, int size) {
         byte[] bytes = source.array();
         try {
@@ -1557,33 +1567,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
         return  null;
     }
 
-    // 源码函数 截取下标从 start 到 end 的字节段
-    private static ByteBuffer sliceFromToCus(ByteBuffer source, int start, int end) {
-        if (start < 0) {
-            throw new IllegalArgumentException("start: " + start);
-        }
-        if (end < start) {
-            throw new IllegalArgumentException("end < start: " + end + " < " + start);
-        }
-        int capacity = source.capacity();
-        if (end > source.capacity()) {
-            throw new IllegalArgumentException("end > capacity: " + end + " > " + capacity);
-        }
-        int originalLimit = source.limit();
-        int originalPosition = source.position();
-        try {
-            source.position(0);
-            source.limit(end);
-            source.position(start);
-            ByteBuffer result = source.slice();
-            result.order(source.order());
-            return result;
-        } finally {
-            source.position(0);
-            source.limit(originalLimit);
-            source.position(originalPosition);
-        }
-    }
+
 }
 
 
