@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.GeneralSecurityException;
@@ -1044,14 +1045,144 @@ public class SignerVerifyActivity extends BaseTestActivity {
     // 参照源码，重新实现签名块的提取
     public void test_17(View v) {
         //gotoVerify();
+
+        String apkPath = AssetsUtils.fileOpt(SmartPhonePos_apk, this);
+        try {
+            RandomAccessFile apk = new RandomAccessFile(apkPath, "r");
+
+            SignatureInfo signatureInfo = findSignature(apk);
+
+            LogUtil.e("ok");
+
+            verifyApkOriHash(signatureInfo);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.e(" Exception = " + e.toString());
+        }
+
+    }
+
+    private void verifyApkOriHash(SignatureInfo signatureInfo) {
+        ByteBuffer cozn = signatureInfo.cozn;
+        byte[] coznBytes = new byte[8];
+        cozn.get(coznBytes, 0, 8);
+        LogUtil.e("coznBytes " + ConvertUtil.bytesToHexString(coznBytes));
+
+        // v2签名的子块，不带头size
+        ByteBuffer sigBlock = signatureInfo.signatureV2Block;
+
+        // 输出头，尾 验证
+        byte[] sigBlockBytes = new byte[8];
+        sigBlock.get(sigBlockBytes, 0, 8);
+        LogUtil.e("sigBlock " + ConvertUtil.bytesToHexString(sigBlockBytes));
+
+        byte[] sigBlockBytes4Last = new byte[8];
+        sigBlock.position(sigBlock.capacity() - 8);
+        sigBlock.get(sigBlockBytes4Last, 0, 8);
+        LogUtil.e("sigBlock 4Last" + ConvertUtil.bytesToHexString(sigBlockBytes4Last));
+
+        // 计算 v2签名块的大小 + 8尾size + 16魔数
+        int newSize_InHead_And_Foot = sigBlock.array().length + 8 + 16;
+        ByteBuffer newSize_InHead_And_Foot_Buffer = ByteBuffer.allocate(8);
+        newSize_InHead_And_Foot_Buffer.order(ByteOrder.LITTLE_ENDIAN);
+        newSize_InHead_And_Foot_Buffer.putInt(newSize_InHead_And_Foot);
+        newSize_InHead_And_Foot_Buffer.clear();
+
+        //
+        ByteBuffer sigJxnxBlock = signatureInfo.signatureJxnxBlock;
+        byte[] sigJxnxBlockBytes = new byte[8];
+        sigJxnxBlock.get(sigJxnxBlockBytes, 0, 8);
+        LogUtil.e("sigJxnxBlock " + ConvertUtil.bytesToHexString(sigJxnxBlockBytes));
+
+        // cd 的 前8字节
+        ByteBuffer centralDir = signatureInfo.centralDir;
+        byte[] centralDirBytes = new byte[8];
+        centralDir.get(centralDirBytes, 0, 8);
+        LogUtil.e("centralDir " + ConvertUtil.bytesToHexString(centralDirBytes));
+
+        // eocd 的字节段
+        ByteBuffer eocd = signatureInfo.eocd;
+        byte[] eocdDirBytes = new byte[8];
+        eocd.get(eocdDirBytes, 0, 8);
+        LogUtil.e("eocd " + ConvertUtil.bytesToHexString(eocdDirBytes));
+        eocd.clear();
+
+        ByteBuffer newEocd = makeNewEocd(signatureInfo);
+
+
+        ByteBuffer oriApkBytes = ByteBuffer.allocate(
+                cozn.array().length
+                        + newSize_InHead_And_Foot_Buffer.array().length
+                        + sigBlock.array().length
+                        + newSize_InHead_And_Foot_Buffer.array().length
+                        + endByteV2.length
+                        + centralDir.array().length
+                        + newEocd.array().length);
+
+        oriApkBytes.order(ByteOrder.LITTLE_ENDIAN);
+
+        oriApkBytes.put(cozn.array())
+                .put(newSize_InHead_And_Foot_Buffer.array())
+                .put(sigBlock.array())
+                .put(newSize_InHead_And_Foot_Buffer.array())
+                .put(endByteV2)
+                .put(centralDir.array())
+                .put(newEocd.array());
+
+        byte[] hash;
+        try {
+            hash = SignerVerifyUtils.calHash(oriApkBytes.array(), 0, oriApkBytes.array().length);
+            LogUtil.e("hash = " + ConvertUtil.bytesToHexString(hash));
+        } catch (IOException e) {
+            e.printStackTrace();
+            LogUtil.e("calHash IOException = " + e.toString());
+        }
+
+
+    }
+
+    private ByteBuffer makeNewEocd(SignatureInfo signatureInfo) {
+        ByteBuffer oldEocd = signatureInfo.eocd;
+
+
+        LogUtil.e("11");
+
+        ByteBuffer part1 = getNewByteBuffer(oldEocd, 0, 16);
+        ByteBuffer part2 = getNewByteBuffer(oldEocd, 16, 4);
+        ByteBuffer part3 = getNewByteBuffer(oldEocd, 20, 2);
+
+        LogUtil.e("22");
+
+        // cd 的 偏移量 = cozn的长度 + 8 + v2签名块的长度 + 8 + 16
+        ByteBuffer sigV2Block = signatureInfo.signatureV2Block;
+        int sigV2BlockSize = sigV2Block.array().length;
+
+        ByteBuffer cozn = signatureInfo.cozn;
+        int coznSize = cozn.array().length;
+
+        int cdNewOffset = coznSize + 8 + sigV2BlockSize + 8 + 16;
+
+        ByteBuffer part2New = ByteBuffer.allocate(4);
+        part2New.order(ByteOrder.LITTLE_ENDIAN);
+        part2New.putInt(cdNewOffset);
+        part2New.clear();
+
+        LogUtil.e("33 " + ConvertUtil.bytesToHexString(part2New.array()));
+
+        ByteBuffer newEocd = ByteBuffer.allocate(oldEocd.array().length);
+        newEocd.put(part1.array());
+        newEocd.put(part2New.array());
+        newEocd.put(part3.array());
+        newEocd.clear();
+
+        LogUtil.e("" + ConvertUtil.bytesToHexString(newEocd.array()));
+
+        return newEocd;
     }
 
     private static class SignatureInfo {
         private final ByteBuffer cozn;
-
-        private final long sizeInHeadOffset;
-
-        private final ByteBuffer sizeInHead;
 
         /**
          * （V2 签名块的字节buffer）
@@ -1071,7 +1202,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
         /**
          * （Jxnx 签名块的偏移量）
          */
-        private final long apkSigningJxnxBlockOffset;
+        private final long signatureJxnxBlockOffset;
 
 
         /**
@@ -1093,22 +1224,18 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
         private SignatureInfo(
                 ByteBuffer cozn,
-                long sizeInHeadOffset,
-                ByteBuffer sizeInHead,
-                ByteBuffer signatureBlock,
                 long apkSigningBlockOffset,
-                long apkSigningJxnxBlockOffset,
+                ByteBuffer signatureBlock,
+                long signatureJxnxBlockOffset,
                 ByteBuffer signatureJxnxBlock,
                 long centralDirOffset,
                 ByteBuffer centralDir,
                 long eocdOffset,
                 ByteBuffer eocd) {
             this.cozn = cozn;
-            this.sizeInHeadOffset = sizeInHeadOffset;
-            this.sizeInHead = sizeInHead;
             this.apkSigningV2BlockOffset = apkSigningBlockOffset;
             this.signatureV2Block = signatureBlock;
-            this.apkSigningJxnxBlockOffset = apkSigningJxnxBlockOffset;
+            this.signatureJxnxBlockOffset = signatureJxnxBlockOffset;
             this.signatureJxnxBlock = signatureJxnxBlock;
             this.centralDirOffset = centralDirOffset;
             this.centralDir = centralDir;
@@ -1125,48 +1252,338 @@ public class SignerVerifyActivity extends BaseTestActivity {
         //verify(signatureInfo);
     }
 
+    // 尽量不要用遍历字节数组的方法！！！
+    // 通过字节数组转int的方式，获得某一块的size，再结合偏移量，找到每一块的偏移量！！
+    // 源码中，都是确定好偏移量，从RandomAccessFile 读取到 ByteBuffer内的
     private SignatureInfo findSignature(RandomAccessFile apk) throws Exception {
-        // Find the ZIP End of Central Directory (EoCD) record.
-        //Pair<ByteBuffer, Long> eocdAndOffsetInFile = getEocd(apk);// 先找到中央区尾部
-        //ByteBuffer eocd = eocdAndOffsetInFile.first;  // 中央区尾部字节
-        //long eocdOffset = eocdAndOffsetInFile.second; // 中央区尾部偏移量
+
+        // 找到 eocd
 
         byte[] apkBytes = AssetsUtils.getByteFromAssetsAndCopyToData(SmartPhonePos_apk, this);
         byte[] eocdID = new byte[]{0x50, 0x4b, 0x05, 0x06,};
-        int eocdOffset = BytesOptUtil.matchBytesBySelect(apkBytes,eocdID,1);
-        ByteBuffer eocd = BytesOptUtil.getSubBytesBuffer(apkBytes,eocdOffset,apkBytes.length - eocdOffset);
 
-//        long centralDirOffset = getCentralDirOffset(eocd, eocdOffset); // 中央区偏移量
-        int magic = BytesOptUtil.matchBytesBySelect(apkBytes,endByteV2,1);
-        int centralDirOffset = magic + 16;
+        long eocdOffset = BytesOptUtil.matchBytesBySelect(apkBytes, eocdID, 1);
+        ByteBuffer eocd = BytesOptUtil.getSubBytesBuffer(apkBytes, (int) eocdOffset, apkBytes.length - (int) eocdOffset);
 
-//
-//        Pair<ByteBuffer, Long> apkSigningBlockAndOffsetInFile =
-//                findApkSigningBlock(apk, centralDirOffset); //3-1 根据中央区偏移量，找出签名块和其偏移量，构成键值对，一起返回
+        // 输出验证是否找对
+        LogUtil.e("eocd = " + ConvertUtil.bytesToHexString(eocd.array()));
 
-//        ByteBuffer apkSigningBlock = apkSigningBlockAndOffsetInFile.first;  // 签名块的字节
-//        long apkSigningBlockOffset = apkSigningBlockAndOffsetInFile.second; // 签名块的偏移量
+        // 读取 cd的 偏移量
+        long cdOffsetInEocd = eocdOffset + 16;
+        apk.seek(cdOffsetInEocd);
+        ByteBuffer cdOffsetInBytes = ByteBuffer.allocate(4);
+        cdOffsetInBytes.order(ByteOrder.LITTLE_ENDIAN);
+        apk.readFully(cdOffsetInBytes.array(), cdOffsetInBytes.arrayOffset(), cdOffsetInBytes.capacity());
+        cdOffsetInBytes.rewind();
+        int cdOffset = cdOffsetInBytes.getInt(0);
 
-        // 尽量不要用遍历字节数组的方法！！！
-        // 通过字节数组转int的方式，获得某一块的size，再结合偏移量，找到每一块的偏移量！！
-        // 源码中，都是确定好偏移量，从RandomAccessFile 读取到 ByteBuffer内的
+        // 输出验证是否找对
+        LogUtil.e("cd偏移量的字节 cdOffsetInBytes = " + ConvertUtil.bytesToHexString(cdOffsetInBytes.array()));// 0FDAC300
+        LogUtil.e("cd偏移量的数值 cdOffset = " + cdOffset);// 12835343 = 0xc3da0f
+        LogUtil.e("对比 apk.length() = " + apk.length());
 
-        // Find the APK Signature Scheme v2 Block inside the APK Signing Block.
-        //ByteBuffer apkSignatureSchemeV2Block = findApkSignatureSchemeV2Block(apkSigningBlock); // 返回的是原声签名块里的ID-Value块
-        // 这里需要替换为获取 jxnx 的签名块的逻辑
-        //ByteBuffer apkSignatureJxnxBlock = findApkSignatureJxnxBlock(apkSigningBlock);
+        // 获取 中央区字节
+        long centralDirOffset = cdOffset; // 源码另有逻辑取到值
+        ByteBuffer centralDir = getSubBytes(apk, (int) centralDirOffset, (int) eocdOffset - (int) centralDirOffset);
 
-//        return new SignatureInfo(
-//                apkSignatureJxnxBlock,// ID-Value块
-//                apkSigningBlockOffset,
-//                centralDirOffset,
-//                eocdOffset,
-//                eocd);
-        return null;
+        checkByteBuffer(centralDir);//输出检出
+        LogUtil.e("centralDirOffset = " + cdOffset);
+
+        LogUtil.e("33333333");//
+
+        Pair<ByteBuffer, Long> all_SignBlock_And_Offset_InFile =
+                findApkSigningBlock(apk, centralDirOffset); //3-1 根据中央区偏移量，找出签名块和其偏移量，构成键值对，一起返回
+
+        ByteBuffer all_SignBlock = all_SignBlock_And_Offset_InFile.first;  // 签名块的字节,整个签名块
+        long all_SignBlock_Offset = all_SignBlock_And_Offset_InFile.second; // 签名块的偏移量,包括头size
+
+        LogUtil.e("check all_SignBlock ");
+        checkByteBuffer(all_SignBlock);//输出检出 ,810c开头，34 32魔数结尾
+        LogUtil.e("all_SignBlock_Offset = " + all_SignBlock_Offset); // 整个签名块的偏移量
+        // 12832134 = 0xc3cd86
+
+
+        // all_SignBlock_Offset 该偏移量，是810c的开头
+        LogUtil.e("44444444");//
+
+        // v2 签名子块
+        Pair<ByteBuffer, Long> v2SigBlock_HeadSize_And_Offset_InFile
+                = findApkSubSignBlock(all_SignBlock_Offset, all_SignBlock, APK_SIGNATURE_SCHEME_V2_BLOCK_ID, true); // 返回的是原声签名块里的ID-Value块
+
+
+        ByteBuffer v2SigBlock_HeadSize = v2SigBlock_HeadSize_And_Offset_InFile.first;
+        Long v2Block_HeadSize_Offset = v2SigBlock_HeadSize_And_Offset_InFile.second;
+
+        LogUtil.e("check v2SigBlock_HeadSize ");
+        checkByteBuffer(v2SigBlock_HeadSize);//输出检出
+        //head = D0050000
+        //rear = 03010001
+        LogUtil.e("v2Block_HeadSize_Offset = " + v2Block_HeadSize_Offset);
+
+        LogUtil.e("55555555");
+
+        // jxnx 签名子块
+        Pair<ByteBuffer, Long> jxnxSigBlock_And_Offset_InFile = findApkSubSignBlock(all_SignBlock_Offset, all_SignBlock, APK_SIGNATURE_JXNX_BLOCK_ID, false);// 返回的是JXNX签名块里的ID-Value块
+        ByteBuffer jxnxSigBlock = jxnxSigBlock_And_Offset_InFile.first;
+        long jxnxSigBlock_Offset = jxnxSigBlock_And_Offset_InFile.second;
+        LogUtil.e("6");
+
+        LogUtil.e("check jxnxSigBlock ");
+        checkByteBuffer(jxnxSigBlock);//输出检出
+        //head = D0050000
+        //rear = 03010001
+        LogUtil.e("jxnxSigBlock_Offset = " + jxnxSigBlock_Offset);
+
+        //head = 13114143
+        //rear = 7DC2B325
+
+        // 第一部分的字节
+        ByteBuffer cozn = getSubBytes(apk, 0, (int) all_SignBlock_Offset);
+
+        LogUtil.e("check cozn begin");
+        checkByteBuffer(cozn);//输出检出
+        //504B0304
+        //rear = 2B050000
+        LogUtil.e("check cozn finish" );
+
+
+        return new SignatureInfo(
+                cozn,
+                v2Block_HeadSize_Offset,
+                v2SigBlock_HeadSize,
+                jxnxSigBlock_Offset,
+                jxnxSigBlock,// ID-Value块
+                centralDirOffset,
+                centralDir,
+                eocdOffset,
+                eocd);
+
+        //return null;
     }
 
 
+    private void checkByteBuffer(ByteBuffer byteBuffer) {
+        int pos = byteBuffer.position();
+        int limit = byteBuffer.limit();
+        int capacity = byteBuffer.capacity();
+        LogUtil.e("pos " + pos);
+        LogUtil.e("limit " + limit);
+        LogUtil.e("capacity " + capacity);
 
+        byte[] all = byteBuffer.array();
+
+        if (capacity > 20) {
+            // 输出头尾
+            try {
+                byte[] head = BytesOptUtil.getSubBytes(all, 0, 4);
+                byte[] rear = BytesOptUtil.getSubBytes(all, capacity - 4, 4);
+
+                LogUtil.e("head = " + ConvertUtil.bytesToHexString(head));
+                LogUtil.e("rear = " + ConvertUtil.bytesToHexString(rear));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                LogUtil.e("checkByteBuffer Exception " + e.toString());
+            }
+
+        } else {
+
+            LogUtil.e("all " + ConvertUtil.bytesToHexString(all));
+
+        }
+
+    }
+
+    private ByteBuffer getSubBytes(RandomAccessFile zip, int Offset, int len) {
+
+        ByteBuffer buf = ByteBuffer.allocate(len);
+        buf.order(ByteOrder.LITTLE_ENDIAN);
+
+        try {
+            zip.seek(Offset);
+            zip.readFully(buf.array(), buf.arrayOffset(), buf.capacity());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        buf.clear();
+
+        return buf;
+    }
+
+
+    private static Pair<ByteBuffer, Long> findApkSigningBlock(
+            RandomAccessFile apk, long centralDirOffset)
+            throws IOException {
+
+        // 签名块的结构：前块大小 + 签名信息 + 后块大小 + 魔数
+
+
+        // Read the magic and offset in file from the footer section of the block:
+        // * uint64:   size of block
+        // * 16 bytes: magic
+        ByteBuffer footer = ByteBuffer.allocate(24); // 分配24个字节的空间
+        footer.order(ByteOrder.LITTLE_ENDIAN); // 设置为 小端排序
+        apk.seek(centralDirOffset - footer.capacity());//移动指针到 （后面的块大小+魔数）的起始位置
+        apk.readFully(footer.array()/*获取底层byte[]*/, footer.arrayOffset()/*0*/, footer.capacity()); // 读取（后面的块大小+魔数）到 footer
+
+
+        // Read and compare size fields
+        long apkSigBlockSizeInFooter = footer.getLong(0);// 尾size，前8个字节
+        // 该数值，即签名块的长度值
+
+
+        // apkSigBlockSizeInFooter 该数值包括： 签名整块长度 + 后8字节的块长度 + 魔数长度
+        int totalSize = (int) (apkSigBlockSizeInFooter + 8);
+        long apkSigBlockOffset = centralDirOffset - totalSize;// 签名整块的偏移量
+
+        ByteBuffer apkSigBlock = ByteBuffer.allocate(totalSize);// 签名整块的字节
+        apkSigBlock.order(ByteOrder.LITTLE_ENDIAN);
+        apk.seek(apkSigBlockOffset);
+        apk.readFully(apkSigBlock.array(), apkSigBlock.arrayOffset(), apkSigBlock.capacity());// 签名整块，读到 apkSigBlock
+        long apkSigBlockSizeInHeader = apkSigBlock.getLong(0);
+
+
+        if (apkSigBlockSizeInFooter == apkSigBlockSizeInHeader) {
+            LogUtil.e("头size 和 尾size 相等"); // 这里相等
+        }
+
+        ByteBuffer sizeByteBuffer = ByteBuffer.allocate(8);
+        sizeByteBuffer.order(ByteOrder.LITTLE_ENDIAN);
+        sizeByteBuffer.putInt((int) apkSigBlockSizeInFooter);
+        LogUtil.e("sizeByteBuffer = " + ConvertUtil.bytesToHexString(sizeByteBuffer.array()));//输出：810C000000000000
+
+        return Pair.create(apkSigBlock/*签名整块*/, apkSigBlockOffset);// 最后构造键值对
+    }
+
+    private static final int APK_SIGNATURE_SCHEME_V2_BLOCK_ID = 0x7109871a;
+    //private static final int APK_SIGNATURE_JXNX_BLOCK_ID = 0x78676432;
+    private static final int APK_SIGNATURE_JXNX_BLOCK_ID = 0x32646778;
+
+    /**
+     * 从整个签名块中，读取子签名块，同时返回子签名块在文件中的偏移量
+     *
+     * @param all_SignBlock_Offset
+     * @param all_SignBlock
+     * @param sigBlockID
+     * @param withHeadAndSize
+     * @return
+     */
+    private Pair<ByteBuffer, Long> findApkSubSignBlock(long all_SignBlock_Offset, ByteBuffer all_SignBlock, int sigBlockID, boolean withHeadAndSize) {
+        //checkByteOrderLittleEndian(apkSigningBlock);
+        LogUtil.e("1");
+
+        // 入参 apkSigningBlockOffset 是整个签名块（包括头部）在文件中的偏移量
+
+        //ByteBuffer pairs = sliceFromToCus(apkSigningBlock, 8, apkSigningBlock.capacity() - 24);
+        ByteBuffer pairs = null;
+        try {
+            pairs = BytesOptUtil.getSubBytesBuffer(all_SignBlock.array(), 8, all_SignBlock.capacity() - 8/*头size*/ - 24/*尾size，魔数*/);
+            pairs.order(ByteOrder.LITTLE_ENDIAN);
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.e("get pairs Exception" + e.toString());
+        }
+
+        LogUtil.e("check pairs begin");
+        checkByteBuffer(pairs);
+        // capacity 3177
+        // head = D0050000
+        // rear = 7DC2B325
+        LogUtil.e("check pairs finish");
+
+        //此时的pairs的结构是 8字节的长度 + 4字节标识 + n字节的签名内容块（也称ID-Value块）
+
+        int entryCount = 0;
+        pairs.rewind();
+        while (pairs.hasRemaining()) {
+            LogUtil.e("2111");
+            entryCount++;
+
+            long lenLong = pairs.getLong();// 取8个字节的long数值，position 移动了8位
+            // 该值是原生签名块的长度（该长度包括 4个字节的标识 + n个字节的原生签名数据）
+
+            LogUtil.e("2222");
+
+            int len = (int) lenLong;// 获取长度，即原生v2签名块的长度
+
+            int nextEntryPos = pairs.position() + len;// 下一个元素的下标,下一个子签名块
+
+            LogUtil.e("2333");
+
+            int id = pairs.getInt();// 取4个字节的int数值，position 移动了4位
+            // 该值是原生签名块的标识
+
+            if (id == sigBlockID/*APK_SIGNATURE_SCHEME_V2_BLOCK_ID*/) { // 根据标识判断是否是 原生v2签名
+                LogUtil.e("2");
+                if (withHeadAndSize) {
+                    LogUtil.e("3");
+                    pairs.position(0);
+                    ByteBuffer tmp = getNewByteBuffer(pairs, 0, len + 8);// 加上标识
+
+                    LogUtil.e("tmp = " + ConvertUtil.bytesToHexString(tmp.array()));
+
+                    return Pair.create(tmp, all_SignBlock_Offset + 8);/*在文件中的偏移量*/
+                } else {
+                    LogUtil.e("4");
+                    //return getByteBuffer(pairs, len - 4);// 去掉标识，只返回ID-Value块
+                    return Pair.create(getNewByteBuffer(pairs, pairs.position(),len - 4),
+                            all_SignBlock_Offset + 8 + (long) pairs.position());// 去掉标识，只返回ID-Value块
+                }
+
+            }
+            pairs.position(nextEntryPos);//定位到下一个元素，下一次循环，处理子签名块
+        }
+
+        return null;
+
+    }
+
+    //
+    private ByteBuffer getNewByteBuffer(ByteBuffer source, int offset, int size) {
+        byte[] bytes = source.array();
+        try {
+            byte[] subBytes = BytesOptUtil.getSubBytes(bytes,offset,size);
+            ByteBuffer tmp = ByteBuffer.allocate(size);
+            tmp.order(ByteOrder.LITTLE_ENDIAN);
+            tmp.put(subBytes);
+            tmp.rewind();
+
+
+            return tmp;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  null;
+    }
+
+    // 源码函数 截取下标从 start 到 end 的字节段
+    private static ByteBuffer sliceFromToCus(ByteBuffer source, int start, int end) {
+        if (start < 0) {
+            throw new IllegalArgumentException("start: " + start);
+        }
+        if (end < start) {
+            throw new IllegalArgumentException("end < start: " + end + " < " + start);
+        }
+        int capacity = source.capacity();
+        if (end > source.capacity()) {
+            throw new IllegalArgumentException("end > capacity: " + end + " > " + capacity);
+        }
+        int originalLimit = source.limit();
+        int originalPosition = source.position();
+        try {
+            source.position(0);
+            source.limit(end);
+            source.position(start);
+            ByteBuffer result = source.slice();
+            result.order(source.order());
+            return result;
+        } finally {
+            source.position(0);
+            source.limit(originalLimit);
+            source.position(originalPosition);
+        }
+    }
 }
 
 
