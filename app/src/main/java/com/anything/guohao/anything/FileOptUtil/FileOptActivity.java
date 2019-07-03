@@ -487,6 +487,84 @@ public class FileOptActivity extends BaseTestActivity {
         LogUtil.e("buffer.getInt() = " + buffer.getInt());//结果：67306010
         LogUtil.e("buffer = " + ConvertUtil.bytesToHexString(buffer.array()));
         // 同样的字节端，不同的端序，不同的数值
+
+        // 测试 slice
+        byte[] byte5 = new byte[]{0x01,0x02,0x03,0x04,0x05};
+        ByteBuffer buffer5 = ByteBuffer.allocate(byte5.length);
+        buffer5.put(byte5);
+        buffer5.position(2);
+        buffer5.limit(3);
+        LogUtil.e("buffer5 position " + buffer5.position());
+        LogUtil.e("buffer5 limit " + buffer5.limit());
+        LogUtil.e("buffer5 capacity " + buffer5.capacity());
+        LogUtil.e("buffer5 remaining " + buffer5.remaining());// limit - position
+                                                                   // clear后，limit = capacity
+                                                                   // limit = 1 时，表示还剩一个字节，就是当前的字节
+
+        LogUtil.e("   ");
+
+        ByteBuffer buffer5_new = buffer5.slice();// 把 position 开始的 limit 长度的字节，复制出来
+                                               // buffer5_new 的 limit，capacity等是独立的
+        LogUtil.e("buffer5_new position " + buffer5_new.position());// position 从0开始
+        LogUtil.e("buffer5_new limit " + buffer5_new.limit());
+        LogUtil.e("buffer5_new capacity " + buffer5_new.capacity());
+        LogUtil.e("buffer5_new remaining " + buffer5_new.remaining());
+
+        LogUtil.e("buffer5_new array " + ConvertUtil.bytesToHexString(buffer5_new.array()));
+        // buffer5_new.array() 跟 buffer5.array() 一样
+        // buffer5_new 是 read-only的
+
+        // 小结：slice 就是 复制一段只读的子串出去
+
+        LogUtil.e("   ");
+
+        // 测试 duplicate
+        byte[] byte6 = new byte[]{0x01,0x02,0x03,0x04,0x05};
+        ByteBuffer buffer6 = ByteBuffer.allocate(byte6.length);
+        buffer6.put(byte6);
+        buffer6.position(2);
+        buffer6.limit(3);
+        LogUtil.e("buffer6 position " + buffer6.position());
+        LogUtil.e("buffer6 limit " + buffer6.limit());
+        LogUtil.e("buffer6 capacity " + buffer6.capacity());
+        LogUtil.e("buffer6 remaining " + buffer6.remaining());// limit - position
+
+
+        LogUtil.e("   ");
+
+        ByteBuffer buffer6_new = buffer6.duplicate();
+        LogUtil.e("buffer6_new position " + buffer6_new.position()); // 同上
+        LogUtil.e("buffer6_new limit " + buffer6_new.limit()); // 同上
+        LogUtil.e("buffer6_new capacity " + buffer6_new.capacity()); // 同上
+        LogUtil.e("buffer6_new remaining " + buffer6_new.remaining()); // 同上
+
+        LogUtil.e("buffer6_new array " + ConvertUtil.bytesToHexString(buffer6_new.array()));
+
+        // 小结：duplicate 就是复制一个只读的全串，position，limit等全部一致
+
+        LogUtil.e("   ");
+
+        // 测试 put
+        byte[] byte7 = new byte[]{0x01,0x02,0x03,0x04,0x05};
+        ByteBuffer buffer7 = ByteBuffer.allocate(byte7.length);
+        buffer7.put(byte7);
+        buffer7.position(1);
+        buffer7.put((byte) 0x10);
+        LogUtil.e("buffer7 " + ConvertUtil.bytesToHexString(buffer7.array()));
+
+        buffer7.position(1);
+        byte[] byte7_2 = new byte[]{0x30,0x30};
+        buffer7.put(byte7_2);
+        LogUtil.e("buffer7 " + ConvertUtil.bytesToHexString(buffer7.array()));
+
+
+        // 小结：put 一个字节，就会在 position 的位置上覆盖写入 一个字节
+        // put n个字节，就会在 position 的位置开始覆盖写入 n个字节
+        // 不会影响到后续n+1的字节
+
+        //注意： put(byte[] src, int offset, int length) 和 get(byte[] src, int offset, int length)
+        // 其中的入参 offset 和 length，是针对 src 来说的
+        // 并不是针对 buffer 的 array()
     }
 
 }
