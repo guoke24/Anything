@@ -5,6 +5,7 @@ import com.anything.guohao.anything.LogUtil;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * 字节操作的工具类
@@ -33,6 +34,8 @@ public class BytesOptUtil {
         if(des.length > src.length){
             throw new Exception("des.length must less than or equal to src.length");
         }
+
+        //Arrays.equals()比较字节串
 
         for (int i = srclen - 1; i >= deslen - 1; --i) {//倒序遍历
 

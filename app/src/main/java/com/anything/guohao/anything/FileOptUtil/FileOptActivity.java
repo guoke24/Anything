@@ -565,6 +565,37 @@ public class FileOptActivity extends BaseTestActivity {
         //注意： put(byte[] src, int offset, int length) 和 get(byte[] src, int offset, int length)
         // 其中的入参 offset 和 length，是针对 src 来说的
         // 并不是针对 buffer 的 array()
+
+        bufferToHexString(buffer7);
+
+        bufferToHexString(buffer7,1,3);
     }
 
+
+    public void bufferToHexString(ByteBuffer byteBuffer){
+        StringBuilder stringBuilder = new StringBuilder(byteBuffer.capacity()*2);
+        byteBuffer.clear();
+        while(byteBuffer.remaining()>0){
+            String s = ConvertUtil.loopLogSingleByteToHexString(byteBuffer.get());
+            stringBuilder.append(s + " ");
+        }
+        LogUtil.e("" + stringBuilder.toString());
+    }
+
+    public void bufferToHexString(ByteBuffer byteBuffer,int pos,int len){
+        if(pos + len > byteBuffer.capacity()){
+            LogUtil.e(" pos + len > byteBuffer.capacity() ");
+            return;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder(byteBuffer.capacity()*2);
+        byteBuffer.clear();
+        byteBuffer.position(pos);
+        byteBuffer.limit(pos + len);
+        while(byteBuffer.remaining()>0){
+            String s = ConvertUtil.loopLogSingleByteToHexString(byteBuffer.get());
+            stringBuilder.append(s + " ");
+        }
+        LogUtil.e("" + stringBuilder.toString());
+    }
 }

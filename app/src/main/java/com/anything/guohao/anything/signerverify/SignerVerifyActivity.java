@@ -1050,7 +1050,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
         try {
             RandomAccessFile apk = new RandomAccessFile(apkPath, "r");
 
-            SignatureInfo signatureInfo = findSignature(apk);
+            SignatureInfoForJxnx signatureInfo = findSignatureForJxnx(apk);
 
             LogUtil.e("ok");
 
@@ -1063,7 +1063,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     }
 
-    private void verifyApkOriHash(SignatureInfo signatureInfo) {
+    private void verifyApkOriHash(SignatureInfoForJxnx signatureInfo) {
         ByteBuffer cozn = signatureInfo.cozn;
         byte[] coznBytes = new byte[8];
         cozn.get(coznBytes, 0, 8);
@@ -1142,7 +1142,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     }
 
-    private ByteBuffer makeNewEocd(SignatureInfo signatureInfo) {
+    private ByteBuffer makeNewEocd(SignatureInfoForJxnx signatureInfo) {
         ByteBuffer oldEocd = signatureInfo.eocd;
 
 
@@ -1181,7 +1181,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
         return newEocd;
     }
 
-    private static class SignatureInfo {
+    private static class SignatureInfoForJxnx {
         private final ByteBuffer cozn;
 
         /**
@@ -1222,7 +1222,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
          */
         private final ByteBuffer eocd;
 
-        private SignatureInfo(
+        private SignatureInfoForJxnx(
                 ByteBuffer cozn,
                 long apkSigningBlockOffset,
                 ByteBuffer signatureBlock,
@@ -1248,14 +1248,14 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
     public void gotoVerify(String apkFile) throws Exception {
         RandomAccessFile apk = new RandomAccessFile(apkFile, "r");
-        SignatureInfo signatureInfo = findSignature(apk);
+        SignatureInfoForJxnx signatureInfo = findSignatureForJxnx(apk);
         //verify(signatureInfo);
     }
 
     // 尽量不要用遍历字节数组的方法！！！
     // 通过字节数组转int的方式，获得某一块的size，再结合偏移量，找到每一块的偏移量！！
     // 源码中，都是确定好偏移量，从RandomAccessFile 读取到 ByteBuffer内的
-    private SignatureInfo findSignature(RandomAccessFile apk) throws Exception {
+    private SignatureInfoForJxnx findSignatureForJxnx(RandomAccessFile apk) throws Exception {
 
         // 找到 eocd
 
@@ -1347,7 +1347,7 @@ public class SignerVerifyActivity extends BaseTestActivity {
         LogUtil.e("check cozn finish" );
 
 
-        return new SignatureInfo(
+        return new SignatureInfoForJxnx(
                 cozn,
                 v2Block_HeadSize_Offset,
                 v2SigBlock_HeadSize,
@@ -1360,6 +1360,8 @@ public class SignerVerifyActivity extends BaseTestActivity {
 
         //return null;
     }
+
+
 
     /**
      * 输出bytebuffer的头位和长度，用于验证
