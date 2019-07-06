@@ -653,6 +653,8 @@ public class SignerVerifyActivity extends BaseTestActivity {
             // 把原始apk的hash值
             byte[] hashId = new byte[]{0x02, 0x20};
             int hashOffset = BytesOptUtil.matchBytesBySelect(firstPartBytes, hashId, 1);
+            test_10_2(firstPartBytes);//解析出原始apk的hash
+
             // 拷贝数组
             System.arraycopy(firstPartBytes, hashOffset + 2, orighash, 0, 32);
 
@@ -699,6 +701,35 @@ public class SignerVerifyActivity extends BaseTestActivity {
             e.printStackTrace();
         }
 
+    }
+
+    // 去读第一部分的
+    public void test_10_2(byte[] bytes) throws IOException {
+        InputStream in = new ByteArrayInputStream(bytes);
+        ASN1InputStream asn1InputStream = new ASN1InputStream(in);
+
+        //
+        ASN1Object asn1Primitive = null;
+
+        byte[] firstPartBytes = null;
+        byte[] orighash = new byte[32];
+        byte[] sigData = null;
+        byte[] cert = null;
+
+        while ((asn1Primitive = asn1InputStream.readObject()) != null) {
+            if (asn1Primitive instanceof ASN1Sequence) {
+                ASN1Sequence asn1Sequence = (ASN1Sequence) asn1Primitive;
+                ASN1SequenceParser asn1SequenceParser = asn1Sequence.parser();
+                ASN1Encodable asn1Encodable = null;
+                int n = 0;
+                while ((asn1Encodable = asn1SequenceParser.readObject()) != null) {
+                    LogUtil.e("-------------parse result -------------- n" + n);
+                    asn1Primitive = asn1Encodable.toASN1Primitive();
+                    LogUtil.e("asn1String: " + ConvertUtil.bytesToHexString(asn1Primitive.getEncoded()));
+                    n++;
+                }
+            }
+        }
     }
 
     // 测试 RSAEncrypt类 和 RSASignature类
