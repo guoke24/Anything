@@ -27,6 +27,7 @@ public class SyncTestActivity extends BaseTestActivity {
         testLockCountDemo();
     }
 
+    // 关于 Lock 和 Condition 的使用，
     // 参考：https://cloud.tencent.com/developer/article/1038499
     private void testLockDemo() throws InterruptedException {
         LockDemo lockDemo = new LockDemo();

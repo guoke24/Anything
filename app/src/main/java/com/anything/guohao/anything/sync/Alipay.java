@@ -28,7 +28,7 @@ public class Alipay {
                 // 当阻塞方法收到中断请求的时候就会抛出InterruptedException异常
                 // 一个中断的例子就是，杀毒软件正在全盘查杀病毒，此时我们不想让他杀毒，
                 // 这时候点击取消，那么就是正在中断一个运行的线程。
-                // 关于 InterruptedException 的更多内容，
+                // 关于 InterruptedException 和线程阻塞的更多内容，
                 // 参考：https://www.jianshu.com/p/a8abe097d4ed
             }
 
@@ -86,10 +86,6 @@ public class Alipay {
             accounts[from] = accounts[from] - amount;
             accounts[to] = accounts[to] + amount;
         }
-
-
-
-
 
     }
 
