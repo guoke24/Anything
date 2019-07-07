@@ -5,6 +5,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * 该demo的目的是：sum函数要在add执行两次之后才会被唤醒，然后计算总和
+ */
 public class LockCountDemo {
     public int start = 10;
     public int middle = 90;
