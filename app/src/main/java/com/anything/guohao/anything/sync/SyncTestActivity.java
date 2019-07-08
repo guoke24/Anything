@@ -27,7 +27,7 @@ public class SyncTestActivity extends BaseTestActivity {
         testLockCountDemo();
     }
 
-    // 关于 Lock 和 Condition 的使用，
+    // start 关于 Lock 和 Condition 的使用，
     // 参考：https://cloud.tencent.com/developer/article/1038499
     private void testLockDemo() throws InterruptedException {
         LockDemo lockDemo = new LockDemo();
@@ -94,5 +94,25 @@ public class SyncTestActivity extends BaseTestActivity {
         Thread.sleep(3000);
         System.out.println("over");
     }
+    // end 关于 Lock 和 Condition 的使用，
 
+    public void test_2(View view){
+        new VolatileDemo().test();// 重排序
+    }
+
+    public void test_3(View view){
+        new VolatileDemo.Test().exec();// volatile 没有原子性
+    }
+
+    public void test_4(View view){
+        new VolatileDemo.Test2().exec();// synchronized 有原子性
+    }
+
+    public void test_5(View view){
+        new VolatileDemo.Test3().exec();// Lock 有原子性
+    }
+
+    public void test_6(View view){
+        new VolatileDemo.Test4().exec();// AtomicInteger 有原子性
+    }
 }

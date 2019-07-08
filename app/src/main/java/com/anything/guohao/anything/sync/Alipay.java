@@ -73,7 +73,7 @@ public class Alipay {
 
     //还有一种写法，同步代码块
     private Object sth = new Object();
-    public void transfer(int from, int to, int amount,int nothing,,int nothing2) throws InterruptedException {
+    public void transfer(int from, int to, int amount,int nothing,int nothing2) throws InterruptedException {
 
         synchronized (sth){
             while (accounts[from] < amount) {

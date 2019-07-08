@@ -18,6 +18,46 @@
             android:textSize="15sp"
             android:onClick="test_1"
             />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:textSize="15sp"
+            android:text="test2"
+            android:onClick="test_2"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:textSize="15sp"
+            android:text="test3"
+            android:onClick="test_3"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:textSize="15sp"
+            android:text="test4"
+            android:onClick="test_4"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:textSize="15sp"
+            android:text="test5"
+            android:onClick="test_5"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:textSize="15sp"
+            android:text="test6"
+            android:onClick="test_6"
+            />
     </LinearLayout>
 
 </LinearLayout>
