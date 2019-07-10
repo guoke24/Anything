@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<firmwareManifest fileType="OS" LKLUSDKSPECVersion="2.0.0.7571" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="lklupdatemanifest.xsd">
+<TargetTerminal>T1</TargetTerminal>
+<Vendor>DZ</Vendor>
+<ReleaseDate>2019-01-21</ReleaseDate>
+<firmwareList Count="1">
+<firmware name="V2.1.1_V2.4.1_update.img" UpdateDoneAction="reboot">
+<version>V1.40</version>
+<description>V2.1.1_V2.4.1_update</description>
+<EMD5>o2L56Mo7Nzyt2w/wifKJ8iw8uhfw0KvtuFqzyxN3P7yEkcwPrkdOMTrn5bjP14mOqTvFpd7dDlr7/T7ubqCest7o9AuBx6cfSU3Nu0AklkCo7N/UjaXah5G/W5Buw222DHzjxl0JlTRQeaGXvAeMP+qvmU2+hFLmYTyF40CbiSUMpBJrWrfP4W5836Eeqk3Q/VSr3tHLeAyvODWfP23z9K+pDG60JDa6GGe9mig4IJjurfGv81H1rVqctiF7ZPpCm20x7olnBlODQlwSHkKz/frMY/ROFzcvLWFq+DNIDZyr6qgcCKclRoO4TrxBaEyuTRJ4RNBsRkOjHJ9Fqp/bmw==</EMD5>
+</firmware>
+</firmwareList>
+</firmwareManifest>

@@ -598,4 +598,12 @@ public class FileOptActivity extends BaseTestActivity {
         }
         LogUtil.e("" + stringBuilder.toString());
     }
+
+    public void test_10(View v){
+        String xmlpath = AssetsUtils.fileOpt("updatemanifest.xml",this);
+        String imgpath = AssetsUtils.fileOpt("V2.1.1_V2.4.1_update.img",this);
+        new XmlOptUtil().parseXMLFileSimple(xmlpath,imgpath);
+    }
+
+
 }

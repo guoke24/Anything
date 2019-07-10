@@ -21,7 +21,11 @@
         <activity android:name=".reflect.ReflectTestActivity" />
         <activity android:name=".signerverify.SignerVerifyActivity"></activity>
         <activity android:name=".FileOptUtil.FileOptActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
 
         <provider
@@ -35,11 +39,7 @@
         </provider>
 
         <activity android:name=".sync.SyncTestActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 
