@@ -1,10 +1,13 @@
 package com.anything.guohao.anything.sync;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 
 import com.anything.guohao.anything.BaseTestActivity;
+import com.anything.guohao.anything.LogUtil;
 import com.anything.guohao.anything.R;
 
 import java.util.ArrayList;
@@ -115,4 +118,89 @@ public class SyncTestActivity extends BaseTestActivity {
     public void test_6(View view){
         new VolatileDemo.Test4().exec();// AtomicInteger 有原子性
     }
+
+    // AsyncTask 用法的简单示例 start
+    IAsynTask iAsynTask = null;
+    public void test_7(View v){
+        // 还可以这么写
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                LogUtil.e("in AsyncTask run");
+            }
+        });
+
+        // 也可以这么写
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                LogUtil.e("in Handler run");
+            }
+        });
+
+        iAsynTask = new IAsynTask();
+        iAsynTask.execute("test8");
+    }
+
+    public void test_8(View v){
+        if(iAsynTask != null){
+            if(!iAsynTask.isCancelled())
+                iAsynTask.cancel(true);
+        }
+
+    }
+
+    public class IAsynTask extends AsyncTask<String,Integer,String>{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showMessage("onPreExecute");
+            LogUtil.e("onPreExecute");
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            showMessage("onPostExecute" + s);
+            LogUtil.e("onPostExecute " + s);
+        }
+
+
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values);
+            showMessage("onProgressUpdate " + values[0]);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            publishProgress(100);
+            LogUtil.e("doInBackground begin " + strings[0]);
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            LogUtil.e("doInBackground finish " + strings[0]);
+            return "okkk";
+        }
+
+        // 两个 onCancelled 都会调用到
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            showMessage("onCancelled");
+            LogUtil.e("onCancelled ");
+        }
+
+        @Override
+        protected void onCancelled(String s) { // 此处的s 就是 doInBackground 函数返回的 string
+            super.onCancelled(s);
+            showMessage("onCancelled " + s);
+            LogUtil.e("onCancelled " + s);
+        }
+    }// AsyncTask 用法的简单示例 end
+
 }
