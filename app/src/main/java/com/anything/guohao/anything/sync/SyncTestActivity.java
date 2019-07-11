@@ -12,6 +12,8 @@ import com.anything.guohao.anything.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SyncTestActivity extends BaseTestActivity {
 
@@ -67,14 +69,14 @@ public class SyncTestActivity extends BaseTestActivity {
         LockCountDemo demo = new LockCountDemo();
         Thread thread1 = new Thread(() -> {
             //System.out.println(Thread.currentThread().getName() + " : 开始执行");
-            demo.tmpAns1 = demo.add(demo.start, demo.middle,Thread.currentThread().getName());
+            demo.tmpAns1 = demo.add(demo.start, demo.middle, Thread.currentThread().getName());
             System.out.println(Thread.currentThread().getName() +
                     " : calculate ans: " + demo.tmpAns1);
         }, "count1");
 
         Thread thread2 = new Thread(() -> {
             //System.out.println(Thread.currentThread().getName() + " : 开始执行");
-            demo.tmpAns2 = demo.add(demo.middle, demo.end + 1,Thread.currentThread().getName());
+            demo.tmpAns2 = demo.add(demo.middle, demo.end + 1, Thread.currentThread().getName());
             System.out.println(Thread.currentThread().getName() +
                     " : calculate ans: " + demo.tmpAns2);
         }, "count2");
@@ -99,29 +101,30 @@ public class SyncTestActivity extends BaseTestActivity {
     }
     // end 关于 Lock 和 Condition 的使用，
 
-    public void test_2(View view){
+    public void test_2(View view) {
         new VolatileDemo().test();// 重排序
     }
 
-    public void test_3(View view){
+    public void test_3(View view) {
         new VolatileDemo.Test().exec();// volatile 没有原子性
     }
 
-    public void test_4(View view){
+    public void test_4(View view) {
         new VolatileDemo.Test2().exec();// synchronized 有原子性
     }
 
-    public void test_5(View view){
+    public void test_5(View view) {
         new VolatileDemo.Test3().exec();// Lock 有原子性
     }
 
-    public void test_6(View view){
+    public void test_6(View view) {
         new VolatileDemo.Test4().exec();// AtomicInteger 有原子性
     }
 
     // AsyncTask 用法的简单示例 start
     IAsynTask iAsynTask = null;
-    public void test_7(View v){
+
+    public void test_7(View v) {
         // 还可以这么写
         AsyncTask.execute(new Runnable() {
             @Override
@@ -142,15 +145,15 @@ public class SyncTestActivity extends BaseTestActivity {
         iAsynTask.execute("test8");
     }
 
-    public void test_8(View v){
-        if(iAsynTask != null){
-            if(!iAsynTask.isCancelled())
+    public void test_8(View v) {
+        if (iAsynTask != null) {
+            if (!iAsynTask.isCancelled())
                 iAsynTask.cancel(true);
         }
 
     }
 
-    public class IAsynTask extends AsyncTask<String,Integer,String>{
+    public class IAsynTask extends AsyncTask<String, Integer, String> {
 
         @Override
         protected void onPreExecute() {
@@ -165,7 +168,6 @@ public class SyncTestActivity extends BaseTestActivity {
             showMessage("onPostExecute" + s);
             LogUtil.e("onPostExecute " + s);
         }
-
 
 
         @Override
@@ -203,4 +205,146 @@ public class SyncTestActivity extends BaseTestActivity {
         }
     }// AsyncTask 用法的简单示例 end
 
+    // 线程 测试 start
+    public void test_9(View view) {
+        test_threadPool();
+        //test_sleep();
+        //test_Thead_sleep();
+    }
+
+    // 测试：线程池的复用
+    public void test_threadPool() {
+        System.out.println("主线程：" + Thread.currentThread().getName());
+
+        //创建一个可缓存线程池
+        ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+
+        for (int i = 0; i < 10; i++) {//
+
+            // 循环10次 执行线程
+            cachedThreadPool.execute(new Runnable() {
+                public void run() {
+                    //打印正在执行的缓存线程信息
+                    LogUtil.e("f子线程：" + Thread.currentThread().getName() + " 正在被执行");
+                    try {
+                        Thread.currentThread().sleep(1000);//睡眠一秒，再结束子线程
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    // 观察 每隔一秒 执行一次的任务，是否用的同一个线程？
+                    // 不是同一个。因为每执行一个任务，前一个子线程还在睡眠没有退出，所以要用新的线程来执行任务
+                }
+            });
+
+        }
+
+
+        for (int i = 0; i < 10; i++) {//
+
+            try {
+                // 让主线程睡眠1秒，再去执行下一个线程，这样上一个线程就会执行完退出
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // 循环10次 执行线程
+            cachedThreadPool.execute(new Runnable() {
+                public void run() {
+                    //打印正在执行的缓存线程信息
+                    LogUtil.e("s子线程：" + Thread.currentThread().getName() + " 正在被执行");
+                    // 观察 每隔一秒 执行一次的任务，是否用的同一个线程？
+                    // 是的。因为每执行一个任务，上一个线程已经结束退出（因主线程休眠1s再开始下一个任务），所以可以复用
+                }
+            });
+
+        }
+    }
+
+
+    // 测试：主线程 睡眠，子线程是否会受影响
+    public void test_sleep(){
+
+        // 执行一个子线程，循环打印，睡眠一一秒，打印一次
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                int i = 0;
+                while(true){
+                    i++;
+                    try {
+                        Thread.currentThread().sleep(1000);// 这里还是主线程
+                        LogUtil.e("线程_Handler：" + Thread.currentThread().getName() + " " + i);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if(i == 5) break;
+
+                }
+            }
+        });
+
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int i = 0;
+                while(true){
+                    i++;
+                    try {
+                        Thread.currentThread().sleep(1000);// 这里子主线程
+                        LogUtil.e("线程_Thread：" + Thread.currentThread().getName() + " " + i);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if(i == 5) break;
+
+                }
+            }
+        }).start();
+
+        try {
+            LogUtil.e("主线程 sleep begin");
+            Thread.sleep(6000);
+            LogUtil.e("主线程 sleep finish");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    // 测试：子线程的Thead.sleep
+    public void test_Thead_sleep(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int i = 0;
+                while(true){
+                    i++;
+                    try {
+                        Thread.sleep(1000);// 这里是让主线程还是子线程休眠呢?答：子线程
+                        LogUtil.e("线程_Thread：" + Thread.currentThread().getName() + " " + i);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if(i == 5) break;
+
+                }
+            }
+        }).start();
+
+        int i = 0;
+        while(true){
+            i++;
+            LogUtil.e("线程_Main：" + Thread.currentThread().getName() + " " + i);
+            if(i == 10) break;
+
+        }
+
+        // 观察那个线程被休眠！结果是：子线程，也就是说，在子线程执行 Thread.sleep ，休眠的是子线程
+    }
+    // 线程 测试 end
+
+    // Thread.currentThread().sleep 和 Thread.sleep 都是让当前线程休眠，不让出锁
+    //
 }
