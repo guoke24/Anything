@@ -83,7 +83,7 @@ private static volatile Executor sDefaultExecutor = SERIAL_EXECUTOR;
         onPreExecute();//5-1 回调 1,onPreExecute
 
         mWorker.mParams = params;
-        exec.execute(mFuture); //5-1 即 sDefaultExecutor.execute(mFuture) 对应 代码段4
+        exec.execute(mFuture); //5-2 即 sDefaultExecutor.execute(mFuture) 对应 代码段4
 
         return this;
     }
@@ -251,10 +251,10 @@ private static volatile Executor sDefaultExecutor = SERIAL_EXECUTOR;
 ```
 
 至此，可以得出结论：
-* 1,onPreExecute  在 代码段5 的 5-1 处
-* 2,onPostExecute 在 代码段8 的 8-2
-* 3,onProgressUpdate 在 代码段7_2 的 7_2-3
-* 4,doInBackground   在 代码段7_2 的 7_2-2
-* 5,onCancelled   在 代码段8 的 8-1
-* 6,onCancelled(String) 在 代码段8 的 8-3
+* 1,onPreExecute  在 代码段5 的 5-1 ，主线程，也成UI线程
+* 2,onPostExecute 在 代码段8 的 8-2 ，InternalHandler 的 handleMessage函数中调用，UI线程
+* 3,onProgressUpdate 在 代码段7_2 的 7_2-3，InternalHandler 的 handleMessage函数中调用，UI线程
+* 4,doInBackground   在 代码段7_2 的 7_2-2，WorkerRunnable 类的 call 函数中调用，子线程
+* 5,onCancelled   在 代码段8 的 8-1 ，InternalHandler 的 handleMessage函数中调用，UI线程
+* 6,onCancelled(String) 在 代码段8 的 8-3 ，InternalHandler 的 handleMessage函数中调用，UI线程
 

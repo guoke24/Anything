@@ -75,8 +75,8 @@ public class VolatileDemo {
                 }.start();
             }
 
-            while(Thread.activeCount()>1) //保证前面的线程都执行完
-                Thread.yield();
+            while(Thread.activeCount()>2) //有子线程就让出资源，保证所有子线程都执行完
+                Thread.yield();//当前线程，让出cpu，进入就绪状态
             LogUtil.e("" + test.inc); // 结果小于10000
         }
     }
@@ -100,7 +100,7 @@ public class VolatileDemo {
                 }.start();
             }
 
-            while(Thread.activeCount()>1) //保证前面的线程都执行完
+            while(Thread.activeCount()>2) //有子线程就让出资源，保证所有子线程都执行完
                 Thread.yield();
             LogUtil.e("" + test.inc); // 结果=10000
         }
@@ -131,17 +131,18 @@ public class VolatileDemo {
                 }.start();
             }
 
-            while(Thread.activeCount()>1) //保证前面的线程都执行完
+            while(Thread.activeCount()>2)
                 Thread.yield();
             LogUtil.e("" + test.inc); // 结果=10000
         }
     }
 
     static class Test4 {
+        // 该类带有很多原子性操作
         public AtomicInteger inc = new AtomicInteger();
 
         public void increase() {
-            inc.getAndIncrement();
+            inc.getAndIncrement();//具有原子性
         }
 
         public void exec() {
@@ -155,7 +156,7 @@ public class VolatileDemo {
                 }.start();
             }
 
-            while(Thread.activeCount()>1) //保证前面的线程都执行完
+            while(Thread.activeCount()>2)
                 Thread.yield();
             LogUtil.e("" + test.inc); // 结果=10000
         }
