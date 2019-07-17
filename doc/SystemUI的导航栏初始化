@@ -1,0 +1,359 @@
+从文章《Z_SystemUI源码启动》的代码段5开始：
+/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
+```
+    public void start() {
+	......
+        super.start(); // calls createAndAddWindows()
+	......
+	addNavigationBar();// 设置导航栏
+	......
+	startKeyguard();// 设置锁屏
+    }
+```
+进入函数：addNavigationBar()，
+* 代码段1:
+```
+    // For small-screen devices (read: phones) that lack hardware navigation buttons
+    protected void addNavigationBar() {
+        if (DEBUG) Log.v(TAG, "addNavigationBar: about to add " + mNavigationBarView);
+        if (mNavigationBarView == null) return;
+
+        prepareNavigationBarView();
+
+        mWindowManager.addView(mNavigationBarView, getNavigationBarLayoutParams());
+    }
+```
+进入函数：prepareNavigationBarView()，
+* 代码段2:
+```
+    private void prepareNavigationBarView() {
+        mNavigationBarView.reorient();
+
+        ButtonDispatcher recentsButton = mNavigationBarView.getRecentsButton();
+        recentsButton.setOnClickListener(mRecentsClickListener);
+        recentsButton.setOnTouchListener(mRecentsPreloadOnTouchListener);
+        recentsButton.setLongClickable(true);
+        recentsButton.setOnLongClickListener(mRecentsLongClickListener);
+
+        ButtonDispatcher backButton = mNavigationBarView.getBackButton();//2-1 返回键在此获取
+        backButton.setLongClickable(true);
+        backButton.setOnLongClickListener(mLongPressBackListener);
+
+        ButtonDispatcher homeButton = mNavigationBarView.getHomeButton();
+        homeButton.setOnTouchListener(mHomeActionListener);
+        homeButton.setOnLongClickListener(mLongPressHomeListener);
+
+        ButtonDispatcher hideButton = mNavigationBarView.getHideButton();
+        hideButton.setOnClickListener(mHideClickListener);
+
+        /// M: BMW  restore button @{
+        if (MultiWindowManager.isSupported()) {
+            ButtonDispatcher restoreButton = mNavigationBarView.getRestoreButton();
+            restoreButton.setOnClickListener(mRestoreClickListener);
+
+        }
+        /// @}
+
+        mAssistManager.onConfigurationChanged();
+    }
+```
+2-1处可知，从 mNavigationBarView 可以取到返回键，那么我们应该跟踪 mNavigationBarView 的初始化，赋值和怎么使用。
+
+先看：mNavigationBarView.getBackButton()，
+* 代码段2:
+/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
+```
+public ButtonDispatcher getBackButton() {
+        return mButtonDisatchers.get(R.id.back);
+    }
+```
+```
+// 声明
+private final SparseArray<ButtonDispatcher> mButtonDisatchers = new SparseArray<>();
+```
+```
+//在构造函数实例化
+	mBarTransitions = new NavigationBarTransitions(this);
+
+        mButtonDisatchers.put(R.id.back, new ButtonDispatcher(R.id.back));
+        mButtonDisatchers.put(R.id.home, new ButtonDispatcher(R.id.home));
+        mButtonDisatchers.put(R.id.recent_apps, new ButtonDispatcher(R.id.recent_apps));
+```
+经过搜索，mBarTransitions 在 NavigationBarView 类的生命周期函数：onFinishInflate 中出现，
+* 代码段3:
+```
+public void onFinishInflate() {
+        updateRotatedViews();
+        ((NavigationBarInflaterView) findViewById(R.id.navigation_inflater)).setButtonDispatchers(
+                mButtonDisatchers);
+	......
+}
+```
+进入函数：setButtonDispatchers(mButtonDisatchers)，
+* 代码段4:
+/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarInflaterView.java
+```
+    public void setButtonDispatchers(SparseArray<ButtonDispatcher> buttonDisatchers) {
+        mButtonDispatchers = buttonDisatchers;
+        for (int i = 0; i < buttonDisatchers.size(); i++) {
+            initiallyFill(buttonDisatchers.valueAt(i));
+        }
+    }
+```
+追到这里，没啥线索了。
+
+于是回到代码段2，回到类：PhoneStatusBar.java，关注这个变量：mNavigationBarView 的实例化：
+```
+    protected void inflateNavigationBarView(Context context) {
+        mNavigationBarView = (NavigationBarView) View.inflate(
+                context, R.layout.navigation_bar, null);
+    }
+```
+R.layout.navigation_bar 对应的配置文件：
+/frameworks/base/packages/SystemUI/res/layout/navigation_bar.xml
+```
+<com.android.systemui.statusbar.phone.NavigationBarView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:systemui="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:background="@drawable/system_bar_background">
+
+    <FrameLayout
+        android:id="@+id/blind_mode_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:layout_weight="1"/>
+
+    <com.android.systemui.statusbar.phone.NavigationBarInflaterView
+        android:id="@+id/navigation_inflater"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0"/>
+
+</com.android.systemui.statusbar.phone.NavigationBarView>
+```
+由此可知，mNavigationBarView 类内部含有 NavigationBarInflaterView，id为 @+id/navigation_inflater；
+通过对 NavigationBarInflaterView类的代码追踪，发现：
+```
+    public static final String BACK = "back";
+    public static final String HOME = "home";
+    public static final String RECENT = "recent";
+```
+
+```
+    // 生命周期函数
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        inflateChildren();
+        clearViews();
+        inflateLayout(getDefaultLayout());
+    }
+```
+
+
+```
+    protected void inflateLayout(String newLayout) {
+        mCurrentLayout = newLayout;
+        if (newLayout == null) {
+            newLayout = getDefaultLayout();
+        }
+        String[] sets = newLayout.split(GRAVITY_SEPARATOR, 3);
+        String[] start = sets[0].split(BUTTON_SEPARATOR);
+        String[] center = sets[1].split(BUTTON_SEPARATOR);
+        String[] end = sets[2].split(BUTTON_SEPARATOR);
+        // Inflate these in start to end order or accessibility traversal will be messed up.
+        inflateButtons(start, (ViewGroup) mRot0.findViewById(R.id.ends_group), false);
+        inflateButtons(start, (ViewGroup) mRot90.findViewById(R.id.ends_group), true);
+
+        inflateButtons(center, (ViewGroup) mRot0.findViewById(R.id.center_group), false);
+        inflateButtons(center, (ViewGroup) mRot90.findViewById(R.id.center_group), true);
+
+        addGravitySpacer((LinearLayout) mRot0.findViewById(R.id.ends_group));
+        addGravitySpacer((LinearLayout) mRot90.findViewById(R.id.ends_group));
+
+        inflateButtons(end, (ViewGroup) mRot0.findViewById(R.id.ends_group), false);
+        inflateButtons(end, (ViewGroup) mRot90.findViewById(R.id.ends_group), true);
+    }
+```
+
+
+```
+    private void inflateButtons(String[] buttons, ViewGroup parent, boolean landscape) {
+        for (int i = 0; i < buttons.length; i++) {
+            inflateButton(buttons[i], parent, landscape, i);
+        }
+    }
+```
+
+```
+    protected View inflateButton(String buttonSpec, ViewGroup parent, boolean landscape,
+            int indexInParent) {
+        LayoutInflater inflater = landscape ? mLandscapeInflater : mLayoutInflater;
+        float size = extractSize(buttonSpec);
+        String button = extractButton(buttonSpec);
+        View v = null;
+        if (HOME.equals(button)) {
+            v = inflater.inflate(R.layout.home, parent, false);
+            if (landscape && isSw600Dp()) {
+                setupLandButton(v);
+            }
+        } else if (BACK.equals(button)) {
+            v = inflater.inflate(R.layout.back, parent, false);//x-1
+            if (landscape && isSw600Dp()) {
+                setupLandButton(v);
+            }
+        } else if (RECENT.equals(button)) {
+            v = inflater.inflate(R.layout.recent_apps, parent, false);
+            if (landscape && isSw600Dp()) {
+                setupLandButton(v);
+            }
+        }
+	......
+	parent.addView(v);
+	......
+    }
+```
+x-1处，加载了返回键的布局文件！
+
+
+于是可以梳理出以下关系链：
+PhoneStatusBar 类，还有 mNavigationBarView 的引用，
+mNavigationBarView 类内部含有 NavigationBarInflaterView 类的实例，
+NavigationBarInflaterView 类内，加载 home键，back键，recent键的布局文件。
+
+带着这层关系链，再重看 代码段2：
+这次主要看 mNavigationBarView 的使用
+/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
+```
+    private void prepareNavigationBarView() {
+        mNavigationBarView.reorient();
+	......
+    }
+```
+
+/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/NavigationBarView.java
+```
+    public void reorient() {
+        updateCurrentView();
+	....
+    }
+```
+
+```
+    private void updateCurrentView() {
+        final int rot = mDisplay.getRotation();
+        adjustBlindModeLayout(rot);
+	....
+    }			
+```
+
+```
+    private void adjustBlindModeLayout(int rotation) {
+        if (!TopwiseProp.getDefaultSettingBoolean("system_support_blind_mode", false)) {
+            Log.e(TAG, "system not support blind mode");
+            return;
+        }
+        View blindModeLayout = findViewById(R.id.blind_mode_view);
+        View barLayout = findViewById(R.id.navigation_inflater);// 此处引用了 NavigationBarInflaterView
+	......
+    }
+```
+
+NavigationBarView.java 内另一处引用了 NavigationBarInflaterView 的地方：
+```
+// 生命周期函数
+    public void onFinishInflate() {
+        updateRotatedViews();
+        ((NavigationBarInflaterView) findViewById(R.id.navigation_inflater)).setButtonDispatchers(
+                mButtonDisatchers);
+	......
+    }
+```
+看到眼熟的东西， mButtonDisatchers 在代码段2被实例化，即在 NavigationBarView.java 内被实例化。
+追踪到这里，发现 NavigationBarInflaterView 内部逻辑比较简单。故再跟踪一个 NavigationBarView 的构造函数的逻辑。
+
+NavigationBarView 被初始化的地方：
+/frameworks/base/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBar.java
+```
+    protected void createNavigationBarView(Context context) {
+        inflateNavigationBarView(context);
+	......
+    }
+```
+
+```
+    protected void inflateNavigationBarView(Context context) {
+        mNavigationBarView = (NavigationBarView) View.inflate(
+                context, R.layout.navigation_bar, null);
+    }
+```
+
+再看 NavigationBarView 的构造函数：
+补充一个：
+mButtonDisatchers 的 构造函数中，有这么一个函数：updateIcons(context, Configuration.EMPTY, mConfiguration)，
+```
+    private void updateIcons(Context ctx, Configuration oldConfig, Configuration newConfig) {
+	......
+
+        if (oldConfig.densityDpi != newConfig.densityDpi) {
+            mBackIcon = ctx.getDrawable(R.drawable.ic_sysbar_back);// 这里也是引用back键的图标！！！要替换图标的话。不要漏掉这里！！！
+	    ....
+            updateCarModeIcons(ctx);
+        }
+    }
+```
+
+至此，为何在 NavigationBarInflaterView 类的内部更换引用的布局文件也不生效的问题解决了！
+
+两个地方：
+其一：
+NavigationBarInflaterView.java
+v = inflater.inflate(R.layout.back, parent, false);//x-1
+其二：
+NavigationBarView.java
+mBackIcon = ctx.getDrawable(R.drawable.ic_sysbar_back);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -20,9 +20,7 @@
         <activity android:name=".classloader.ClassLoaderActivity" />
         <activity android:name=".reflect.ReflectTestActivity" />
         <activity android:name=".signerverify.SignerVerifyActivity"></activity>
-        <activity android:name=".FileOptUtil.FileOptActivity">
-
-        </activity>
+        <activity android:name=".FileOptUtil.FileOptActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -34,13 +32,15 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".sync.SyncTestActivity">
+        <activity android:name=".sync.SyncTestActivity" />
+        <activity android:name=".handler.handlerTestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".initActivity"></activity>
     </application>
 
 </manifest>
