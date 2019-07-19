@@ -16,10 +16,12 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity" />
         <activity android:name=".CusViewActivity" />
-        <activity android:name=".PackagesListActivity" />
+        <activity android:name=".PackagesListActivity" >
+
+        </activity>
         <activity android:name=".classloader.ClassLoaderActivity" />
         <activity android:name=".reflect.ReflectTestActivity" />
-        <activity android:name=".signerverify.SignerVerifyActivity"></activity>
+        <activity android:name=".signerverify.SignerVerifyActivity" />
         <activity android:name=".FileOptUtil.FileOptActivity" />
 
         <provider
@@ -34,13 +36,16 @@
 
         <activity android:name=".sync.SyncTestActivity" />
         <activity android:name=".handler.handlerTestActivity">
+
+        </activity>
+        <activity android:name=".initActivity" />
+        <activity android:name=".pms.PmsTestActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".initActivity"></activity>
     </application>
 
 </manifest>
