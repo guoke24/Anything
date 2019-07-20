@@ -70,4 +70,21 @@ public class handlerTestActivity extends BaseTestActivity {
         kobeThread.start();
     }
 
+    public void test_2(View view){
+        showMessage("handlerTestActivity test_2:");
+
+    }
+
+    public void testLooper(){
+        //Looper looper = new Looper(); 非public，不能新建，
+
+        People p = new People();
+        LogUtil.e("People.a = " + People.a);//静态变量，只能通过类名去访问，而不能通过对象名去访问
+        LogUtil.e("p.b = " + p.b);
+
+    }
+
+
+
+
 }
