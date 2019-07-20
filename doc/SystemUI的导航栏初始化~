@@ -316,7 +316,7 @@ v = inflater.inflate(R.layout.back, parent, false);//x-1
 NavigationBarView.java
 mBackIcon = ctx.getDrawable(R.drawable.ic_sysbar_back);
 
-补充，还有一个地方：NavigationBar.java 不懂什么时候会有用到
+补充，还有一个地方：NavigationBar.java
 /frameworks/base/tools/layoutlib/bridge/src/com/android/layoutlib/bridge/bars/NavigationBar.java
 loadIcon(back, "ic_sysbar_back.png", density, isRtl);
 
