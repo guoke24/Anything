@@ -82,6 +82,14 @@
             android:text="test9"
             android:onClick="test_9"
             />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:textSize="15sp"
+            android:text="test10"
+            android:onClick="test_10"
+            />
     </LinearLayout>
 
 </LinearLayout>

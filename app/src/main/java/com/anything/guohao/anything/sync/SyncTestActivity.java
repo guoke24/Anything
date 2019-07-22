@@ -347,4 +347,74 @@ public class SyncTestActivity extends BaseTestActivity {
 
     // Thread.currentThread().sleep 和 Thread.sleep 都是让当前线程休眠，不让出锁
     //
+
+    Object object = new Object();
+
+    /*
+     * 在主线程开启一个子线程，然后主线程阻塞，等待子线程耗时操作结束后，唤醒主线程
+     *
+     */
+    public void test_10(View view){
+        int a = getValue();
+        LogUtil.e("返回值 a = " + a);
+    }
+
+    public int getValue(){
+        synchronized (object){
+            try {
+                LogUtil.e(Thread.currentThread().getName() + " 启动子线程执行耗时任务");
+                Thread t1 = new MyThread("子线程");
+                t1.start();
+                LogUtil.e(Thread.currentThread().getName() + " 阻塞开始！等待子线程唤醒。");
+                object.wait();//阻塞，释放锁
+                LogUtil.e(Thread.currentThread().getName() + " 被唤醒！阻塞结束！");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return 24;
+    }
+
+    class MyThread extends Thread{
+        public MyThread(String name) {
+            super(name);
+        }
+
+        @Override
+        public void run() {
+            //super.run();
+            try {
+                LogUtil.e( Thread.currentThread().getName() + " 开始耗时任务,约5秒");
+                int j = 0;
+                while(true){
+                    Thread.currentThread().sleep(1000);
+                    LogUtil.e("耗时 " + (++j) + "秒");
+                    if(j == 5) break;
+                }
+
+                LogUtil.e( Thread.currentThread().getName() + " 结束耗时任务");
+                synchronized (object){
+                    LogUtil.e( Thread.currentThread().getName() + " 唤醒主线程");
+                    object.notifyAll();
+                    //LogUtil.e( Thread.currentThread().getName() + " 唤醒结束");
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
