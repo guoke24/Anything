@@ -46,7 +46,21 @@ import java.util.jar.JarFile;
  * 第二部，提取字节
  * 学到的知识点：
  * 1,字节可以直接用=比较，转字符在比较会很慢
- * 2,文件读取有很多比inputstream更高效的办法，如：RandomAccessFile，FileChannel和MappedByteBuffer等，有空总结
+ * 2,文件读取有很多比inputstream更高效的办法，如：RandomAccessFile，FileChannel和 MappedByteBuffer 等，有空总结
+ */
+
+/**
+ * 2019-7-25
+ * 总结一下，江西农商行验签项目能提炼出来的几点收获：
+ * 第一，代码中查看apk的方法：JarFIle类遍历，Zip格式截取四个分区（文件区，签名块，目录区，目录结尾区）
+ * 第二，签名块的结构，以及如何去掉去掉签名块后还原apk（目录结尾区的目录区要修改）
+ * 第三，可以延伸以下；自己插入签名块怎么做（同上，目录结尾区的目录区要修改）
+ * 第四，前三条本质上就是需要对ZIP文件的格式了解清楚
+ * 第五，RandomAccessFile 和 ByteBuffer 类的使用
+ * 第六，了解了RSA算法加密解密，签名验签的流程
+ * 第七，总结一份 V2签名 和 验签 的源码文档，发表。
+ * 第八，并把该项目的测试内容整理一遍，相关函数放入Util类中，便于以后复用。
+ *
  */
 public class SignerVerifyActivity extends BaseTestActivity {
 
@@ -1286,6 +1300,13 @@ public class SignerVerifyActivity extends BaseTestActivity {
     // 尽量不要用遍历字节数组的方法！！！
     // 通过字节数组转int的方式，获得某一块的size，再结合偏移量，找到每一块的偏移量！！
     // 源码中，都是确定好偏移量，从RandomAccessFile 读取到 ByteBuffer内的
+
+    /**
+     * 读取apk的四大块：文件区，签名块，中央区，中央结尾区，放入一个集合
+     * @param apk
+     * @return
+     * @throws Exception
+     */
     private SignatureInfoForJxnx findSignatureForJxnx(RandomAccessFile apk) throws Exception {
 
         // 找到 eocd
