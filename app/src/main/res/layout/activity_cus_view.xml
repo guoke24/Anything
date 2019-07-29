@@ -4,20 +4,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CusViewActivity">
+    tools:context=".viewtest.CusViewActivity">
 
-    <com.anything.guohao.anything.CusView
+    <com.anything.guohao.anything.viewtest.CusView
         android:id="@+id/customView"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:background="@color/colorPrimary"/>
 
-    <com.anything.guohao.anything.CusView
+    <com.anything.guohao.anything.viewtest.CusView
         android:id="@+id/customView2"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="300dp"
-        android:layout_marginLeft="180dp"
+        android:layout_marginLeft="0dp"
         android:background="@color/colorAccent"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="180dp"
+        />
 
 </RelativeLayout>
