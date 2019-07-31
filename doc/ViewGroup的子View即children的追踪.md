@@ -186,3 +186,150 @@ setView() 中会调用到requestLayout()。requestLayout() 中调用 scheduleTra
 总结：每个Activity对应一个PhoneWindow,window与decorView相关联。
 设置布局的时候使用WindowManager addView,
 每调用一次addView便创建一个ViewRootImpl,也就是创建一颗view树。
+
+=========================================================
+
+借个地方，分析 ViewGroup#dispatchTouchEvent函数的逻辑结构，一共分为三大逻辑：
+第一，拦截判断
+第二，遍历子view，分发事件
+第三，处理 mFirstTouchTarget
+最后返回拦截的结果。
+
+ViewGroup 的函数： dispatchTouchEvent
+
+```
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        boolean handled = false;
+        if (onFilterTouchEventForSecurity(ev)) { // 99%逻辑都在里边
+            final int action = ev.getAction();
+            final int actionMasked = action & MotionEvent.ACTION_MASK;
+
+            // Handle an initial down.
+            if (actionMasked == MotionEvent.ACTION_DOWN) {
+                // Throw away all previous state when starting a new touch gesture.
+                // The framework may have dropped the up or cancel event for the previous gesture
+                // due to an app switch, ANR, or some other state change.
+                cancelAndClearTouchTargets(ev); // 清除 mFirstTouchTarget
+                resetTouchState(); // 清除各种flag
+            }
+
+            // Check for interception.
+            final boolean intercepted;
+            if (actionMasked == MotionEvent.ACTION_DOWN
+                    || mFirstTouchTarget != null) {
+                 // ACTION_DOWN 说明是手指下落
+
+                 // 补充说明：当一个点击产生，处于点击位置所有view，就会形成一个点击目标链条，
+                 // 最顶层就是DecView，最底层一定是一个view，而不是viewGroup
+
+                 // mFirstTouchTarget != null 说明点击的目标在本view的子view链里
+
+                final boolean disallowIntercept = (mGroupFlags & FLAG_DISALLOW_INTERCEPT) != 0;
+                if (!disallowIntercept) {
+                    intercepted = onInterceptTouchEvent(ev);
+                    ev.setAction(action); // restore action in case it was changed
+                } else {
+                    intercepted = false;
+                }
+            } else {
+                // There are no touch targets and this action is not an initial down
+                // so this view group continues to intercept touches.
+                intercepted = true;
+                // 逻辑走到这里，说明点击目标没在子view链里，
+                // 而逻辑会走到这里，暗含一个事实，本view处理点击目标链条，且父view没有拦截点击事件
+                // 那就只剩一种可能，那就是本view要处理这个事件
+                // 而且这个事件，绝不会是 down 事件，只可能是 move 或者 up 事件
+            }
+            // 在决定是否拦截后，接着去遍历子view
+
+
+            // If intercepted, start normal event dispatch. Also if there is already
+            // a view that is handling the gesture, do normal event dispatch.
+            if (intercepted || mFirstTouchTarget != null) {
+                ev.setTargetAccessibilityFocus(false);
+            }
+
+            // Check for cancelation.
+            final boolean canceled = resetCancelNextUpFlag(this)
+                    || actionMasked == MotionEvent.ACTION_CANCEL;
+
+            // Update list of touch targets for pointer down, if needed.
+            final boolean split = (mGroupFlags & FLAG_SPLIT_MOTION_EVENTS) != 0;
+            TouchTarget newTouchTarget = null;
+            boolean alreadyDispatchedToNewTouchTarget = false;
+
+            // 不取消也不拦截，则遍历子view
+            if (!canceled && !intercepted) {
+                // 遍历子view
+            }
+            // 遍历子view结束,立马去处理 mFirstTouchTarget
+
+
+            // Dispatch to touch targets.
+            if (mFirstTouchTarget == null) { // 处理 mFirstTouchTarget
+                // No touch targets so treat this as an ordinary view.
+                handled = dispatchTransformedTouchEvent(ev, canceled, null,
+                        TouchTarget.ALL_POINTER_IDS);
+            } else {
+                // Dispatch to touch targets, excluding the new touch target if we already
+                // dispatched to it.  Cancel touch targets if necessary.
+                TouchTarget predecessor = null;
+                TouchTarget target = mFirstTouchTarget;
+                while (target != null) {
+                    final TouchTarget next = target.next;
+                    if (alreadyDispatchedToNewTouchTarget && target == newTouchTarget) {
+                        handled = true;
+                    } else {
+                        final boolean cancelChild = resetCancelNextUpFlag(target.child)
+                                || intercepted;
+                        if (dispatchTransformedTouchEvent(ev, cancelChild,
+                                target.child, target.pointerIdBits)) {
+                            handled = true;
+                        }
+                        if (cancelChild) {
+                            if (predecessor == null) {
+                                mFirstTouchTarget = next;
+                            } else {
+                                predecessor.next = next;
+                            }
+                            target.recycle();
+                            target = next;
+                            continue;
+                        }
+                    }
+                    predecessor = target;
+                    target = next;
+                }
+            }
+
+            ......
+        }
+        ......
+        return handled;
+    }
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
