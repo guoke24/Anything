@@ -31,7 +31,27 @@
             android:text="loadFile"
             android:textSize="15sp"
             android:onClick="test_3" />
-
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:text="test_4"
+            android:textSize="15sp"
+            android:onClick="test_4" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:text="test_5"
+            android:textSize="15sp"
+            android:onClick="test_5" />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:text="test_6"
+            android:textSize="15sp"
+            android:onClick="test_6" />
 
     </LinearLayout>
 
