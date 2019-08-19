@@ -32,7 +32,7 @@ public class handlerTestActivity extends BaseTestActivity {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(1000);//休眠一秒的目的，就是等待Loop启动
                     if(mHandler == null) return;
                     Message message = new Message();
                     message.obj = "I am Tmac,trainning?";
