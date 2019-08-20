@@ -11,7 +11,7 @@ public final class Looper {
 Looper类中的变量 sThreadLocal 是 static 的，那么我 Looper looper = new Looper();
 对象 looper 持有的 sThreadLocal 跟 Looper 类中的 sThreadLocal 是同一个吗？
 答：静态变量，只能通过类名去访问，而不能通过对象名去访问，所以 对象 looper 不持有 sThreadLocal 的引用。
-
+更正：静态的成员变量是可以通过对象去访问的。
 
 问题二，handler 发消息，怎么发给 Looper的？
 这可以从 handler 的构造函数看起：

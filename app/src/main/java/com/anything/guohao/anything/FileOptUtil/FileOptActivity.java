@@ -221,6 +221,8 @@ public class FileOptActivity extends BaseTestActivity {
 
     }
 
+    // 拓展，替换一行，待完成
+
 
     // 以下为ByteBuffer 测试
     public void test_6(View view) {
@@ -290,8 +292,6 @@ public class FileOptActivity extends BaseTestActivity {
         }
 
     }
-
-
 
 
     // 安装 jxnx 测试ok
