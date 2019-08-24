@@ -216,14 +216,16 @@ public class ApkSignerV2 {
         beforeCentralDir.clear();
         centralDir.clear();
         eocd.clear();
+
         // Insert APK Signing Block immediately before the ZIP Central Directory.
         return new ByteBuffer[] {
                 beforeCentralDir,
-                apkSigningBlock,
+                apkSigningBlock,// 追踪这个变量
                 centralDir,
                 eocd,
         };
     }
+
     private static Map<Integer, byte[]> computeContentDigests(
             Set<Integer> digestAlgorithms,
             ByteBuffer[] contents) throws DigestException {
@@ -309,22 +311,32 @@ public class ApkSignerV2 {
         }
         return result;
     }
+
     private static final int getChunkCount(int inputSize, int chunkSize) {
         return (inputSize + chunkSize - 1) / chunkSize;
     }
+
     private static void setUnsignedInt32LittleEngian(int value, byte[] result, int offset) {
         result[offset] = (byte) (value & 0xff);
         result[offset + 1] = (byte) ((value >> 8) & 0xff);
         result[offset + 2] = (byte) ((value >> 16) & 0xff);
         result[offset + 3] = (byte) ((value >> 24) & 0xff);
     }
+
     private static byte[] generateApkSigningBlock(
             List<SignerConfig> signerConfigs,
             Map<Integer, byte[]> contentDigests) throws InvalidKeyException, SignatureException {
+
+        // 此处返回的是 是原生V2签名分块value值
         byte[] apkSignatureSchemeV2Block =
                 generateApkSignatureSchemeV2Block(signerConfigs, contentDigests);
+                // 该函数 会产生 是原生V2签名分块value值
+
+        // 此处的入参 apkSignatureSchemeV2Block 是原生V2签名分块value值
         return generateApkSigningBlock(apkSignatureSchemeV2Block);
+        // 此处返回的已经是完整的 apk 签名分块
     }
+
     private static byte[] generateApkSigningBlock(byte[] apkSignatureSchemeV2Block) {
         // FORMAT:
         // uint64:  size (excluding this field)
@@ -352,9 +364,13 @@ public class ApkSignerV2 {
         result.put(APK_SIGNING_BLOCK_MAGIC);
         return result.array();
     }
+
+    // 返回值就是 原生V2签名分块value值
     private static byte[] generateApkSignatureSchemeV2Block(
             List<SignerConfig> signerConfigs,
             Map<Integer, byte[]> contentDigests) throws InvalidKeyException, SignatureException {
+        // 入参的 contentDigests 就是apk的每个分块的摘要
+
         // FORMAT:
         // * length-prefixed sequence of length-prefixed signer blocks.
         List<byte[]> signerBlocks = new ArrayList<>(signerConfigs.size());
@@ -363,30 +379,38 @@ public class ApkSignerV2 {
             signerNumber++;
             byte[] signerBlock;
             try {
+                // 将每个分块的 contentDigests，生成 signer
                 signerBlock = generateSignerBlock(signerConfig, contentDigests);
             } catch (InvalidKeyException e) {
                 throw new InvalidKeyException("Signer #" + signerNumber + " failed", e);
             } catch (SignatureException e) {
                 throw new SignatureException("Signer #" + signerNumber + " failed", e);
             }
+            // signer 的集合
             signerBlocks.add(signerBlock);
         }
+
+        // 返回值就是 原生V2签名分块value值
         return encodeAsSequenceOfLengthPrefixedElements(
                 new byte[][] {
-                        encodeAsSequenceOfLengthPrefixedElements(signerBlocks),
-                });
+                        encodeAsSequenceOfLengthPrefixedElements(signerBlocks),// 把多个 signer 转成 len-signer 结构，统称 signers
+                });// 把 signers 转成 len-signers 结构的字节段
     }
+
+    // 将每个入参的 contentDigests，生成一个 signer，并返回
     private static byte[] generateSignerBlock(
             SignerConfig signerConfig,
             Map<Integer, byte[]> contentDigests) throws InvalidKeyException, SignatureException {
+
         if (signerConfig.certificates.isEmpty()) {
             throw new SignatureException("No certificates configured for signer");
         }
+
         PublicKey publicKey = signerConfig.certificates.get(0).getPublicKey();
         byte[] encodedPublicKey = encodePublicKey(publicKey);
         V2SignatureSchemeBlock.SignedData signedData = new V2SignatureSchemeBlock.SignedData();
         try {
-            signedData.certificates = encodeCertificates(signerConfig.certificates);
+            signedData.certificates = encodeCertificates(signerConfig.certificates);// 证书链
         } catch (CertificateEncodingException e) {
             throw new SignatureException("Failed to encode certificates", e);
         }
@@ -403,7 +427,8 @@ public class ApkSignerV2 {
                                 + getSignatureAlgorithmJcaSignatureAlgorithm(signatureAlgorithm)
                                 + " not computed");
             }
-            digests.add(Pair.create(signatureAlgorithm, contentDigest));
+            digests.add(Pair.create(signatureAlgorithm, contentDigest));// 摘要链
+            // 此处构造的摘要链，含有n个"算法-摘要"对
         }
         signedData.digests = digests;
         V2SignatureSchemeBlock.Signer signer = new V2SignatureSchemeBlock.Signer();
@@ -422,6 +447,8 @@ public class ApkSignerV2 {
                 // additional attributes
                 new byte[0],
         });
+        // ======================构造 signedData 结束===============================
+
         signer.publicKey = encodedPublicKey;
         signer.signatures = new ArrayList<>();
         for (int signatureAlgorithm : signerConfig.signatureAlgorithms) {
@@ -464,6 +491,8 @@ public class ApkSignerV2 {
             }
             signer.signatures.add(Pair.create(signatureAlgorithm, signatureBytes));
         }
+        // ======================构造 signatures 结束===============================
+
         // FORMAT:
         // * length-prefixed signed data
         // * length-prefixed sequence of length-prefixed signatures:
@@ -477,7 +506,22 @@ public class ApkSignerV2 {
                                 signer.signatures),
                         signer.publicKey,
                 });
+        //带长度前缀的 signer（带长度前缀）序列：
+        //带长度前缀的 signed data：
+        //带长度前缀的 digests（带长度前缀）序列：
+        //signature algorithm ID (uint32)
+        //（带长度前缀）digest - 请参阅受完整性保护的内容
+        //带长度前缀的 X.509 certificates 序列：
+        //带长度前缀的 X.509 certificate（ASN.1 DER 形式）
+        //带长度前缀的 additional attributes（带长度前缀）序列：
+        //ID (uint32)
+        //value（可变长度：附加属性的长度 - 4 个字节）
+        //带长度前缀的 signatures（带长度前缀）序列：
+        //signature algorithm ID (uint32)
+        //signed data 上带长度前缀的 signature
+        //带长度前缀的 public key（SubjectPublicKeyInfo，ASN.1 DER 形式）
     }
+
     private static final class V2SignatureSchemeBlock {
         private static final class Signer {
             public byte[] signedData;
@@ -489,6 +533,7 @@ public class ApkSignerV2 {
             public List<byte[]> certificates;
         }
     }
+
     private static byte[] encodePublicKey(PublicKey publicKey) throws InvalidKeyException {
         byte[] encodedPublicKey = null;
         if ("X.509".equals(publicKey.getFormat())) {
@@ -514,6 +559,7 @@ public class ApkSignerV2 {
         }
         return encodedPublicKey;
     }
+
     public static List<byte[]> encodeCertificates(List<X509Certificate> certificates)
             throws CertificateEncodingException {
         List<byte[]> result = new ArrayList<>();
@@ -522,10 +568,12 @@ public class ApkSignerV2 {
         }
         return result;
     }
+
     private static byte[] encodeAsSequenceOfLengthPrefixedElements(List<byte[]> sequence) {
         return encodeAsSequenceOfLengthPrefixedElements(
                 sequence.toArray(new byte[sequence.size()][]));
     }
+
     private static byte[] encodeAsSequenceOfLengthPrefixedElements(byte[][] sequence) {
         int payloadSize = 0;
         for (byte[] element : sequence) {
@@ -539,6 +587,7 @@ public class ApkSignerV2 {
         }
         return result.array();
     }
+
     private static byte[] encodeAsSequenceOfLengthPrefixedPairsOfIntAndLengthPrefixedBytes(
             List<Pair<Integer, byte[]>> sequence) {
         int resultSize = 0;
@@ -556,6 +605,7 @@ public class ApkSignerV2 {
         }
         return result.array();
     }
+
     /**
      * Relative <em>get</em> method for reading {@code size} number of bytes from the current
      * position of this buffer.
@@ -585,7 +635,9 @@ public class ApkSignerV2 {
             source.limit(originalLimit);
         }
     }
+
     private static Pair<String, ? extends AlgorithmParameterSpec>
+
     getSignatureAlgorithmJcaSignatureAlgorithm(int sigAlgorithm) {
         switch (sigAlgorithm) {
             case SIGNATURE_RSA_PSS_WITH_SHA256:
@@ -616,6 +668,7 @@ public class ApkSignerV2 {
                                 + Long.toHexString(sigAlgorithm & 0xffffffff));
         }
     }
+
     private static int getSignatureAlgorithmContentDigestAlgorithm(int sigAlgorithm) {
         switch (sigAlgorithm) {
             case SIGNATURE_RSA_PSS_WITH_SHA256:
@@ -634,6 +687,7 @@ public class ApkSignerV2 {
                                 + Long.toHexString(sigAlgorithm & 0xffffffff));
         }
     }
+
     private static String getContentDigestAlgorithmJcaDigestAlgorithm(int digestAlgorithm) {
         switch (digestAlgorithm) {
             case CONTENT_DIGEST_CHUNKED_SHA256:
@@ -645,6 +699,7 @@ public class ApkSignerV2 {
                         "Unknown content digest algorthm: " + digestAlgorithm);
         }
     }
+
     private static int getContentDigestAlgorithmOutputSizeBytes(int digestAlgorithm) {
         switch (digestAlgorithm) {
             case CONTENT_DIGEST_CHUNKED_SHA256:
@@ -656,6 +711,7 @@ public class ApkSignerV2 {
                         "Unknown content digest algorthm: " + digestAlgorithm);
         }
     }
+
     /**
      * Indicates that APK file could not be parsed.
      */
