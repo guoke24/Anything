@@ -494,6 +494,7 @@ public class ApkSignerV2 {
 
         // 新建 signedData 实例
         V2SignatureSchemeBlock.SignedData signedData = new V2SignatureSchemeBlock.SignedData();
+
         // 根据入参 signerConfig，获得 证书链，并赋值给 signedData.certificates
         try {
             signedData.certificates = encodeCertificates(signerConfig.certificates);// 证书链
@@ -550,8 +551,8 @@ public class ApkSignerV2 {
                 //sequence of length-prefixed additional attributes length-prefixed
                 new byte[0],
         });
-        // x-1处，入参 signedData.digests，内有多个 "签名算法ID-摘要" 对
-        // 返回值：byte[],包含多个 "长度前缀 -（ 签名算法ID -（长度前缀-摘要））" 对
+        // x-1处，入参 signedData.digests，内有多个 "签名算法ID-摘要" pair
+        // 返回值：byte[],包含多个 "pair长度前缀 -（ 签名算法ID -（摘要长度前缀-摘要））" 对
         // 即上述注释中的 sequence of length-prefixed digests，
         // 每个 digests 的内部格式为：
         // 四个字节：签名算法ID
@@ -706,7 +707,7 @@ public class ApkSignerV2 {
         return result.array();
     }
 
-    // 对"算法ID - digest"结构的pair，进行前缀构造
+    // 对 sequence 中的每一个 "算法ID - digest"pair，进行前缀构造
     private static byte[] encodeAsSequenceOfLengthPrefixedPairsOfIntAndLengthPrefixedBytes(
             List<Pair<Integer, byte[]>> sequence) {
         int resultSize = 0;
