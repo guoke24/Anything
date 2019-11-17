@@ -9,7 +9,7 @@ import butterknife.BindView;
 
 public class MainActivity extends AppCompatActivity {
 
-    // 在 module 中使用 butterknife ，参考：https://github.com/JakeWharton/butterknife
+    // for butterknife module ，参考：https://github.com/JakeWharton/butterknife
     @BindView(R2.id.tx2)//注意此处需要用R2
     TextView tx2;
 

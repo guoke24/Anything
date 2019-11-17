@@ -1,5 +1,5 @@
-apply plugin: 'com.android.library'
-apply plugin: 'com.jakewharton.butterknife'// module特有的
+apply plugin: 'com.android.library' // for butterknife
+apply plugin: 'com.jakewharton.butterknife'// for butterknife module特有的
 
 
 android {
@@ -35,7 +35,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    // butterknife 版本使用 root build.gradle 的示例
+    // for butterknife
     api "com.jakewharton:butterknife:$rootProject.ext.butterknifeVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.ext.butterknifeVersion"
 

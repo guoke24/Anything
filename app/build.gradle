@@ -34,7 +34,7 @@ dependencies {
 
     implementation project(path: ':commom')
 
-    // butterknife 版本使用 root build.gradle 的示例
+    // for butterknife
     api "com.jakewharton:butterknife:$rootProject.ext.butterknifeVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.ext.butterknifeVersion"
 
