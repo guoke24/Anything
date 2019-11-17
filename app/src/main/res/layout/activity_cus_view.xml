@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".viewtest.CusViewActivity">
+    tools:context="com.guohao.anything.viewtest.CusViewActivity">
 
-    <com.anything.guohao.anything.viewtest.CusView
+    <com.guohao.anything.viewtest.CusView
         android:id="@+id/customView"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:background="@color/colorPrimary"/>
 
-    <com.anything.guohao.anything.viewtest.CusView
+    <com.guohao.anything.viewtest.CusView
         android:id="@+id/customView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

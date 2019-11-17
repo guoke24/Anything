@@ -17,20 +17,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".jvm.Main2Activity">
+        <activity android:name="com.guohao.anything.butterknife.butterknifeActivity"></activity>
+        <activity android:name="com.guohao.anything.jvm.Main2Activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
-        </activity>
-        <activity android:name=".viewtest.CusViewActivity"></activity>
-        <activity android:name=".PackagesListActivity"></activity>
-        <activity android:name=".classloader.ClassLoaderActivity" />
-        <activity android:name=".reflect.ReflectTestActivity" />
-        <activity android:name=".signerverify.SignerVerifyActivity" />
-        <activity android:name=".FileOptUtil.FileOptActivity" />
+        <activity android:name="com.guohao.anything.MainActivity"></activity>
+        <activity android:name="com.guohao.anything.viewtest.CusViewActivity" />
+        <activity android:name="com.guohao.anything.PackagesListActivity" />
+        <activity android:name="com.guohao.anything.classloader.ClassLoaderActivity" />
+        <activity android:name="com.guohao.anything.reflect.ReflectTestActivity" />
+        <activity android:name="com.guohao.anything.signerverify.SignerVerifyActivity" />
+        <activity android:name="com.guohao.anything.FileOptUtil.FileOptActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -42,10 +43,10 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".sync.SyncTestActivity"></activity>
-        <activity android:name=".handler.handlerTestActivity"></activity>
-        <activity android:name=".initActivity" />
-        <activity android:name=".pms.PmsTestActivity"></activity>
+        <activity android:name="com.guohao.anything.sync.SyncTestActivity" />
+        <activity android:name="com.guohao.anything.handler.handlerTestActivity" />
+        <activity android:name="com.guohao.anything.initActivity" />
+        <activity android:name="com.guohao.anything.pms.PmsTestActivity" />
     </application>
 
 </manifest>
