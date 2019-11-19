@@ -16,16 +16,19 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name="com.guohao.anything.butterknife.butterknifeActivity"></activity>
-        <activity android:name="com.guohao.anything.jvm.Main2Activity">
+        android:theme="@style/AppTheme.Base">
+        <activity android:name="com.guohao.anything.FragmentDemo.Home2Activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.guohao.anything.MainActivity"></activity>
+        <activity android:name="com.guohao.anything.FragmentDemo.HomeActivity">
+        </activity>
+        <activity android:name="com.guohao.anything.butterknife.butterknifeActivity" />
+        <activity android:name="com.guohao.anything.jvm.Main2Activity"></activity>
+        <activity android:name="com.guohao.anything.MainActivity" />
         <activity android:name="com.guohao.anything.viewtest.CusViewActivity" />
         <activity android:name="com.guohao.anything.PackagesListActivity" />
         <activity android:name="com.guohao.anything.classloader.ClassLoaderActivity" />

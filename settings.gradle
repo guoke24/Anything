@@ -1,1 +1,1 @@
-include ':app', ':commom'
+include ':app', ':commom', ':xtalker_common'
