@@ -27,7 +27,10 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class MainActivity extends Activity
+/**
+ * module 中的 Activity，直接在 app 中的 AndroidManifest.xml 中声明就可以使用！
+ */
+public class MainXActivity extends Activity
         implements BottomNavigationView.OnNavigationItemSelectedListener,
         NavHelper.OnTabChangedListener<Integer> {
 
@@ -52,12 +55,12 @@ public class MainActivity extends Activity
     private NavHelper<Integer> mNavHelper;
 
     /**
-     * MainActivity 显示的入口
+     * MainXActivity 显示的入口
      *
      * @param context 上下文
      */
     public static void show(Context context) {
-        context.startActivity(new Intent(context, MainActivity.class));
+        context.startActivity(new Intent(context, MainXActivity.class));
     }
 
     @Override
