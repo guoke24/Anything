@@ -7,6 +7,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="group" />
+        android:text="group"
+        android:textSize="25dp"
+        android:layout_centerInParent="true"
+        android:textColor="@color/red_600"/>
 
 </RelativeLayout>

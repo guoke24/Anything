@@ -63,7 +63,6 @@ import java.nio.ByteOrder;
 public class FileOptActivity extends BaseTestActivity {
 
     String SmartPhonePos_apk = "SmartPhonePos_new_20190612_2_0_3_release.apk";
-    //String SmartPhonePos_apk = "SmartPhonePos_new_20190612_2_0_3_release.apk";
     String apkPath = "";
 
     @Override

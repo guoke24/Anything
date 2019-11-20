@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void test_3(View v) {
-        // 把 assets 的 sougou.apk，copy 到 context.getFilesDir() 的路径下
+        // 把 assets 的 xxx.apk，copy 到 context.getFilesDir() 的路径下
         // 即 /data/user/0/com.anything.guohao.anything/files
         String path = AssetsUtils.fileOpt("classes.dex", this);
         if (path != null) {
