@@ -2,7 +2,7 @@ package com.guohao.xtalker;
 
 import android.view.View;
 
-import common.app.Fragment;
+import com.guohao.common.app.Fragment;
 
 public class ContactFragment extends Fragment {
 

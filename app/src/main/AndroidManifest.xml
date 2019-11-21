@@ -17,13 +17,14 @@
         android:theme="@style/AppTheme.Base">
         <activity android:name="com.guohao.anything.FragmentDemo.Home2Activity"></activity>
         <activity android:name="com.guohao.anything.FragmentDemo.Home3XActivity">
-        </activity>
-        <activity android:name="com.guohao.xtalker.MainXActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name="com.guohao.xtalker.MainXActivity">
+
         </activity>
 
         <activity android:name="com.guohao.anything.FragmentDemo.HomeActivity"></activity>

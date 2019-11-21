@@ -1,4 +1,4 @@
-package com.guohao.xtalker;
+package com.guohao.common.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;

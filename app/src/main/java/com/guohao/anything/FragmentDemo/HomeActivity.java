@@ -23,7 +23,7 @@ import com.guohao.xtalker.NavHelper;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import common.app.Activity;
+import com.guohao.common.app.Activity;
 
 public class HomeActivity extends Activity
         implements BottomNavigationView.OnNavigationItemSelectedListener,

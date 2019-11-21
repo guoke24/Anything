@@ -22,7 +22,7 @@
             android:paddingLeft="@dimen/len_4"
             android:paddingRight="@dimen/len_4">
 
-            <com.guohao.xtalker.PortraitView
+            <com.guohao.common.widget.PortraitView
 
                 android:id="@+id/im_portrait"
                 android:layout_width="@dimen/len_40"

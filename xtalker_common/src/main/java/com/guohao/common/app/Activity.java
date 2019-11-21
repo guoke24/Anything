@@ -1,4 +1,4 @@
-package common.app;
+package com.guohao.common.app;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.List;
 
 import butterknife.ButterKnife;
+import com.guohao.common.widget.PlaceHolderView;
 
 /**
  * @author qiujuer
@@ -98,9 +99,9 @@ public abstract class Activity extends AppCompatActivity {
         if (fragments != null && fragments.size() > 0) {
             for (Fragment fragment : fragments) {
                 // 判断是否为我们能够处理的Fragment类型
-                if (fragment instanceof common.app.Fragment) {
+                if (fragment instanceof com.guohao.common.app.Fragment) {
                     // 判断是否拦截了返回按钮
-                    if (((common.app.Fragment) fragment).onBackPressed()) {
+                    if (((com.guohao.common.app.Fragment) fragment).onBackPressed()) {
                         // 如果有直接Return
                         return;
                     }

@@ -1,4 +1,4 @@
-package common.app;
+package com.guohao.common.app;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import com.guohao.common.widget.PlaceHolderView;
 
 /**
  * @author qiujuer

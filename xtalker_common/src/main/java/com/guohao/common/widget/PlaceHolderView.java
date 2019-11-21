@@ -1,4 +1,4 @@
-package common.app;
+package com.guohao.common.widget;
 
 import android.support.annotation.StringRes;
 
