@@ -35,7 +35,7 @@ public class GalleryFragment extends BottomSheetDialogFragment
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // 返回一个我们复写的
-        return new BottomSheetDialog(Objects.requireNonNull(getContext()));
+        return new TransStatusBottomSheetDialog(Objects.requireNonNull(getContext()));
     }
 
     @Override

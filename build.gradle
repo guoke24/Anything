@@ -3,9 +3,10 @@
 buildscript {
     
     repositories {
-        mavenCentral() // for butterknife
         google()
         jcenter()
+        mavenCentral() // for butterknife
+
 
     }
     dependencies {
@@ -22,7 +23,8 @@ allprojects {
     repositories {
         google()
         jcenter()
-
+        mavenCentral()
+        maven { url "https://www.jitpack.io" }
     }
 }
 

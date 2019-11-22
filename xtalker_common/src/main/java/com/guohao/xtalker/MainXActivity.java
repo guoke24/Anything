@@ -116,6 +116,9 @@ public class MainXActivity extends Activity
 
     @OnClick(R2.id.im_portrait)
     void onPortraitClick() {
+        // 跳转到用户界面
+        AccountActivity.show(this);
+
     }
 
     @OnClick(R2.id.im_search)

@@ -15,8 +15,8 @@ public class ActiveFragment extends Fragment implements GalleryView.SelectedChan
 
     @Override
     protected int getContentLayoutId() {
-        //return R.layout.fragment_active;
-        return R.layout.fragment_gallery;
+        return R.layout.fragment_active;
+        //return R.layout.fragment_gallery;
     }
 
     GalleryView mGallery;
@@ -24,16 +24,15 @@ public class ActiveFragment extends Fragment implements GalleryView.SelectedChan
     protected void initWidget(View root) {
         super.initWidget(root);
         //inflater.inflate(R.layout.fragment_gallery, frameLayout, true);
-        mGallery = root.findViewById(R.id.galleryView);
-        //mGallery.setup(getLoaderManager(), null);
+        //mGallery = root.findViewById(R.id.galleryView);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        mGallery.setup(getLoaderManager(), this);
-    }
-
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        mGallery.setup(getLoaderManager(), this);
+//    }
+//
     @Override
     public void onSelectedCountChanged(int count) {
         Log.d("guohaox","onSelectedCountChanged");
