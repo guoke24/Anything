@@ -36,8 +36,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
 
-    implementation project(path: ':commom')
-
     implementation 'com.android.support:appcompat-v7:28.0.0'
     api "com.android.support:design:$rootProject.ext.supportVersion"
 
