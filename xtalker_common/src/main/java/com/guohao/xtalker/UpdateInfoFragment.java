@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -13,6 +14,8 @@ import com.bumptech.glide.Glide;
 import com.guohao.common.app.Application;
 import com.guohao.common.app.Fragment;
 import com.guohao.common.widget.PortraitView;
+import com.guohao.factory.Factory;
+import com.guohao.factory.UploadHelper;
 import com.yalantis.ucrop.UCrop;
 
 import net.qiujuer.genius.ui.widget.Loading;
@@ -120,6 +123,18 @@ public class UpdateInfoFragment extends Fragment
                 .asBitmap()
                 .centerCrop()
                 .into(mPortrait);
+
+        // 拿到本地文件的地址
+        final String localPath = uri.getPath();
+        Log.e("guohaox", "localPath:" + localPath);
+
+        Factory.runOnAsync(new Runnable() {
+            @Override
+            public void run() {
+                String url = UploadHelper.uploadPortrait(localPath);
+                Log.e("guohaox", "url:" + url);
+            }
+        });
     }
 
     @OnClick(R2.id.im_sex)

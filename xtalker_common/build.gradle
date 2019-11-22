@@ -59,7 +59,10 @@ dependencies {
     // 工具包
     api "net.qiujuer.genius:kit-handler:$rootProject.ext.geniusVersion"
 
-    //
+    // 权限申请框架
     implementation "pub.devrel:easypermissions:$rootProject.ext.easyPMVersion"
+
+    // ali OSS SDK
+    api "com.aliyun.dpa:oss-android-sdk:$rootProject.ext.ossVersion"
 
 }
