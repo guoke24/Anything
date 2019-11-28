@@ -51,4 +51,17 @@ dependencies {
 
     // 图片剪切
     implementation "com.yalantis:ucrop:$rootProject.ext.ucropVersion"
+
+    // retrofit
+    api "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofitVersion"
+    api "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofitVersion"
+    api "com.google.code.gson:gson:$rootProject.ext.gsonVersion"
+
+    // retrofit 接收String类的结果
+    implementation 'com.squareup.retrofit2:converter-scalars:2.0.0'
+
+    //日志打印
+    implementation('com.github.ihsanbal:LoggingInterceptor:3.0.0') {
+        exclude group: 'org.json', module: 'json'
+    }
 }
