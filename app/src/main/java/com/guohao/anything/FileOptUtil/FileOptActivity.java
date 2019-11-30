@@ -16,7 +16,7 @@ import com.guohao.anything.AssetsUtils;
 import com.guohao.anything.BaseTestActivity;
 import com.guohao.anything.ConvertUtil;
 import com.guohao.anything.LogUtil;
-import com.anything.guohao.anything.R;
+import com.guohao.anything.R;
 import com.guohao.anything.signerverify.SignerVerifyUtils;
 
 import java.io.File;

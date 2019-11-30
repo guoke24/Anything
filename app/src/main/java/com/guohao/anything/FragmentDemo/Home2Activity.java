@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.animation.AnticipateOvershootInterpolator;
 
-import com.anything.guohao.anything.R;
+import com.guohao.anything.R;
 import com.guohao.xtalker.frags.main.ActiveFragment;
 import com.guohao.xtalker.frags.main.ContactFragment;
 import com.guohao.xtalker.frags.main.GroupFragment;

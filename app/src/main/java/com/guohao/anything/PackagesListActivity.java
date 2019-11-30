@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.anything.guohao.anything.R;
+import com.guohao.anything.R;
 
 import java.util.List;
 

@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 
 import com.guohao.anything.PackagesListActivity;
-import com.anything.guohao.anything.R;
+import com.guohao.anything.R;
 
 public class CusViewActivity extends AppCompatActivity {
 

@@ -9,7 +9,7 @@ import android.view.View;
 
 import com.guohao.anything.BaseTestActivity;
 import com.guohao.anything.LogUtil;
-import com.anything.guohao.anything.R;
+import com.guohao.anything.R;
 // 参考：https://blog.csdn.net/wsq_tomato/article/details/80301851
 public class handlerTestActivity extends BaseTestActivity {
 

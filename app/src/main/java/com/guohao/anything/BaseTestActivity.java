@@ -19,7 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.anything.guohao.anything.R;
+import com.guohao.anything.R;
 
 import java.util.List;
 

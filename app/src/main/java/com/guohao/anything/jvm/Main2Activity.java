@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.guohao.anything.BaseTestActivity;
-import com.anything.guohao.anything.R;
+import com.guohao.anything.R;
 
 public class Main2Activity extends BaseTestActivity {
 

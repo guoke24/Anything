@@ -13,7 +13,7 @@ import com.guohao.anything.ConvertUtil;
 import com.guohao.anything.FileOptUtil.BytesOptUtil;
 import com.guohao.anything.FileOptUtil.FileOptUtil;
 import com.guohao.anything.LogUtil;
-import com.anything.guohao.anything.R;
+import com.guohao.anything.R;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1InputStream;

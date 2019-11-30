@@ -1,7 +1,7 @@
 package com.guohao.anything.net.xtalker;
 
 
-import com.anything.guohao.anything.BuildConfig;
+import com.guohao.anything.BuildConfig;
 import com.google.gson.GsonBuilder;
 import com.ihsanbal.logging.Level;
 import com.ihsanbal.logging.LoggingInterceptor;

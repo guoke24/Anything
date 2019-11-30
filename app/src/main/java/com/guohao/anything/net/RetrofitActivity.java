@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.anything.guohao.anything.BuildConfig;
-import com.anything.guohao.anything.R;
+import com.guohao.anything.BuildConfig;
+import com.guohao.anything.R;
 import com.google.gson.Gson;
 import com.guohao.anything.BaseTestActivity;
 import com.guohao.anything.net.gsonDemo.Cart;

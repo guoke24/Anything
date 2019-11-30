@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.guohao.anything.BaseTestActivity;
-import com.anything.guohao.anything.R;
+import com.guohao.anything.R;
 
 import java.lang.reflect.Field;
 //参考：https://blog.csdn.net/kai_zone/article/details/80217219

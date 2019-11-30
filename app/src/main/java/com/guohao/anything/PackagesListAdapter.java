@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.anything.guohao.anything.R;
+import com.guohao.anything.R;
 
 import java.util.ArrayList;
 import java.util.List;

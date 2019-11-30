@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import com.anything.guohao.anything.R;
+import com.guohao.anything.R;
 import com.guohao.anything.hotfix.BugTest;
 import com.guohao.anything.hotfix.FixDexUtil;
 

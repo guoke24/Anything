@@ -3,7 +3,7 @@ package com.guohao.anything;
 import android.os.Bundle;
 import android.view.View;
 
-import com.anything.guohao.anything.R;
+import com.guohao.anything.R;
 
 public class initActivity extends BaseTestActivity {
 
