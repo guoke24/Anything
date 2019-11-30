@@ -1,10 +1,11 @@
-package com.guohao.xtalker;
+package com.guohao.xtalker.frags.main;
 
 import android.util.Log;
 import android.view.View;
 
 import com.guohao.common.app.Fragment;
 import com.guohao.common.widget.GalleryView;
+import com.guohao.xtalker.R;
 
 public class ActiveFragment extends Fragment implements GalleryView.SelectedChangeListener {
 

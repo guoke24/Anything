@@ -1,7 +1,6 @@
 package com.guohao.anything.FragmentDemo;
 
 import android.animation.Animator;
-import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentTransaction;
@@ -12,10 +11,9 @@ import android.view.MenuItem;
 import android.view.animation.AnticipateOvershootInterpolator;
 
 import com.anything.guohao.anything.R;
-import com.guohao.xtalker.ActiveFragment;
-import com.guohao.xtalker.ContactFragment;
-import com.guohao.xtalker.GroupFragment;
-import com.guohao.xtalker.R2;
+import com.guohao.xtalker.frags.main.ActiveFragment;
+import com.guohao.xtalker.frags.main.ContactFragment;
+import com.guohao.xtalker.frags.main.GroupFragment;
 
 import net.qiujuer.genius.ui.animation.AnimatorListener;
 import net.qiujuer.genius.ui.widget.FloatActionButton;

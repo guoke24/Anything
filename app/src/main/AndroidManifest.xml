@@ -21,11 +21,7 @@
         android:theme="@style/AppTheme.Base">
         <activity
             android:name="com.guohao.anything.net.RetrofitActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name="com.guohao.anything.FragmentDemo.Home2Activity" />
         <activity android:name="com.guohao.anything.FragmentDemo.Home3XActivity"></activity>
@@ -36,6 +32,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity android:name="com.guohao.xtalker.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name="com.guohao.anything.FragmentDemo.HomeActivity" />
         <activity android:name="com.guohao.anything.butterknife.butterknifeActivity" />

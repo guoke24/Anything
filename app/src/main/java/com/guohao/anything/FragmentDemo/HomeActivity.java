@@ -16,10 +16,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.ViewTarget;
-import com.guohao.xtalker.ActiveFragment;
-import com.guohao.xtalker.ContactFragment;
-import com.guohao.xtalker.GroupFragment;
-import com.guohao.xtalker.NavHelper;
+import com.guohao.xtalker.frags.main.ActiveFragment;
+import com.guohao.xtalker.frags.main.ContactFragment;
+import com.guohao.xtalker.frags.main.GroupFragment;
+import com.guohao.xtalker.helper.NavHelper;
 
 import butterknife.BindView;
 import butterknife.OnClick;

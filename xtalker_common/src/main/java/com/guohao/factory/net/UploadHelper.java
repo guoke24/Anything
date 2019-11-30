@@ -1,4 +1,4 @@
-package com.guohao.factory;
+package com.guohao.factory.net;
 
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -9,6 +9,7 @@ import com.alibaba.sdk.android.oss.common.auth.OSSCredentialProvider;
 import com.alibaba.sdk.android.oss.common.auth.OSSPlainTextAKSKCredentialProvider;
 import com.alibaba.sdk.android.oss.model.PutObjectRequest;
 import com.alibaba.sdk.android.oss.model.PutObjectResult;
+import com.guohao.factory.Factory;
 import com.guohao.utils.HashUtil;
 
 

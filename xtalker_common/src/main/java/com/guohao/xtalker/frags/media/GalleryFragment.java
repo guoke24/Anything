@@ -1,4 +1,4 @@
-package com.guohao.xtalker;
+package com.guohao.xtalker.frags.media;
 
 
 import android.app.Activity;
@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 
 import com.guohao.common.tools.UiTool;
 import com.guohao.common.widget.GalleryView;
+import com.guohao.xtalker.R;
 
 import java.util.Objects;
 

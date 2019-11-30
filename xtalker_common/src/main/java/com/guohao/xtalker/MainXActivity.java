@@ -21,6 +21,10 @@ import net.qiujuer.genius.ui.Ui;
 import net.qiujuer.genius.ui.widget.FloatActionButton;
 import com.guohao.common.app.Activity;
 import com.guohao.common.widget.PortraitView;
+import com.guohao.xtalker.frags.main.ActiveFragment;
+import com.guohao.xtalker.frags.main.ContactFragment;
+import com.guohao.xtalker.frags.main.GroupFragment;
+import com.guohao.xtalker.helper.NavHelper;
 
 
 import java.util.Objects;

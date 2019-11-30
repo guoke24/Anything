@@ -1,4 +1,4 @@
-package com.guohao.xtalker;
+package com.guohao.xtalker.helper;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;

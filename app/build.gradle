@@ -60,7 +60,7 @@ dependencies {
     // retrofit 接收String类的结果
     implementation 'com.squareup.retrofit2:converter-scalars:2.0.0'
 
-    //日志打印
+    // retrofit 日志打印
     implementation('com.github.ihsanbal:LoggingInterceptor:3.0.0') {
         exclude group: 'org.json', module: 'json'
     }

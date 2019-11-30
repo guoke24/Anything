@@ -1,4 +1,4 @@
-package com.guohao.xtalker;
+package com.guohao.xtalker.frags.user;
 
 
 import android.content.Intent;
@@ -15,7 +15,10 @@ import com.guohao.common.app.Application;
 import com.guohao.common.app.Fragment;
 import com.guohao.common.widget.PortraitView;
 import com.guohao.factory.Factory;
-import com.guohao.factory.UploadHelper;
+import com.guohao.factory.net.UploadHelper;
+import com.guohao.xtalker.R;
+import com.guohao.xtalker.R2;
+import com.guohao.xtalker.frags.media.GalleryFragment;
 import com.yalantis.ucrop.UCrop;
 
 import net.qiujuer.genius.ui.widget.Loading;
