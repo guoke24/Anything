@@ -7,6 +7,9 @@ import android.text.TextUtils;
 import com.guohao.common.Common;
 import com.guohao.factory.Factory;
 import com.guohao.factory.persistence.Account;
+import com.guohao.xtalker.BuildConfig;
+import com.ihsanbal.logging.Level;
+import com.ihsanbal.logging.LoggingInterceptor;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +18,7 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.internal.platform.Platform;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -63,6 +67,14 @@ public class Network {
                         return chain.proceed(newRequest);
                     }
                 })
+                // 打印 log
+                .addInterceptor(new LoggingInterceptor.Builder()
+                        .loggable(BuildConfig.DEBUG)
+                        .log(Platform.INFO)
+                        .setLevel(Level.BASIC)
+                        .request("guohao-请求")
+                        .response("guohao-响应")
+                        .build())
                 .build();
         return instance.client;
     }

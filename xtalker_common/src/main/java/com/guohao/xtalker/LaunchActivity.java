@@ -8,11 +8,13 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Property;
 import android.view.View;
 
 import com.guohao.common.app.Activity;
 import com.guohao.common.frags.PermissionsFragment;
+import com.guohao.factory.persistence.Account;
 
 import net.qiujuer.genius.res.Resource;
 import net.qiujuer.genius.ui.compat.UiCompat;
@@ -21,6 +23,8 @@ public class LaunchActivity extends Activity {
 
     // Drawable
     private ColorDrawable mBgDrawable;
+    // 是否已经得到PushId
+    private boolean mAlreadyGotPushReceiverId = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,17 +59,54 @@ public class LaunchActivity extends Activity {
 
         // 动画进入到50%等待PushId获取到
         // 检查等待状态
-        startAnim(0.5f, this::reallySkip);
+        startAnim(0.5f, this::waitPushReceiverId);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-//        if (PermissionsFragment.haveAll(this, getSupportFragmentManager())) {
-//            MainXActivity.show(this);
-//            finish();
-//        }
+        // 判断是否已经得到推送Id，如果已经得到则进行跳转操作，
+        // 在操作中检测权限状态
+        if (mAlreadyGotPushReceiverId) {
+            reallySkip();
+        }
+    }
+
+    /**
+     * 等待个推框架对我们的PushId设置好值
+     */
+    private void waitPushReceiverId() {
+        if (Account.isLogin()) {
+            // 已经登录情况下，判断是否绑定
+            // 如果没有绑定则等待广播接收器进行绑定
+            if (Account.isBind()) {
+                waitPushReceiverIdDone();
+                return;
+            }
+        } else {
+            // 没有登录
+            // 如果拿到了PushId, 没有登录是不能绑定PushId的
+            if (!TextUtils.isEmpty(Account.getPushId())) {
+                // 跳转
+                waitPushReceiverIdDone();
+                return;
+            }
+        }
+
+        // 循环等待
+        getWindow().getDecorView()
+                .postDelayed(this::waitPushReceiverId, 500);
+    }
+
+
+    /**
+     * 在跳转之前需要把剩下的50%进行完成
+     */
+    private void waitPushReceiverIdDone() {
+        // 标志已经得到PushId
+        mAlreadyGotPushReceiverId = true;
+        startAnim(1f, this::reallySkip);
     }
 
     /**
@@ -75,13 +116,11 @@ public class LaunchActivity extends Activity {
         // 权限检测，跳转
         if (PermissionsFragment.haveAll(this, getSupportFragmentManager())) {
             // 检查跳转到主页还是登录
-//            if (Account.isLogin()) {
-//                MainXActivity.show(this);
-//            } else {
-//                AccountActivity.show(this);
-//            }
-            AccountActivity.show(this);
-            finish();
+            if (Account.isLogin()) {
+                MainXActivity.show(this);
+            } else {
+                AccountActivity.show(this);
+            }
         }
     }
 

@@ -9,6 +9,14 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        //个推相关参数
+        manifestPlaceholders = [
+                GETUI_APP_ID    : "Rr51sROK4B8FXbq0TUjAF5",
+                GETUI_APP_KEY   : "eurxTdqHECAKgc7s4xtUe9",
+                GETUI_APP_SECRET: "wvAHiSQwuJ79Fp1tBy8Td8",
+                PACKAGE_NAME    : "net.qiujuer.italker.push"
+        ]
     }
     buildTypes {
         release {
@@ -64,4 +72,7 @@ dependencies {
     implementation('com.github.ihsanbal:LoggingInterceptor:3.0.0') {
         exclude group: 'org.json', module: 'json'
     }
+
+    // 个推
+    api "com.getui:sdk:$rootProject.ext.getuiVersion"
 }
