@@ -121,6 +121,7 @@ public class LaunchActivity extends Activity {
             } else {
                 AccountActivity.show(this);
             }
+            finish();
         }
     }
 

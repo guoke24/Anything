@@ -76,6 +76,7 @@ public class MainXActivity extends Activity
             return super.initArgs(bundle);
         }else{
             UserActivity.show(this);
+            finish();
             return false;
         }
     }

@@ -23,7 +23,7 @@ import java.util.Date;
  * @version 1.0.0
  */
 public class UploadHelper {
-    private static final String TAG = UploadHelper.class.getSimpleName();
+    private static final String TAG = "guohao-" + UploadHelper.class.getSimpleName();
     // 与你们的存储区域有关系
     //public static final String ENDPOINT = "http://oss-cn-hongkong.aliyuncs.com";
     public static final String ENDPOINT = "http://oss-cn-shenzhen.aliyuncs.com";

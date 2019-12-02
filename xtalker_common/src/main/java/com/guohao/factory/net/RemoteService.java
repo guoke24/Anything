@@ -6,6 +6,8 @@ import com.guohao.factory.model.api.RspModel;
 import com.guohao.factory.model.api.account.AccountRspModel;
 import com.guohao.factory.model.api.account.LoginModel;
 import com.guohao.factory.model.api.account.RegisterModel;
+import com.guohao.factory.model.api.user.UserUpdateModel;
+import com.guohao.factory.model.card.UserCard;
 
 import java.util.List;
 
@@ -51,10 +53,10 @@ public interface RemoteService {
     @POST("account/bind/{pushId}")
     Call<RspModel<AccountRspModel>> accountBind(@Path(encoded = true, value = "pushId") String pushId);
 
-//    // 用户更新的接口
-//    @PUT("user")
-//    Call<RspModel<UserCard>> userUpdate(@Body UserUpdateModel model);
-//
+    // 用户更新的接口
+    @PUT("user")
+    Call<RspModel<UserCard>> userUpdate(@Body UserUpdateModel model);
+
 //    // 用户搜索的接口
 //    @GET("user/search/{name}")
 //    Call<RspModel<List<UserCard>>> userSearch(@Path("name") String name);

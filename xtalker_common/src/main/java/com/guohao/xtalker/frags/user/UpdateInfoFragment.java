@@ -13,9 +13,13 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.guohao.common.app.Application;
 import com.guohao.common.app.Fragment;
+import com.guohao.common.app.PresenterFragment;
 import com.guohao.common.widget.PortraitView;
 import com.guohao.factory.Factory;
 import com.guohao.factory.net.UploadHelper;
+import com.guohao.factory.presenter.user.UpdateInfoContract;
+import com.guohao.factory.presenter.user.UpdateInfoPresenter;
+import com.guohao.xtalker.MainXActivity;
 import com.guohao.xtalker.R;
 import com.guohao.xtalker.R2;
 import com.guohao.xtalker.frags.media.GalleryFragment;
@@ -34,9 +38,9 @@ import static android.app.Activity.RESULT_OK;
 /**
  * 用户更新信息的节目
  */
-public class UpdateInfoFragment extends Fragment
-//        PresenterFragment<UpdateInfoContract.Presenter>
-//        implements UpdateInfoContract.View
+public class UpdateInfoFragment extends
+        PresenterFragment<UpdateInfoContract.Presenter>
+        implements UpdateInfoContract.View
 {
 
     @BindView(R2.id.im_sex)
@@ -152,53 +156,53 @@ public class UpdateInfoFragment extends Fragment
         mSex.getBackground().setLevel(isMan ? 0 : 1);
     }
 
-//    @OnClick(R2.id.btn_submit)
-//    void onSubmitClick() {
-//        String desc = mDesc.getText().toString();
-//        // 调用P层进行注册
-//        mPresenter.update(mPortraitPath, desc, isMan);
-//    }
+    @OnClick(R2.id.btn_submit)
+    void onSubmitClick() {
+        String desc = mDesc.getText().toString();
+        // 调用P层进行注册
+        mPresenter.update(mPortraitPath, desc, isMan);
+    }
 
-//    @Override
-//    public void showError(int str) {
-//        super.showError(str);
-//        // 当需要显示错误的时候触发，一定是结束了
-//
-//        // 停止Loading
-//        mLoading.stop();
-//        // 让控件可以输入
-//        mDesc.setEnabled(true);
-//        mPortrait.setEnabled(true);
-//        mSex.setEnabled(true);
-//        // 提交按钮可以继续点击
-//        mSubmit.setEnabled(true);
-//    }
+    @Override
+    public void showError(int str) {
+        super.showError(str);
+        // 当需要显示错误的时候触发，一定是结束了
 
-//    @Override
-//    public void showLoading() {
-//        super.showLoading();
-//
-//        // 正在进行时，正在进行注册，界面不可操作
-//        // 开始Loading
-//        mLoading.start();
-//        // 让控件不可以输入
-//        mDesc.setEnabled(false);
-//        mPortrait.setEnabled(false);
-//        mSex.setEnabled(false);
-//        // 提交按钮不可以继续点击
-//        mSubmit.setEnabled(false);
-//    }
+        // 停止Loading
+        mLoading.stop();
+        // 让控件可以输入
+        mDesc.setEnabled(true);
+        mPortrait.setEnabled(true);
+        mSex.setEnabled(true);
+        // 提交按钮可以继续点击
+        mSubmit.setEnabled(true);
+    }
 
-//    @Override
-//    public void updateSucceed() {
-//        // 更新成功跳转到主界面
-//        MainActivity.show(getContext());
-//        getActivity().finish();
-//    }
-//
-//    @Override
-//    protected UpdateInfoContract.Presenter initPresenter() {
-//        // 初始化Presenter
-//        return new UpdateInfoPresenter(this);
-//    }
+    @Override
+    public void showLoading() {
+        super.showLoading();
+
+        // 正在进行时，正在进行注册，界面不可操作
+        // 开始Loading
+        mLoading.start();
+        // 让控件不可以输入
+        mDesc.setEnabled(false);
+        mPortrait.setEnabled(false);
+        mSex.setEnabled(false);
+        // 提交按钮不可以继续点击
+        mSubmit.setEnabled(false);
+    }
+
+    @Override
+    public void updateSucceed() {
+        // 更新成功跳转到主界面
+        MainXActivity.show(getContext());
+        getActivity().finish();
+    }
+
+    @Override
+    protected UpdateInfoContract.Presenter initPresenter() {
+        // 初始化Presenter
+        return new UpdateInfoPresenter(this);
+    }
 }
