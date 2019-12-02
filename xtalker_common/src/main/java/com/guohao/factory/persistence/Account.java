@@ -7,6 +7,8 @@ import android.text.TextUtils;
 import com.guohao.factory.Factory;
 import com.guohao.factory.model.api.account.AccountRspModel;
 import com.guohao.factory.model.db.User;
+import com.guohao.factory.model.db.User_Table;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 
 /**
@@ -147,11 +149,11 @@ public class Account {
      */
     public static User getUser() {
         // 如果为null返回一个new的User，其次从数据库查询
-//        return TextUtils.isEmpty(userId) ? new User() : SQLite.select()
-//                .from(User.class)
-//                .where(User_Table.id.eq(userId))
-//                .querySingle();
-        return null;
+        return TextUtils.isEmpty(userId) ? new User() : SQLite.select()
+                .from(User.class)
+                .where(User_Table.id.eq(userId))
+                .querySingle();
+        //return null;
     }
 
     /**

@@ -131,13 +131,13 @@ public class UpdateInfoFragment extends Fragment
         final String localPath = uri.getPath();
         Log.e("guohaox", "localPath:" + localPath);
 
-        Factory.runOnAsync(new Runnable() {
-            @Override
-            public void run() {
-                String url = UploadHelper.uploadPortrait(localPath);
-                Log.e("guohaox", "url:" + url);
-            }
-        });
+//        Factory.runOnAsync(new Runnable() {
+//            @Override
+//            public void run() {
+//                String url = UploadHelper.uploadPortrait(localPath);
+//                Log.e("guohaox", "url:" + url);
+//            }
+//        });
     }
 
     @OnClick(R2.id.im_sex)

@@ -38,6 +38,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name="com.guohao.xtalker.UserActivity"></activity>
         <activity android:name="com.guohao.anything.FragmentDemo.HomeActivity" />
         <activity android:name="com.guohao.anything.butterknife.butterknifeActivity" />
         <activity android:name="com.guohao.anything.jvm.Main2Activity" />
@@ -64,7 +66,7 @@
             android:exported="true"
             android:label="AppMessageReceiverService"
             android:permission="1000" />
-        
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.fileProvider"

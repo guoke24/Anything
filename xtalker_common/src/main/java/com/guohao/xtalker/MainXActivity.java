@@ -21,6 +21,7 @@ import net.qiujuer.genius.ui.Ui;
 import net.qiujuer.genius.ui.widget.FloatActionButton;
 import com.guohao.common.app.Activity;
 import com.guohao.common.widget.PortraitView;
+import com.guohao.factory.persistence.Account;
 import com.guohao.xtalker.frags.main.ActiveFragment;
 import com.guohao.xtalker.frags.main.ContactFragment;
 import com.guohao.xtalker.frags.main.GroupFragment;
@@ -70,7 +71,13 @@ public class MainXActivity extends Activity
 
     @Override
     protected boolean initArgs(Bundle bundle) {
-        return super.initArgs(bundle);
+        if(Account.isComplete()) {
+            // 判断用户信息是否完全，完全则走正常流程
+            return super.initArgs(bundle);
+        }else{
+            UserActivity.show(this);
+            return false;
+        }
     }
 
     @Override
