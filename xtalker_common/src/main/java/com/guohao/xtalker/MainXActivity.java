@@ -135,7 +135,11 @@ public class MainXActivity extends Activity
 
     @OnClick(R2.id.im_search)
     void onSearchMenuClick() {
-
+        // 在群的界面的时候，点击顶部的搜索就进入群搜索界面
+        // 其他都为人搜索的界面
+        int type = Objects.equals(mNavHelper.getCurrentTab().extra, R.string.title_group) ?
+                SearchActivity.TYPE_GROUP : SearchActivity.TYPE_USER;
+        SearchActivity.show(this, type);
     }
 
     @OnClick(R2.id.btn_action)

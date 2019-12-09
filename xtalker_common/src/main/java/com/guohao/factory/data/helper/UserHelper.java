@@ -6,7 +6,6 @@ import com.guohao.factory.model.api.RspModel;
 import com.guohao.factory.model.api.user.UserUpdateModel;
 import com.guohao.factory.model.card.UserCard;
 import com.guohao.factory.model.db.User;
-import com.guohao.factory.model.db.User_Table;
 import com.guohao.factory.net.Network;
 import com.guohao.factory.net.RemoteService;
 import com.guohao.xtalker.R;
@@ -59,5 +58,33 @@ public class UserHelper {
         });
     }
 
+    // 搜索的方法
+    public static Call search(String name, final DataSource.Callback<List<UserCard>> callback) {
+        RemoteService service = Network.remote();
+
+        // 传入参数 name，产生一个完整的请求实例
+        Call<RspModel<List<UserCard>>> call = service.userSearch(name);
+
+        call.enqueue(new Callback<RspModel<List<UserCard>>>() {
+            @Override
+            public void onResponse(Call<RspModel<List<UserCard>>> call, Response<RspModel<List<UserCard>>> response) {
+                RspModel<List<UserCard>> rspModel = response.body();
+                if (rspModel.success()) {
+                    // 返回数据
+                    callback.onDataLoaded(rspModel.getResult());
+                } else {
+                    Factory.decodeRspCode(rspModel, callback);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<RspModel<List<UserCard>>> call, Throwable t) {
+                callback.onDataNotAvailable(R.string.data_network_error);
+            }
+        });
+
+        // 把当前的调度者返回
+        return call;
+    }
 
 }

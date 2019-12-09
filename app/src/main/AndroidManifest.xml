@@ -39,7 +39,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.guohao.xtalker.UserActivity"></activity>
+        <activity
+            android:name="com.guohao.xtalker.SearchActivity"
+            android:label="@string/title_search"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.TransStatusBar" />        <activity android:name="com.guohao.xtalker.UserActivity"></activity>
         <activity android:name="com.guohao.anything.FragmentDemo.HomeActivity" />
         <activity android:name="com.guohao.anything.butterknife.butterknifeActivity" />
         <activity android:name="com.guohao.anything.jvm.Main2Activity" />
