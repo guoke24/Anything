@@ -46,4 +46,9 @@
     <string name="toast_audio_record_time_short_error">录音时间太短!</string>
 
     <string name="toast_download_error">下载失败!</string>
+
+    <string name="btn_follow">Follow</string>
+    <string name="btn_send_start">发起聊天</string>
+    <string name="btn_preview">预览</string>
+    <string name="btn_send">发送</string>
 </resources>

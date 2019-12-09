@@ -26,6 +26,7 @@
         <activity android:name="com.guohao.anything.FragmentDemo.Home2Activity" />
         <activity android:name="com.guohao.anything.FragmentDemo.Home3XActivity"></activity>
         <activity android:name="com.guohao.xtalker.MainXActivity"></activity>
+        <activity android:name="com.guohao.xtalker.PersonalActivity"></activity>
         <activity android:name="com.guohao.xtalker.AccountActivity"></activity>
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"

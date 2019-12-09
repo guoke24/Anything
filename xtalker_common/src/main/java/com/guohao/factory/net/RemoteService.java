@@ -61,18 +61,18 @@ public interface RemoteService {
     @GET("user/search/{name}")
     Call<RspModel<List<UserCard>>> userSearch(@Path("name") String name);
 
-//    // 用户关注接口
-//    @PUT("user/follow/{userId}")
-//    Call<RspModel<UserCard>> userFollow(@Path("userId") String userId);
-//
-//    // 获取联系人列表
-//    @GET("user/contact")
-//    Call<RspModel<List<UserCard>>> userContacts();
-//
-//    // 查询某人的信息
-//    @GET("user/{userId}")
-//    Call<RspModel<UserCard>> userFind(@Path("userId") String userId);
-//
+    // 用户关注接口
+    @PUT("user/follow/{userId}")
+    Call<RspModel<UserCard>> userFollow(@Path("userId") String userId);
+
+    // 获取联系人列表
+    @GET("user/contact")
+    Call<RspModel<List<UserCard>>> userContacts();
+
+    // 查询某人的信息
+    @GET("user/{userId}")
+    Call<RspModel<UserCard>> userFind(@Path("userId") String userId);
+
 //    // 发送消息的接口
 //    @POST("msg")
 //    Call<RspModel<MessageCard>> msgPush(@Body MsgCreateModel model);

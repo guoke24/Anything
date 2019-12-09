@@ -171,4 +171,13 @@ public class Factory {
 
     }
 
+//    /**
+//     * 获取一个用户中心的实现类
+//     *
+//     * @return 用户中心的规范接口
+//     */
+//    public static UserCenter getUserCenter() {
+//        return UserDispatcher.instance();
+//    }
+
 }

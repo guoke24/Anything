@@ -123,14 +123,15 @@ public class MainXActivity extends Activity
         // 触发首次选中Home
         menu.performIdentifierAction(R.id.action_home, 0);
 
-
+        // 初始化头像加载
+        mPortrait.setup(Glide.with(this), Account.getUser());
     }
 
     @OnClick(R2.id.im_portrait)
     void onPortraitClick() {
         // 跳转到用户界面
-        AccountActivity.show(this);
-
+        //AccountActivity.show(this);
+        PersonalActivity.show(this,Account.getUserId());
     }
 
     @OnClick(R2.id.im_search)
