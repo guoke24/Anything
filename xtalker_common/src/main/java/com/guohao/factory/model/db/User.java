@@ -1,6 +1,7 @@
 package com.guohao.factory.model.db;
 
 import com.guohao.factory.model.Author;
+import com.guohao.utils.DiffUiDataCallback;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
@@ -10,11 +11,15 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- * @author qiujuer Email:qiujuer@live.cn
- * @version 1.0.0
+ * 跟数据库交互的实体类
+ * 实现的接口一：Author
+ * 该接口是为了规范用户类的基础函数
+ *
+ * 实现的接口二：DiffUiDataCallback.UiDataDiffer
+ * 该接口的函数是为了对该类型的实例进行比较的
  */
 @Table(database = AppDatabase.class)
-public class User extends BaseModel implements Author {
+public class User extends BaseModel implements Author, DiffUiDataCallback.UiDataDiffer<User> {
     public static final int SEX_MAN = 1;
     public static final int SEX_WOMAN = 2;
 

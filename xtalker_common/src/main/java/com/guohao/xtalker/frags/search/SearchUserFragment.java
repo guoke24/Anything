@@ -17,6 +17,7 @@ import com.guohao.factory.presenter.contact.FollowContract;
 import com.guohao.factory.presenter.contact.FollowPresenter;
 import com.guohao.factory.presenter.search.SearchContract;
 import com.guohao.factory.presenter.search.SearchUserPresenter;
+import com.guohao.xtalker.PersonalActivity;
 import com.guohao.xtalker.R;
 import com.guohao.xtalker.R2;
 import com.guohao.xtalker.SearchActivity;
@@ -156,6 +157,12 @@ public class SearchUserFragment extends PresenterFragment<SearchContract.Present
         void onFollowClick() {
             // 发起关注
             mPresenter.follow(mData.getId());
+        }
+
+        @OnClick(R2.id.im_portrait)
+        void onPortraitClick() {
+            // 显示信息
+            PersonalActivity.show(getContext(), mData.getId());
         }
 
         @Override
