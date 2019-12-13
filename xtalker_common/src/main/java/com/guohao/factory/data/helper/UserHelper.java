@@ -38,12 +38,8 @@ public class UserHelper {
                 RspModel<UserCard> rspModel = response.body();
                 if (rspModel.success()) {
                     UserCard userCard = rspModel.getResult();
-
-                    // 数据库的存储操作，需要把UserCard转换为User
-                    // 保存用户信息
-                    User user = userCard.build();
-                    user.save();
-
+                    // 唤起进行保存的操作
+                    Factory.getUserCenter().dispatch(userCard);
                     // 返回成功
                     callback.onDataLoaded(userCard);
                 } else {
@@ -62,8 +58,6 @@ public class UserHelper {
     // 搜索的方法
     public static Call search(String name, final DataSource.Callback<List<UserCard>> callback) {
         RemoteService service = Network.remote();
-
-        // 传入参数 name，产生一个完整的请求实例
         Call<RspModel<List<UserCard>>> call = service.userSearch(name);
 
         call.enqueue(new Callback<RspModel<List<UserCard>>>() {
@@ -88,6 +82,7 @@ public class UserHelper {
         return call;
     }
 
+
     // 关注的网络请求
     public static void follow(String id, final DataSource.Callback<UserCard> callback) {
         RemoteService service = Network.remote();
@@ -99,11 +94,8 @@ public class UserHelper {
                 RspModel<UserCard> rspModel = response.body();
                 if (rspModel.success()) {
                     UserCard userCard = rspModel.getResult();
-                    // 保存到本地数据库
-                    User user = userCard.build();
-                    user.save();
-                    // TODO 通知联系人列表刷新
-
+                    // 唤起进行保存的操作
+                    Factory.getUserCenter().dispatch(userCard);
                     // 返回数据
                     callback.onDataLoaded(userCard);
                 } else {
@@ -118,16 +110,37 @@ public class UserHelper {
         });
     }
 
-    /**
-     * 搜索一个用户，优先网络查询
-     * 没有用然后再从本地缓存拉取
-     */
-    public static User searchFirstOfNet(String id) {
-        User user = findFromNet(id);
-        if (user == null) {
-            return findFromLocal(id);
-        }
-        return user;
+    // 刷新联系人的操作，不需要Callback，直接存储到数据库，
+    // 并通过数据库观察者进行通知界面更新，
+    // 界面更新的时候进行对比，然后差异更新
+    public static void refreshContacts() {
+        RemoteService service = Network.remote();
+        service.userContacts()
+                .enqueue(new Callback<RspModel<List<UserCard>>>() {
+                    @Override
+                    public void onResponse(Call<RspModel<List<UserCard>>> call, Response<RspModel<List<UserCard>>> response) {
+                        RspModel<List<UserCard>> rspModel = response.body();
+                        if (rspModel.success()) {
+                            // 拿到集合
+                            List<UserCard> cards = rspModel.getResult();
+                            if (cards == null || cards.size() == 0)
+                                return;
+
+                            UserCard[] cards1 = cards.toArray(new UserCard[0]);
+                            // CollectionUtil.toArray(cards, UserCard.class);
+
+                            Factory.getUserCenter().dispatch(cards1);
+
+                        } else {
+                            Factory.decodeRspCode(rspModel, null);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<RspModel<List<UserCard>>> call, Throwable t) {
+                        // nothing
+                    }
+                });
     }
 
     // 从本地查询一个用户的信息
@@ -147,7 +160,7 @@ public class UserHelper {
             if (card != null) {
                 User user = card.build();
                 // 数据库的存储并通知
-                //Factory.getUserCenter().dispatch(card);
+                Factory.getUserCenter().dispatch(card);
                 return user;
             }
 
@@ -158,26 +171,29 @@ public class UserHelper {
         return null;
     }
 
-    // 刷新联系人的操作
-    public static void refreshContacts(final DataSource.Callback<List<UserCard>> callback) {
-        RemoteService service = Network.remote();
-        service.userContacts()
-                .enqueue(new Callback<RspModel<List<UserCard>>>() {
-                    @Override
-                    public void onResponse(Call<RspModel<List<UserCard>>> call, Response<RspModel<List<UserCard>>> response) {
-                        RspModel<List<UserCard>> rspModel = response.body();
-                        if (rspModel.success()) {
-                            // 返回数据
-                            callback.onDataLoaded(rspModel.getResult());
-                        } else {
-                            Factory.decodeRspCode(rspModel, callback);
-                        }
-                    }
 
-                    @Override
-                    public void onFailure(Call<RspModel<List<UserCard>>> call, Throwable t) {
-                        callback.onDataNotAvailable(R.string.data_network_error);
-                    }
-                });
+    /**
+     * 搜索一个用户，优先本地缓存，
+     * 没有用然后再从网络拉取
+     */
+    public static User search(String id) {
+        User user = findFromLocal(id);
+        if (user == null) {
+            return findFromNet(id);
+        }
+        return user;
     }
+
+    /**
+     * 搜索一个用户，优先网络查询
+     * 没有用然后再从本地缓存拉取
+     */
+    public static User searchFirstOfNet(String id) {
+        User user = findFromNet(id);
+        if (user == null) {
+            return findFromLocal(id);
+        }
+        return user;
+    }
+
 }

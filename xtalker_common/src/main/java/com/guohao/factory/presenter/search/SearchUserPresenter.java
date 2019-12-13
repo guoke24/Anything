@@ -3,12 +3,14 @@ package com.guohao.factory.presenter.search;
 import com.guohao.factory.data.DataSource;
 import com.guohao.factory.data.helper.UserHelper;
 import com.guohao.factory.model.card.UserCard;
+import com.guohao.factory.persistence.Account;
 import com.guohao.factory.presenter.BasePresenter;
 
 import net.qiujuer.genius.kit.handler.Run;
 import net.qiujuer.genius.kit.handler.runable.Action;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -50,7 +52,16 @@ public class SearchUserPresenter extends BasePresenter<SearchContract.UserView>
             Run.onUiAsync(new Action() {
                 @Override
                 public void call() {
-                    view.onSearchDone(userCards);
+                    // 过滤用户本身
+                    List<UserCard> userCards2 = new ArrayList<>();
+                    for(UserCard userCard: userCards){
+                        if (userCard.getId().equals(Account.getUserId())){
+                            continue;
+                        }
+                        userCards2.add(userCard);
+                    }
+
+                    view.onSearchDone(userCards2);
                 }
             });
         }

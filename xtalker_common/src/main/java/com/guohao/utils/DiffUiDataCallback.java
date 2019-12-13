@@ -5,7 +5,7 @@ import android.support.v7.util.DiffUtil;
 import java.util.List;
 
 /**
- * 自定义的比较规则，并且定义类接口规范 泛型类 T
+ * 自定义的比较规则，并且定义类接口规范 DiffUiDataCallback.UiDataDiffer
  */
 public class DiffUiDataCallback<T extends DiffUiDataCallback.UiDataDiffer<T>> extends DiffUtil.Callback {
     private List<T> mOldList, mNewList;

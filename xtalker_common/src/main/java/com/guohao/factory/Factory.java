@@ -1,13 +1,13 @@
 package com.guohao.factory;
 
 import android.support.annotation.StringRes;
-import android.util.Log;
-
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.guohao.common.app.Application;
 import com.guohao.factory.data.DataSource;
+import com.guohao.factory.data.user.UserCenter;
+import com.guohao.factory.data.user.UserDispatcher;
 import com.guohao.factory.model.api.RspModel;
 import com.guohao.factory.persistence.Account;
 import com.guohao.utils.DBFlowExclusionStrategy;
@@ -15,8 +15,8 @@ import com.guohao.xtalker.R;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 
-import java.lang.reflect.Type;
-import java.util.List;
+
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -25,8 +25,7 @@ import java.util.concurrent.Executors;
  * @version 1.0.0
  */
 public class Factory {
-    private static final String TAG = Factory.class.getSimpleName();
-    // 单例模式
+    // 单例模式ø
     private static final Factory instance;
     // 全局的线程池
     private final Executor executor;
@@ -71,14 +70,6 @@ public class Factory {
         return Application.getInstance();
     }
 
-    /**
-     * 返回一个全局的Gson，在这可以进行Gson的一些全局的初始化
-     *
-     * @return Gson
-     */
-    public static Gson getGson() {
-        return instance.gson;
-    }
 
     /**
      * 异步运行的方法
@@ -91,6 +82,16 @@ public class Factory {
     }
 
     /**
+     * 返回一个全局的Gson，在这可以进行Gson的一些全局的初始化
+     *
+     * @return Gson
+     */
+    public static Gson getGson() {
+        return instance.gson;
+    }
+
+
+    /**
      * 进行错误Code的解析，
      * 把网络返回的Code值进行统一的规划并返回为一个String资源
      *
@@ -98,11 +99,8 @@ public class Factory {
      * @param callback DataSource.FailedCallback 用于返回一个错误的资源Id
      */
     public static void decodeRspCode(RspModel model, DataSource.FailedCallback callback) {
-        if (model == null){
-            decodeRspCode(R.string.data_rsp_error_unknown, callback);
+        if (model == null)
             return;
-        }
-
 
         // 进行Code区分
         switch (model.getCode()) {
@@ -157,6 +155,7 @@ public class Factory {
                 break;
         }
     }
+
     private static void decodeRspCode(@StringRes final int resId,
                                       final DataSource.FailedCallback callback) {
         if (callback != null)
@@ -171,13 +170,44 @@ public class Factory {
 
     }
 
+
+    /**
+     * 处理推送来的消息
+     *
+     * @param message 消息
+     */
+    public static void dispatchPush(String message) {
+        // TODO
+    }
+
+
+    /**
+     * 获取一个用户中心的实现类
+     *
+     * @return 用户中心的规范接口
+     */
+    public static UserCenter getUserCenter() {
+        return UserDispatcher.instance();
+    }
+
 //    /**
-//     * 获取一个用户中心的实现类
+//     * 获取一个消息中心的实现类
 //     *
-//     * @return 用户中心的规范接口
+//     * @return 消息中心的规范接口
 //     */
-//    public static UserCenter getUserCenter() {
-//        return UserDispatcher.instance();
+//    public static MessageCenter getMessageCenter() {
+//        return MessageDispatcher.instance();
 //    }
+//
+//
+//    /**
+//     * 获取一个群处理中心的实现类
+//     *
+//     * @return 群中心的规范接口
+//     */
+//    public static GroupCenter getGroupCenter() {
+//        return GroupDispatcher.instance();
+//    }
+
 
 }
