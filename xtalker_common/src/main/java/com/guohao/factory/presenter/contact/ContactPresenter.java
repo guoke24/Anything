@@ -9,7 +9,7 @@ import com.guohao.factory.data.helper.UserHelper;
 import com.guohao.factory.data.user.ContactDataSource;
 import com.guohao.factory.data.user.ContactRepository;
 import com.guohao.factory.model.db.User;
-import com.guohao.factory.presenter.BaseRecyclerPresenter;
+import com.guohao.factory.presenter.BaseSourcePresenter;
 import com.guohao.utils.DiffUiDataCallback;
 
 import java.util.List;
@@ -20,14 +20,19 @@ import java.util.List;
  * @author qiujuer Email:qiujuer@live.cn
  * @version 1.0.0
  */
-public class ContactPresenter extends BaseRecyclerPresenter<User, ContactContract.View>
+public class ContactPresenter extends BaseSourcePresenter<User,User,
+        ContactDataSource,
+        ContactContract.View>
         implements ContactContract.Presenter, DataSource.SucceedCallback<List<User>> {
 
-    private ContactDataSource mSource;
+    // 移到父类
+    //private ContactDataSource mSource;
 
     public ContactPresenter(ContactContract.View view) {
-        super(view);
-        mSource = new ContactRepository();
+        super(new ContactRepository(),view);
+
+        // 直接传给父类的构造函数
+        //mSource = new ContactRepository();
     }
 
 
@@ -35,8 +40,9 @@ public class ContactPresenter extends BaseRecyclerPresenter<User, ContactContrac
     public void start() {
         super.start();
 
+        // 移到父类进行
         // 进行本地的数据加载，并添加监听
-        mSource.load(this);
+        //mSource.load(this);
 
         // 加载网络数据
         UserHelper.refreshContacts();
@@ -62,10 +68,5 @@ public class ContactPresenter extends BaseRecyclerPresenter<User, ContactContrac
         refreshData(result, users);
     }
 
-    @Override
-    public void destroy() {
-        super.destroy();
-        // 当界面销毁的时候，我们应该把数据监听进行销毁
-        mSource.dispose();
-    }
+
 }

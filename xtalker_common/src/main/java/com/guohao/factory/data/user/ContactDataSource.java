@@ -3,6 +3,7 @@ package com.guohao.factory.data.user;
 
 
 import com.guohao.factory.data.DataSource;
+import com.guohao.factory.data.DbDataSource;
 import com.guohao.factory.model.db.User;
 
 import java.util.List;
@@ -13,16 +14,11 @@ import java.util.List;
  * @author qiujuer Email:qiujuer@live.cn
  * @version 1.0.0
  */
-public interface ContactDataSource {
+public interface ContactDataSource extends DbDataSource<User> {
     /**
      * 对数据进行加载的一个职责
      *
      * @param callback 加载成功后返回的Callback
      */
     void load(DataSource.SucceedCallback<List<User>> callback);
-
-    /**
-     * 销毁操作
-     */
-    void dispose();
 }
