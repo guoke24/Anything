@@ -5,8 +5,14 @@ import android.support.annotation.StringRes;
 /**
  * 数据源接口定义
  *
- * @author qiujuer Email:qiujuer@live.cn
- * @version 1.0.0
+ * 接口内可含有接口，
+ * 接口内的函数需要实现，
+ * 但接口内的接口不需要实现。
+ *
+ * 实现一个接口，
+ * 一来是需要实现所有的接口函数，
+ * 二来是可以持有接口内的子接口的实现者的引用
+ *
  */
 public interface DataSource {
 
