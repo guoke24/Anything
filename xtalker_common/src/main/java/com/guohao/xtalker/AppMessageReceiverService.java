@@ -94,6 +94,6 @@ public class AppMessageReceiverService extends GTIntentService {
      */
     private void onMessageArrived(String message) {
         // 交给Factory处理
-        //Factory.dispatchPush(message);
+        Factory.dispatchPush(message);
     }
 }

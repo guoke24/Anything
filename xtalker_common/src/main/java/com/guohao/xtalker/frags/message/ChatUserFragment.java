@@ -2,23 +2,43 @@ package com.guohao.xtalker.frags.message;
 
 
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 
-
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.ViewTarget;
 import com.guohao.common.widget.PortraitView;
+import com.guohao.factory.model.db.User;
+import com.guohao.factory.presenter.message.ChatContract;
+import com.guohao.factory.presenter.message.ChatUserPresenter;
 import com.guohao.xtalker.PersonalActivity;
 import com.guohao.xtalker.R;
 import com.guohao.xtalker.R2;
+
 
 import butterknife.BindView;
 import butterknife.OnClick;
 
 /**
  * 用户聊天界面
+ *
+ * 所做工作：
+ *
+ * 监听顶部bar的折叠状态，实时刷新头像和Icon的状态
+ *
+ * 监听头像点击（顶部的头像和item的头像），跳转到用户详情页：PersonalActivity
+ *
+ * 实现初始化逻辑：onInit，根据用户加载头像和名字
+ *
+ * 创建单聊Presenter：ChatUserPresenter
+ *
  */
-public class ChatUserFragment extends ChatFragment {
+public class ChatUserFragment extends ChatFragment<User>
+        implements ChatContract.UserView {
     @BindView(R2.id.im_portrait)
     PortraitView mPortrait;
 
@@ -31,6 +51,23 @@ public class ChatUserFragment extends ChatFragment {
     @Override
     protected int getContentLayoutId() {
         return R.layout.fragment_chat_user;
+    }
+
+
+    @Override
+    protected void initWidget(View root) {
+        super.initWidget(root);
+
+        Glide.with(this)
+                .load(R.drawable.default_banner_chat)
+                .centerCrop()
+                .into(new ViewTarget<CollapsingToolbarLayout, GlideDrawable>(mCollapsingLayout) {
+                    @Override
+                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+                        this.view.setContentScrim(resource.getCurrent());
+                    }
+                });
+
     }
 
     @Override
@@ -106,5 +143,18 @@ public class ChatUserFragment extends ChatFragment {
     @OnClick(R2.id.im_portrait)
     void onPortraitClick() {
         PersonalActivity.show(getContext(), mReceiverId);
+    }
+
+    @Override
+    protected ChatContract.Presenter initPresenter() {
+        // 初始化Presenter
+        return new ChatUserPresenter(this, mReceiverId);
+    }
+
+    @Override
+    public void onInit(User user) {
+        // 对和你聊天的朋友的信息进行初始化操作
+        //mPortrait.setup(Glide.with(this), user.getPortrait());
+        mCollapsingLayout.setTitle(user.getName());
     }
 }

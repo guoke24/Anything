@@ -28,6 +28,7 @@
         <activity android:name="com.guohao.xtalker.MainXActivity"></activity>
         <activity android:name="com.guohao.xtalker.PersonalActivity"></activity>
         <activity android:name="com.guohao.xtalker.AccountActivity"></activity>
+        <activity android:name="com.guohao.xtalker.MessageActivity"></activity>
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"

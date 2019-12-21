@@ -14,6 +14,7 @@ import com.guohao.common.widget.recycler.RecyclerAdapter;
 import com.guohao.factory.model.db.User;
 import com.guohao.factory.presenter.contact.ContactContract;
 import com.guohao.factory.presenter.contact.ContactPresenter;
+import com.guohao.xtalker.MessageActivity;
 import com.guohao.xtalker.PersonalActivity;
 import com.guohao.xtalker.R;
 import com.guohao.xtalker.R2;
@@ -68,7 +69,7 @@ public class ContactFragment extends PresenterFragment<ContactContract.Presenter
             @Override
             public void onItemClick(RecyclerAdapter.ViewHolder holder, User user) {
                 // 跳转到聊天界面
-                //MessageActivity.show(getContext(), user);
+                MessageActivity.show(getContext(), user);
             }
         });
 

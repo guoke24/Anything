@@ -19,7 +19,7 @@ import net.qiujuer.genius.kit.reflect.Reflector;
  * 该函数由 DbHelper.ChangedListener 接口约束；
  *
  *
- * 同时，也可主动发起数据库查询，可在开放的 load 接口内实现，需要接口 DbDataSource 来约束，
+ * 同时，其子类可主动发起数据库查询，可在开放的 load 接口内实现，需要接口 DbDataSource 来约束，
  * 外部将通过接口 DbDataSource 来依赖；
  * 查询的数据表由泛型的确定，
  * @param <Data> 泛型，BaseModel的子类，该类查询的表，对应的实体类都是BaseModel的子类；
@@ -32,6 +32,22 @@ import net.qiujuer.genius.kit.reflect.Reflector;
  * 最总，统一由 onDataSave 函数再回调给 P 端，通过 P 端的引用，即 SucceedCallback 接口，
  * P 端在实例化该类型时，便传入 SucceedCallback 接口实例进行绑定。
  *
+ *
+ */
+
+/**
+ * 该类将作为 P 端和 数据库 的中间桥梁
+ *
+ *
+ * 数据库Helper 通过 DbHelper.ChangedListener 的 onDataSave 函数
+ * 或 onDataDelete 函数，回调到此处，
+ * 再由该类通过 SucceedCallback.onDataLoaded 函数回调到 P 端
+ *
+ *
+ * P 端唯一只能通过 DbDataSource.load 函数，调用进此处
+ *
+ *
+ * @param <Data>
  */
 public abstract class BaseDbRepository<Data extends BaseDbModel>
         implements
