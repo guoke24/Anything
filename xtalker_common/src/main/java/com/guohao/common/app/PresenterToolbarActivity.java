@@ -8,8 +8,14 @@ import com.guohao.xtalker.R;
 
 
 /**
- * @author qiujuer Email:qiujuer@live.cn
- * @version 1.0.0
+ * 该基类添加的功能
+ *
+ * 在继承带ToolBar的ToolbarActivity后，
+ * 实现一些 MVP 模式中，View 端需要实现的职责：
+ * 1.初始化和设置 Presenter
+ * 2.显示和隐藏加载 by 占位布局 mPlaceHolderView
+ * 3.显示错误 by 占位布局 mPlaceHolderView
+ *
  */
 public abstract class PresenterToolbarActivity<Presenter extends BaseContract.Presenter>
         extends ToolbarActivity implements BaseContract.View<Presenter> {

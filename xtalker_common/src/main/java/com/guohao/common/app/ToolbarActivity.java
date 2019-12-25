@@ -7,8 +7,12 @@ import com.guohao.xtalker.R;
 
 
 /**
- * @author qiujuer Email:qiujuer@live.cn
- * @version 1.0.0
+ * 该基类添加的功能
+ *
+ * 在 initWidget 流程的时候，初始化 ToolBar：
+ * 1.把 ToolBar 设置为 SupportActionBar，
+ * 2.实现返回效果
+ *
  */
 public abstract class ToolbarActivity extends Activity {
     protected Toolbar mToolbar;

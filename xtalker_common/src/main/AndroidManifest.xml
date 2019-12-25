@@ -3,7 +3,6 @@
     package="com.guohao.xtalker">
 
     <application>
-        <activity android:name=".LaunchActivity"></activity>
     </application>
 
 </manifest>
