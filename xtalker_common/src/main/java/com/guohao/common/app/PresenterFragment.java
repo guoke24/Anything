@@ -12,6 +12,15 @@ import com.guohao.factory.presenter.BaseContract;
 public abstract class PresenterFragment<Presenter extends BaseContract.Presenter> extends Fragment
         implements BaseContract.View<Presenter> {
 
+    /**
+     * 在该类中，没有直接赋值，而是由外部调用进来赋值
+     *
+     * 其 setPresenter 函数会在 p 端的构造函数内被调用，
+     * 进而完成间接的赋值；
+     * setPresenter 函数也是接口 BaseContract.View 中的约束；
+     * 在 presenter 的基类 BasePresenter 中，有调用 setPresenter 函数。
+     *
+     */
     protected Presenter mPresenter;
 
     @Override

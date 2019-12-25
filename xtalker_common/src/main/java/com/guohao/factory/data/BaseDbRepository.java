@@ -59,7 +59,7 @@ public abstract class BaseDbRepository<Data extends BaseDbModel>
     // 此处持有的成功回调接口，是由 P 端实现的，
     // 也就是由此接口，回调传递接口给 P 端。
     SucceedCallback<List<Data>> callback;
-    private final List<Data> dataList = new LinkedList<>(); // 当前缓存的数据
+    protected final LinkedList<Data> dataList = new LinkedList<>(); // 当前缓存的数据
     private Class<Data> dataClass; // 当前范型对应的真实的Class信息
 
 

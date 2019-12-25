@@ -1,8 +1,18 @@
 package com.guohao.factory.presenter;
 
 /**
- * @author qiujuer Email:qiujuer@live.cn
- * @version 1.0.0
+ * Presenter 的顶层基类
+ *
+ * 添加的功能：
+ *
+ * 实现了 BaseContract.Presenter 接口的函数 start 和 destroy，
+ * 开放给 View 端调用；
+ *
+ * 实现了 setView 和 getView 两个函数，
+ * 并在构造函数内绑定 View 端，
+ * 然后调用 View 端绑定自己，
+ * 从而实现双向绑定。
+ *
  */
 public class BasePresenter<T extends BaseContract.View> implements BaseContract.Presenter {
     private T mView;

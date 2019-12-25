@@ -23,6 +23,7 @@ import com.guohao.common.app.Activity;
 import com.guohao.common.widget.PortraitView;
 import com.guohao.factory.persistence.Account;
 import com.guohao.xtalker.frags.main.ActiveFragment;
+import com.guohao.xtalker.frags.main.ActiveFragment2;
 import com.guohao.xtalker.frags.main.ContactFragment;
 import com.guohao.xtalker.frags.main.GroupFragment;
 import com.guohao.xtalker.helper.NavHelper;

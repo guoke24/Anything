@@ -317,6 +317,10 @@ public abstract class RecyclerAdapter<Data>
         /**
          * 用于绑定数据的触发
          *
+         * 每次更新 RecycleView 的数据，每刷新一个item，都会调用一次 RecycleView.onBindViewHolder 的函数
+         *
+         * 在 onBindViewHolder 函数内，调用进来此处
+         *
          * @param data 绑定的数据
          */
         void bind(Data data) {

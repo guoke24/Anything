@@ -11,8 +11,8 @@ import java.util.List;
 /**
  * 联系人数据源
  *
- * @author qiujuer Email:qiujuer@live.cn
- * @version 1.0.0
+ * 给父接口的泛型指定 User 类型
+ *
  */
 public interface ContactDataSource extends DbDataSource<User> {
     /**

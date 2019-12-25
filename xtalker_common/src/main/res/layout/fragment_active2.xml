@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.guohao.xtalker.frags.main.ActiveFragment">
+    tools:context="com.guohao.xtalker.frags.main.ActiveFragment2">
 
     <!--v7包的RecyclerView-->
     <android.support.v7.widget.RecyclerView
@@ -16,7 +16,7 @@
         android:outlineProvider="bounds"
         android:paddingBottom="@dimen/len_12"
         android:paddingTop="@dimen/len_12"
-        android:visibility="gone"
+
         tools:targetApi="lollipop" />
 
     <!--占位布局-->

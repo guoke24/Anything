@@ -12,8 +12,10 @@ import java.util.List;
 /**
  * 对RecyclerView进行的一个简单的Presenter封装
  *
- * @author qiujuer Email:qiujuer@live.cn
- * @version 1.0.0
+ * 该基类添加的功能：
+ *
+ * 实现类一个刷新数据的函数，接收 差异结果，新数据list 作为参数
+ *
  */
 public class BaseRecyclerPresenter<ViewMode, View extends BaseContract.RecyclerView>
         extends BasePresenter<View> {

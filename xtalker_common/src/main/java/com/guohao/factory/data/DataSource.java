@@ -5,6 +5,16 @@ import android.support.annotation.StringRes;
 /**
  * 数据源接口定义
  *
+ * 该接口定义了两个子接口：
+ * 成功回调接口，内含 onDataLoaded 函数，
+ * 失败的回调接口，内含 onDataNotAvailable 函数，
+ * 并用了 Callback 接口继承自上述两个接口，
+ * 实现该接口的类，将会持有 SucceedCallback 和 FailedCallback 两个接口，可以回调出去，而不是回调进来
+ *
+ * 一个函数：
+ * 销毁操作，开放给委托者调用进来
+ *
+ * 小节：
  * 接口内可含有接口，
  * 接口内的函数需要实现，
  * 但接口内的接口不需要实现。
