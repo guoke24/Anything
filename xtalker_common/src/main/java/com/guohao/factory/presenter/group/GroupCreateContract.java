@@ -19,7 +19,7 @@ public interface GroupCreateContract {
 
     interface View extends BaseContract.RecyclerView<Presenter,ViewModel>{
         // 创建成功
-        void createSucceed();
+        void onCreateSucceed();
     }
 
     class ViewModel {

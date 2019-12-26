@@ -8,6 +8,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.guohao.common.app.Application;
 import com.guohao.factory.data.DataSource;
+import com.guohao.factory.data.group.GroupCenter;
+import com.guohao.factory.data.group.GroupDispatcher;
 import com.guohao.factory.data.message.MessageCenter;
 import com.guohao.factory.data.message.MessageDispatcher;
 import com.guohao.factory.data.user.UserCenter;
@@ -271,9 +273,9 @@ public class Factory {
      *
      * @return 群中心的规范接口
      */
-//    public static GroupCenter getGroupCenter() {
-//        return GroupDispatcher.instance();
-//    }
+    public static GroupCenter getGroupCenter() {
+        return GroupDispatcher.instance();
+    }
 
 
 }
