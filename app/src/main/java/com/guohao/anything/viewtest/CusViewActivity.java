@@ -1,14 +1,19 @@
 package com.guohao.anything.viewtest;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
+import android.view.View;
+
+
 
 import com.guohao.anything.PackagesListActivity;
 import com.guohao.anything.R;
 
-public class CusViewActivity extends AppCompatActivity {
+
+
+public class CusViewActivity extends Activity {
 
     CusView cusView1;
     CusView cusView2;
@@ -17,9 +22,12 @@ public class CusViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cus_view);
-        initView();
+        //initView();
+
+        ViewUtils.listViewTree(getWindow().getDecorView());
     }
 
+    // 给两个控件设置回调
     public void initView(){
         cusView1 = findViewById(R.id.customView);
         cusView1.setCallBack(new CusView.CallBack() {
@@ -39,8 +47,8 @@ public class CusViewActivity extends AppCompatActivity {
     }
 
 
-
-    public void checkIfSamePosition(){
+    // 检查是否位置重合
+    private void checkIfSamePosition(){
         if(cusView1.getX() > cusView2.getX()){
             //
             //Toast.makeText(this,"SamePosition!",Toast.LENGTH_SHORT).show();
@@ -51,4 +59,8 @@ public class CusViewActivity extends AppCompatActivity {
         }
     }
 
+    // 点击响应
+    public void btClick(View v){
+        ViewUtils.listViewTree(getWindow().getDecorView());
+    }
 }

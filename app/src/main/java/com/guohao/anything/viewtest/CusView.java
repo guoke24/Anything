@@ -77,16 +77,16 @@ public class CusView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        int w_mode = MeasureSpec.getMode(widthMeasureSpec) >> 30;
-        LogUtil.e("w_mode = " + w_mode);
-
-        LogUtil.e("WRAP_CONTENT = " + ViewGroup.LayoutParams.WRAP_CONTENT);
-
-
-        int h_mode = MeasureSpec.getMode(heightMeasureSpec) >> 30;
-        LogUtil.e("h_mode = " + h_mode);
-
-        LogUtil.e("\n");
+//        int w_mode = MeasureSpec.getMode(widthMeasureSpec) >> 30;
+//        LogUtil.e("w_mode = " + w_mode);
+//
+//        LogUtil.e("widthMeasureSpec = " + ViewGroup.LayoutParams.WRAP_CONTENT);
+//
+//
+//        int h_mode = MeasureSpec.getMode(heightMeasureSpec) >> 30;
+//        LogUtil.e("heightMeasureSpec = " + h_mode);
+//
+//        LogUtil.e("\n");
 
         // 1 代表 exactly ，2 代表 at_most
         // 该 view 的父view 的 mode应该是 exactly
@@ -99,6 +99,5 @@ public class CusView extends View {
     @Override
     public void layout(int l, int t, int r, int b) {
         super.layout(l, t, r, b);
-
     }
 }

@@ -6,10 +6,21 @@
     android:layout_height="match_parent"
     tools:context="com.guohao.anything.viewtest.CusViewActivity">
 
+    <com.guohao.anything.viewtest.CusLinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <com.guohao.anything.viewtest.CusTextView
+            android:layout_width="wrap_content"
+            android:layout_height="58px"
+            android:textColor="@color/black"
+            android:text="a text"/>
+    </com.guohao.anything.viewtest.CusLinearLayout>
+
     <com.guohao.anything.viewtest.CusView
         android:id="@+id/customView"
         android:layout_width="150dp"
         android:layout_height="150dp"
+        android:layout_marginTop="30dp"
         android:background="@color/colorPrimary"/>
 
     <com.guohao.anything.viewtest.CusView
@@ -25,6 +36,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
         android:layout_marginLeft="180dp"
+        android:onClick="btClick"
         />
+
 
 </RelativeLayout>
