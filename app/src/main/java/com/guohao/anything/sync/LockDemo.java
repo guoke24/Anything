@@ -3,6 +3,9 @@ package com.guohao.anything.sync;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * 简单的上锁和解锁的例子
+ */
 public class LockDemo {
 
     private Lock lock = new ReentrantLock();

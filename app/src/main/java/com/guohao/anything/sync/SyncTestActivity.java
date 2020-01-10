@@ -23,6 +23,10 @@ public class SyncTestActivity extends BaseTestActivity {
 
     }
 
+    // --------------------- 分割线 ---------------------
+    // 关于 Lock 和 Condition 的使用，start
+    // 参考：https://cloud.tencent.com/developer/article/1038499
+
     public void test_1(View view) throws InterruptedException {
         showMessage("SyncTestActivity");
 
@@ -31,8 +35,7 @@ public class SyncTestActivity extends BaseTestActivity {
         testLockCountDemo();
     }
 
-    // start 关于 Lock 和 Condition 的使用，
-    // 参考：https://cloud.tencent.com/developer/article/1038499
+    // 测试 LockDemo 简单的上锁和解锁的例子
     private void testLockDemo() throws InterruptedException {
         LockDemo lockDemo = new LockDemo();
 
@@ -64,6 +67,7 @@ public class SyncTestActivity extends BaseTestActivity {
         System.out.println("main over!");
     }
 
+    // 测试 LockCountDemo，累加次数唤醒
     private void testLockCountDemo() throws InterruptedException {
         LockCountDemo demo = new LockCountDemo();
         Thread thread1 = new Thread(() -> {
@@ -98,10 +102,13 @@ public class SyncTestActivity extends BaseTestActivity {
         Thread.sleep(3000);
         System.out.println("over");
     }
-    // end 关于 Lock 和 Condition 的使用，
+    // 关于 Lock 和 Condition 的使用，end
 
+    // --------------------- 分割线 ---------------------
+
+    // VolatileDemo 可见性和原子性 start
     public void test_2(View view) {
-        new VolatileDemo().test();// 重排序
+        new VolatileDemo().test();// 可见性
     }
 
     public void test_3(View view) {
@@ -119,31 +126,36 @@ public class SyncTestActivity extends BaseTestActivity {
     public void test_6(View view) {
         new VolatileDemo.Test4().exec();// AtomicInteger 有原子性
     }
+    // VolatileDemo 可见性和原子性 end
+
+    // --------------------- 分割线 ---------------------
 
     // AsyncTask 用法的简单示例 start
     IAsynTask iAsynTask = null;
 
     public void test_7(View v) {
-        // 还可以这么写
+        // 在子线程执行一个 Runnable
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                LogUtil.e("in AsyncTask run");
+                LogUtil.e("in AsyncTask run，currentThread = " + Thread.currentThread().getName());
             }
         });
 
-        // 也可以这么写
+        // 在主线程排队执行一个 Runnable
         new Handler().post(new Runnable() {
             @Override
             public void run() {
-                LogUtil.e("in Handler run");
+                LogUtil.e("in Handler runcurrentThread = " + Thread.currentThread().getName());
             }
         });
 
+        // 执行一个异步任务
         iAsynTask = new IAsynTask();
         iAsynTask.execute("test8");
     }
 
+    // 取消异步任务 iAsynTask 的执行
     public void test_8(View v) {
         if (iAsynTask != null) {
             if (!iAsynTask.isCancelled())
@@ -152,57 +164,86 @@ public class SyncTestActivity extends BaseTestActivity {
 
     }
 
+    /**
+     * 继承 AsyncTask，复写几个关键的函数：
+     *
+     * 在 子线程中 执行
+     * doInBackground
+     *
+     * 四个函数在 主线程中 执行
+     * onPreExecute，调用时机在 doInBackground 之前
+     * onPostExecute，调用时机在 doInBackground 之前
+     * onProgressUpdate，调用时机在 doInBackground 函数中执行了 publishProgress 的时候，publishProgress 是 protected 修饰的，不可外部调用
+     * onCancelled 内外部调用 cancel 函数时
+     *
+     */
     public class IAsynTask extends AsyncTask<String, Integer, String> {
 
         @Override
-        protected void onPreExecute() {
+        protected void onPreExecute() { // 主线程执行
             super.onPreExecute();
             showMessage("onPreExecute");
-            LogUtil.e("onPreExecute");
+            LogUtil.e("onPreExecute，currentThread = " + Thread.currentThread().getName());
         }
 
         @Override
-        protected void onPostExecute(String s) {
+        protected void onPostExecute(String s) { // 主线程执行
             super.onPostExecute(s);
             showMessage("onPostExecute" + s);
-            LogUtil.e("onPostExecute " + s);
+            LogUtil.e("onPostExecute " + s + "，currentThread = " + Thread.currentThread().getName());
         }
 
 
         @Override
-        protected void onProgressUpdate(Integer... values) {
+        protected void onProgressUpdate(Integer... values) { // 主线程执行
             super.onProgressUpdate(values);
-            showMessage("onProgressUpdate " + values[0]);
+            showMessage("onProgressUpdate " + values[0] + "，currentThread = " + Thread.currentThread().getName());
+            LogUtil.e(values[0] + "，currentThread = " + Thread.currentThread().getName());
         }
 
         @Override
-        protected String doInBackground(String... strings) {
-            publishProgress(100);
-            LogUtil.e("doInBackground begin " + strings[0]);
+        protected String doInBackground(String... strings) { // 子线程执行
+            //publishProgress(100);
+            LogUtil.e("begin " + strings[0] + "，currentThread = " + Thread.currentThread().getName());
             try {
-                Thread.sleep(10000);
+                // 模拟更新进度
+                Thread.sleep(2000);
+                publishProgress(1);
+                Thread.sleep(2000);
+                publishProgress(2);
+                Thread.sleep(2000);
+                publishProgress(3);
+                Thread.sleep(2000);
+                if(strings[0].equals("test8")){
+                    cancel(true);
+                }
+                publishProgress(4);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            LogUtil.e("doInBackground finish " + strings[0]);
+            LogUtil.e("finish " + strings[0] + "，currentThread = " + Thread.currentThread().getName());
             return "okkk";
         }
 
         // 两个 onCancelled 都会调用到
         @Override
-        protected void onCancelled() {
+        protected void onCancelled() { // 主线程执行
             super.onCancelled();
             showMessage("onCancelled");
-            LogUtil.e("onCancelled ");
+            LogUtil.e("currentThread = " + Thread.currentThread().getName());
         }
 
         @Override
-        protected void onCancelled(String s) { // 此处的s 就是 doInBackground 函数返回的 string
+        protected void onCancelled(String s) { // 主线程执行
             super.onCancelled(s);
-            showMessage("onCancelled " + s);
-            LogUtil.e("onCancelled " + s);
+            showMessage("onCancelled " + s); // 此处的s 就是 doInBackground 函数返回的 string
+            LogUtil.e(" " + s + "，currentThread = " + Thread.currentThread().getName());
         }
-    }// AsyncTask 用法的简单示例 end
+    }
+    // AsyncTask 用法的简单示例 end
+
+    // --------------------- 分割线 ---------------------
 
     // 线程 测试 start
     public void test_9(View view) {
@@ -345,7 +386,9 @@ public class SyncTestActivity extends BaseTestActivity {
     // 线程 测试 end
 
     // Thread.currentThread().sleep 和 Thread.sleep 都是让当前线程休眠，不让出锁
-    //
+
+    // --------------------- 分割线 ---------------------
+
 
     Object object = new Object();
 

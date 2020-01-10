@@ -4,6 +4,17 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * 当多个线程，同时调用 Alipay 的同一个实例的 transfer 函数时候，
+ * 会遇到 数据交叉混乱的 问题，这个时候就需要给 transfer 函数加一把锁，
+ * 保证同一个时刻，只能有一个线程在执行 transfer 函数，其他尝试执行 transfer 函数的线程，
+ * 会因为尝试取得 Alipay 实例内的锁，而被放入等待集，
+ * 只有持有锁的那个线程执行完 transfer 函数，释放锁并唤醒等待集的线程之后，
+ * 等待集的线程之中又会有一个线程可以抢到锁，从而重复上述的流程：上锁 -- 执行任务 -- 释放锁 -- 唤醒其他线程
+ *
+ * 关于锁的重要概念之一，就是：多个线程，竞争同一个实例的锁，这个锁才有意义。
+ *
+ */
 public class Alipay {
     private double[] accounts;
     private Lock alipaylock;
