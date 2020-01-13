@@ -1,5 +1,6 @@
 package com.guohao.factory.presenter.search;
 
+import com.guohao.factory.model.card.GroupCard;
 import com.guohao.factory.model.card.UserCard;
 import com.guohao.factory.presenter.BaseContract;
 
@@ -23,8 +24,8 @@ public interface SearchContract {
     }
 
     // 搜索群的界面
-//    interface GroupView extends BaseContract.View<Presenter> {
-//        void onSearchDone(List<GroupCard> groupCards);
-//    }
+    interface GroupView extends BaseContract.View<Presenter> {
+        void onSearchDone(List<GroupCard> groupCards);
+    }
 
 }

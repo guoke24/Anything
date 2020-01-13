@@ -12,6 +12,7 @@ import android.view.MenuItem;
 
 import com.guohao.common.app.Fragment;
 import com.guohao.common.app.ToolbarActivity;
+import com.guohao.xtalker.frags.search.SearchGroupFragment;
 import com.guohao.xtalker.frags.search.SearchUserFragment;
 
 /**
@@ -60,18 +61,18 @@ public class SearchActivity extends ToolbarActivity {
 
         // 显示对应的Fragment
         Fragment fragment;
-        SearchUserFragment searchUserFragment = new SearchUserFragment();
-        fragment = searchUserFragment;
-        mSearchFragment = searchUserFragment;
-//        if (type == TYPE_USER) {
-//            SearchUserFragment searchUserFragment = new SearchUserFragment();
-//            fragment = searchUserFragment;
-//            mSearchFragment = searchUserFragment;
-//        } else {
-//            SearchGroupFragment searchGroupFragment = new SearchGroupFragment();
-//            fragment = searchGroupFragment;
-//            mSearchFragment = searchGroupFragment;
-//        }
+//        SearchUserFragment searchUserFragment = new SearchUserFragment();
+//        fragment = searchUserFragment;
+//        mSearchFragment = searchUserFragment;
+        if (type == TYPE_USER) {
+            SearchUserFragment searchUserFragment = new SearchUserFragment();
+            fragment = searchUserFragment;
+            mSearchFragment = searchUserFragment;
+        } else {
+            SearchGroupFragment searchGroupFragment = new SearchGroupFragment();
+            fragment = searchGroupFragment;
+            mSearchFragment = searchGroupFragment;
+        }
 
         getSupportFragmentManager().beginTransaction()
                 .add(R.id.lay_container, fragment)

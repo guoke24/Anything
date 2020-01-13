@@ -15,7 +15,7 @@ public class Common {
 
         // 基础的网络请求地址
         // 本地地址，需要自己配置为本地局域网电脑ip地址
-        String API_URL = "http://192.168.0.102:8080/api/";
+        String API_URL = "http://192.168.0.105:8080/api/";
 
         // 远程公共地址，不保证永久有效
         //String API_URL = "http://api-italker.qiujuer.net/api/";

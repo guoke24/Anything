@@ -211,6 +211,18 @@ public abstract class RecyclerAdapter<Data>
     public void clear() {
         mDataList.clear();
         notifyDataSetChanged();
+        /**
+         *
+         * Adapter 是 RecyclerView 的内部类
+         * notifyDataSetChanged()
+         * --> this.mObservable.notifyChanged();
+         * 调用自己的内部类 AdapterDataObservable 的 notifyChanged 函数：
+         * public void notifyChanged() {
+         *      for(int i = this.mObservers.size() - 1; i >= 0; --i) {
+         *          ((RecyclerView.AdapterDataObserver)this.mObservers.get(i)).onChanged();
+         *      }
+         * }
+         */
     }
 
     /**

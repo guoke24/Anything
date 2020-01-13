@@ -89,9 +89,9 @@ public interface RemoteService {
 //    @GET("group/{groupId}")
 //    Call<RspModel<GroupCard>> groupFind(@Path("groupId") String groupId);
 //
-//    // 群搜索的接口
-//    @GET("group/search/{name}")
-//    Call<RspModel<List<GroupCard>>> groupSearch(@Path(value = "name", encoded = true) String name);
+    // 群搜索的接口
+    @GET("group/search/{name}")
+    Call<RspModel<List<GroupCard>>> groupSearch(@Path(value = "name", encoded = true) String name);
 //
 //    // 我的群列表
 //    @GET("group/list/{date}")
