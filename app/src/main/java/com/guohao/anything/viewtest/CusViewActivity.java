@@ -5,12 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
-
-
-
 import com.guohao.anything.PackagesListActivity;
 import com.guohao.anything.R;
-
 
 
 public class CusViewActivity extends Activity {

@@ -37,10 +37,14 @@ public class ViewUtils {
 
         for(int i = 0; i < ((ViewGroup) vg).getChildCount(); i++){
             View v = ((ViewGroup) vg).getChildAt(i);
-            LogUtil.e( "   \n");
-            LogUtil.e( line.toString() + "第" + temp + "层，" + "第" + i + "次循环：" + getLastName(v.getClass().getName())
-                    + "，w = " + lpCode2Str(v.getLayoutParams().width)
-                    + "，h = " + lpCode2Str(v.getLayoutParams().height) );
+//            LogUtil.e( "   \n");
+//            LogUtil.e( line.toString() + "第" + temp + "层，" + "第" + i + "次循环：" + getLastName(v.getClass().getName())
+//                    + "，w = " + lpCode2Str(v.getLayoutParams().width)
+//                    + "，h = " + lpCode2Str(v.getLayoutParams().height) );
+
+            LogUtil.e( line.toString() + "第" + temp + "层，" + "第" + (i + 1) + "个视图：" + getLastName(v.getClass().getName())
+                     );
+
             listViewTree(v,temp + 1);
         }
     }
