@@ -123,13 +123,14 @@ public class PackagesListAdapter extends RecyclerView.Adapter<PackagesListAdapte
         for (int i = 0; i < paklist.size(); i++) {
             PackageInfo pak = (PackageInfo) paklist.get(i);
             //判断是否为非系统预装的应用程序
-            if ((pak.applicationInfo.flags & pak.applicationInfo.FLAG_SYSTEM) <= 0) {
-                // 0 & 1 = 0
-                // 0 | 1 = 1
-
-                // customs applications
-                apps.add(pak);
-            }
+//            if ((pak.applicationInfo.flags & pak.applicationInfo.FLAG_SYSTEM) <= 0) {
+//                // 0 & 1 = 0
+//                // 0 | 1 = 1
+//
+//                // customs applications
+//                apps.add(pak);
+//            }
+            apps.add(pak);
         }
         return apps;
     }

@@ -23,6 +23,7 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="测试"
+        android:textColor="@color/black"
         android:layout_marginRight="1dp"
         android:layout_marginLeft="1dp"
         android:layout_marginTop="1dp"

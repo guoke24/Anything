@@ -37,11 +37,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity android:name="com.guohao.xtalker.LaunchActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity
@@ -54,7 +50,13 @@
         <activity android:name="com.guohao.anything.jvm.Main2Activity" />
         <activity android:name="com.guohao.anything.MainActivity" />
         <activity android:name="com.guohao.anything.viewtest.CusViewActivity" />
-        <activity android:name="com.guohao.anything.PackagesListActivity" />
+        <activity android:name="com.guohao.anything.PackagesListActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name="com.guohao.anything.classloader.ClassLoaderActivity" />
         <activity android:name="com.guohao.anything.reflect.ReflectTestActivity" />
         <activity android:name="com.guohao.anything.signerverify.SignerVerifyActivity" />
