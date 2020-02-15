@@ -1,0 +1,36 @@
+# 使用插件 Plantuml 打开
+@startuml
+
+-> ViewGroup: dispatchTouchEvent
+activate ViewGroup #FFBBBB
+
+ViewGroup -> ViewGroup: onInterceptTouchEvent
+activate ViewGroup #33BBFF
+deactivate ViewGroup
+
+ViewGroup -> childView: for : child.dispatchTouchEvent
+activate ViewGroup #FF3333
+
+childView -> childView: dispatchTouchEvent
+activate childView #FF3334
+
+childView -> childView: onTouch
+activate childView
+deactivate childView
+
+childView -> childView: onTouchEvent
+activate childView
+deactivate childView
+
+childView -> ViewGroup:.           返回 true/false
+deactivate childView
+deactivate ViewGroup
+
+ViewGroup -> ViewGroup: onTouchEvent
+activate ViewGroup #99FF99
+deactivate ViewGroup
+
+<- ViewGroup : 返回 true/false
+deactivate ViewGroup
+
+@enduml
