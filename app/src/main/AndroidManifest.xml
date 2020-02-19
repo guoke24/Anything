@@ -19,58 +19,55 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Base">
-        <activity
-            android:name="com.guohao.anything.net.RetrofitActivity">
-
-        </activity>
-        <activity android:name="com.guohao.anything.FragmentDemo.Home2Activity" />
-        <activity android:name="com.guohao.anything.FragmentDemo.Home3XActivity"></activity>
-        <activity android:name="com.guohao.xtalker.MainXActivity"></activity>
-        <activity android:name="com.guohao.xtalker.PersonalActivity"></activity>
-        <activity android:name="com.guohao.xtalker.AccountActivity"></activity>
-        <activity android:name="com.guohao.xtalker.MessageActivity"></activity>
-        <activity android:name="com.guohao.xtalker.GroupCreateActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Group.Create"></activity>
-        <activity
-            android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
-        <activity android:name="com.guohao.xtalker.LaunchActivity">
-
-        </activity>
-
-        <activity
-            android:name="com.guohao.xtalker.SearchActivity"
-            android:label="@string/title_search"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.TransStatusBar" />        <activity android:name="com.guohao.xtalker.UserActivity"></activity>
-        <activity android:name="com.guohao.anything.FragmentDemo.HomeActivity" />
-        <activity android:name="com.guohao.anything.butterknife.butterknifeActivity" />
-        <activity android:name="com.guohao.anything.jvm.Main2Activity" />
-        <activity android:name="com.guohao.anything.MainActivity" />
-        <activity android:name="com.guohao.anything.viewtest.CusViewActivity" />
-        <activity android:name="com.guohao.anything.PackagesListActivity" >
+        <activity android:name=".CollapsingToolbar.DemoActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.guohao.anything.classloader.ClassLoaderActivity" />
-        <activity android:name="com.guohao.anything.reflect.ReflectTestActivity" />
-        <activity android:name="com.guohao.anything.signerverify.SignerVerifyActivity" />
-        <activity android:name="com.guohao.anything.FileOptUtil.FileOptActivity" />
+        <activity android:name=".net.RetrofitActivity"></activity>
+        <activity android:name=".CollapsingToolbar.CollapsingActivity">
 
-        <!-- 个推的Service服务,维持长链接接收消息，process 名字不可更改 -->
+        </activity>
+        <activity android:name=".FragmentDemo.Home2Activity" />
+        <activity android:name=".FragmentDemo.Home3XActivity" />
+        <activity android:name="com.guohao.xtalker.MainXActivity" />
+        <activity android:name="com.guohao.xtalker.PersonalActivity" />
+        <activity android:name="com.guohao.xtalker.AccountActivity" />
+        <activity android:name="com.guohao.xtalker.MessageActivity" />
+        <activity
+            android:name="com.guohao.xtalker.GroupCreateActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Group.Create" />
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+        <activity android:name="com.guohao.xtalker.LaunchActivity"></activity>
+        <activity
+            android:name="com.guohao.xtalker.SearchActivity"
+            android:label="@string/title_search"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.TransStatusBar" />
+        <activity android:name="com.guohao.xtalker.UserActivity" />
+        <activity android:name=".FragmentDemo.HomeActivity" />
+        <activity android:name=".butterknife.butterknifeActivity" />
+        <activity android:name=".jvm.Main2Activity" />
+        <activity android:name=".MainActivity" />
+        <activity android:name=".viewtest.CusViewActivity" />
+        <activity android:name=".PackagesListActivity"></activity>
+        <activity android:name=".classloader.ClassLoaderActivity" />
+        <activity android:name=".reflect.ReflectTestActivity" />
+        <activity android:name=".signerverify.SignerVerifyActivity" />
+        <activity android:name=".FileOptUtil.FileOptActivity" /> <!-- 个推的Service服务,维持长链接接收消息，process 名字不可更改 -->
         <service
             android:name="com.guohao.xtalker.AppPushService"
             android:enabled="true"
             android:exported="true"
             android:label="AppPushService"
             android:permission="1000"
-            android:process=":pushservice" />
-        <!-- 个推的消息送达服务，用以接收AppPushService处理后的有效消息接收，类似于之前的广播 -->
+            android:process=":pushservice" /> <!-- 个推的消息送达服务，用以接收AppPushService处理后的有效消息接收，类似于之前的广播 -->
         <service
             android:name="com.guohao.xtalker.AppMessageReceiverService"
             android:enabled="true"
@@ -88,10 +85,10 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name="com.guohao.anything.sync.SyncTestActivity" />
-        <activity android:name="com.guohao.anything.handler.handlerTestActivity" />
-        <activity android:name="com.guohao.anything.initActivity" />
-        <activity android:name="com.guohao.anything.pms.PmsTestActivity" />
+        <activity android:name=".sync.SyncTestActivity" />
+        <activity android:name=".handler.handlerTestActivity" />
+        <activity android:name=".initActivity" />
+        <activity android:name=".pms.PmsTestActivity" />
     </application>
 
 </manifest>

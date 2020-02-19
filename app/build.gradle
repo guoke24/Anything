@@ -77,4 +77,6 @@ dependencies {
     api "com.getui:sdk:$rootProject.ext.getuiVersion"
     implementation 'org.jetbrains:annotations:15.0'
     implementation 'com.android.support:support-annotations:28.0.0'
+
+    implementation 'com.jaeger.statusbarutil:library:1.4.0'
 }
