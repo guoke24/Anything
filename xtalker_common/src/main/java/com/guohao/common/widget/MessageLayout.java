@@ -9,8 +9,12 @@ import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
 /**
- * @author qiujuer Email:qiujuer@live.cn
- * @version 1.0.0
+ * 自定义的 Layout
+ *
+ * 其作用是：把本 Layout 距离父容器顶部的，左边的，右边的间距设置为 0，
+ * 就等于是把本 Layout 贴紧父容器顶部，
+ * 然后再借助 StatusBarUtil 把顶部状态栏设置为透明，就实现了沉浸式状态栏。
+ *
  */
 public class MessageLayout extends LinearLayout {
     public MessageLayout(Context context) {
