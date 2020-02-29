@@ -22,11 +22,36 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+/**
+ * 通用的 底部导航栏 + fragment切换 的 demo
+ *
+ * 自实现的一个主界面的基本框架
+ * 包括：
+ * 顶部：状态栏，appbar
+ * 中间：fragment 的容器
+ * 底部：导航栏，BottomNavigationView
+ * 额外：浮动按钮，FloatActionButton
+ *
+ * 视图结构：
+ * CoordinatorLayout
+ *  AppBarLayout
+ *  FrameLayout
+ *  BottomNavigationView
+ *  FloatActionButton
+ *
+ *
+ * 加载底部导航栏菜单的工作，放到 xml 布局文件中。
+ *
+ * 点击底部导航栏的回调中，实现 fragment 切换的逻辑。
+ *
+ */
 public class Home2Activity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
+    // 底部导航栏
     @BindView(R.id.navigation)
     BottomNavigationView mNavigation;
 
+    // 浮动按钮
     @BindView(R.id.btn_action)
     FloatActionButton mAction;
 
@@ -36,11 +61,11 @@ public class Home2Activity extends AppCompatActivity implements BottomNavigation
         setContentView(R.layout.activity_home2);
         ButterKnife.bind(this);
 
-        // 添加对底部按钮点击的监听
+        // 监听「底部导航栏」的按钮点击
         mNavigation.setOnNavigationItemSelectedListener(this);
 
         // 获取fragment的事务
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        //FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
     }
 
     // 加上此注解，该按钮才可以被点击
@@ -49,7 +74,7 @@ public class Home2Activity extends AppCompatActivity implements BottomNavigation
         Log.d("guohao", "click search");
     }
 
-    //点击底部导航栏按钮触发的函数
+    // 点击「底部导航栏」按钮时，回调的函数
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
@@ -61,6 +86,7 @@ public class Home2Activity extends AppCompatActivity implements BottomNavigation
         return true;
     }
 
+    // 切换 Fragment
     private void switchFragment(MenuItem item) {
 
         Log.d("guohaox", "click ItemTitle = " + item.getTitle());
