@@ -7,8 +7,37 @@ public class RunWithoutUI {
 
     public static void main(String[] args){
 
-        // View 事件分发流程中，FLAG_DISALLOW_INTERCEPT 变量的位运算
+        test_MeasureSpace();
 
+    }
+
+    private static void test_MeasureSpace(){
+
+        int count_bit = 3;
+        System.out.println("1 = " + Integer.toBinaryString(1));
+        // 1
+
+        int a = 1 << count_bit; // 左移 3 位
+
+        System.out.println("a = " + Integer.toBinaryString(a));
+        // 1000
+
+
+        System.out.println("1 = " + Integer.toBinaryString(-1));
+        // 11111111111111111111111111111111
+        // int 类型的负数，非数值的高位全为1
+
+        int b = -1 << count_bit; // 左移 3 位，即左边去掉 3 位，右边补 3 个 0。
+        System.out.println("b = " + Integer.toBinaryString(b));
+        // 11111111111111111111111111111000
+
+
+
+    }
+
+    private static void test_FLAG_DISALLOW_INTERCEPT(){
+
+        // View 事件分发流程中，FLAG_DISALLOW_INTERCEPT 变量的位运算
         int FLAG_DISALLOW_INTERCEPT = 0x80000; // 0x10000 * 8
         int FLAG_DISALLOW_INTERCEPT3 = 16 * 16 * 16 * 16 * 8;// 能化成2的n次方的，其二进制数就是一个1和n个0组成
         // 4 + 4 + 4 + 4 + 3 = 19（个0）
@@ -28,8 +57,6 @@ public class RunWithoutUI {
         // 因为 mGroupFlags 的每一位的数字都对应着一种标志位的值
 
         System.out.println("" + mGroupFlags);
-
-
     }
 
 }
