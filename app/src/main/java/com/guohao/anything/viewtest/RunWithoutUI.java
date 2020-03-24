@@ -5,6 +5,17 @@ package com.guohao.anything.viewtest;
  */
 public class RunWithoutUI {
 
+    private static final int MODE_SHIFT = 30;
+
+    private static final int MODE_MASK  = 0x3 << MODE_SHIFT; // 1100 0000 ....(省略24个0)
+
+    public static final int UNSPECIFIED = 0 << MODE_SHIFT;   // 0000 0000 ....(省略24个0)
+
+    public static final int EXACTLY     = 1 << MODE_SHIFT;   // 0100 0000 ....
+
+    public static final int AT_MOST     = 2 << MODE_SHIFT;   // 1000 0000 ....
+
+
     public static void main(String[] args){
 
         test_MeasureSpace();
@@ -57,6 +68,45 @@ public class RunWithoutUI {
         // 因为 mGroupFlags 的每一位的数字都对应着一种标志位的值
 
         System.out.println("" + mGroupFlags);
+    }
+
+    /**
+     * size & ~MODE_MASK 把 size 的高 2 位置为 0
+     * mode & MODE_MASK 把 mode 的低 30 位置为 0
+     * 最后通过 | 运算结合起来
+     *
+     * @param size 约定只取 32 位 int 数值的低 30 位的值
+     * @param mode 约定只取 32 位 int 数值的高 2 位的值
+     * @return 返回的 32 位 int 数值，高 2 位的值为 mode 值，低 30 位的值为 size 值
+     */
+//    public static int makeMeasureSpec(@IntRange(from = 0, to = (1 << MeasureSpec.MODE_SHIFT) - 1) int size,
+//                                      @MeasureSpecMode int mode) {
+//        if (sUseBrokenMakeMeasureSpec) {
+//            return size + mode;
+//        } else {
+//            return (size & ~MODE_MASK) | (mode & MODE_MASK);
+//        }
+//    }
+
+    /**
+     * 返回 measureSpec 的高 2 位的数值
+     *
+     * @param measureSpec 一个 32 位 int 数值，高 2 位的值为 mode 值
+     * @return 一个 mode 值
+     */
+    public static int getMode(int measureSpec) {
+        //noinspection ResourceType
+        return (measureSpec & MODE_MASK);
+    }
+
+    /**
+     * 返回 measureSpec 的低 30 位的数值
+     *
+     * @param measureSpec 一个 32 位 int 数值，低 30 位的值为 size 值
+     * @return 一个 size 值
+     */
+    public static int getSize(int measureSpec) {
+        return (measureSpec & ~MODE_MASK);
     }
 
 }
