@@ -19,6 +19,21 @@ import com.guohao.factory.persistence.Account;
 import net.qiujuer.genius.res.Resource;
 import net.qiujuer.genius.ui.compat.UiCompat;
 
+/**
+ * 此类逻辑概述：
+ *
+ * startAnim 函数，动画播放一半，触发 waitPushReceiverId 函数
+ *
+ * waitPushReceiverId 函数，判断是否有 pushID
+ * 一直循环等待，知道拿到 pushID，触发 waitPushReceiverIdDone 函数
+ *
+ * waitPushReceiverIdDone 函数，调用 startAnim 函数
+ * startAnim 函数，将动画播放完毕，并触发 reallySkip 函数
+ *
+ * reallySkip 函数，判断权限
+ * 授权之后，就可以跳转到下一个界面：登录界面 或 主界面
+ *
+ */
 public class LaunchActivity extends Activity {
 
     // Drawable
@@ -78,7 +93,7 @@ public class LaunchActivity extends Activity {
      */
     private void waitPushReceiverId() {
         if (Account.isLogin()) {
-            // 已经登录情况下，判断是否绑定
+            // 已经登录情况下，判断是否绑定，已经绑定说明后台已经拿到 PushId
             // 如果没有绑定则等待广播接收器进行绑定
             if (Account.isBind()) {
                 waitPushReceiverIdDone();
@@ -86,7 +101,8 @@ public class LaunchActivity extends Activity {
             }
         } else {
             // 没有登录
-            // 如果拿到了PushId, 没有登录是不能绑定PushId的
+            // 如果拿到了PushId，也可以下一步
+            // 登录时绑定PushId的
             if (!TextUtils.isEmpty(Account.getPushId())) {
                 // 跳转
                 waitPushReceiverIdDone();

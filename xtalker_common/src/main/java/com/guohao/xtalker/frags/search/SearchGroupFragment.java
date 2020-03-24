@@ -124,7 +124,7 @@ public class SearchGroupFragment extends PresenterFragment<SearchContract.Presen
             mJoin.setEnabled(groupCard.getJoinAt() == null);
         }
 
-        @OnClick(R2.id.im_join)
+        @OnClick(R2.id.im_portrait)
         void onJoinClick() {
             // 进入创建者的个人界面
             PersonalActivity.show(getContext(), mData.getOwnerId());

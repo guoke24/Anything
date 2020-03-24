@@ -14,7 +14,7 @@ import com.raizlabs.android.dbflow.structure.database.transaction.QueryTransacti
 import java.util.List;
 
 /**
- * 联系人仓库
+ * 联系人仓库，数据表 User 的观察者
  *
  *
  */

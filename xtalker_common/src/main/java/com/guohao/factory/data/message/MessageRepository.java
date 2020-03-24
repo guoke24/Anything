@@ -21,6 +21,11 @@ import java.util.List;
  * @author qiujuer Email:qiujuer@live.cn
  * @version 1.0.0
  */
+
+/**
+ * 单聊消息的仓库，数据表 Message 的观察者。
+ *
+ */
 public class MessageRepository extends BaseDbRepository<Message>
         implements MessageDataSource {
     // 聊天的对象Id
