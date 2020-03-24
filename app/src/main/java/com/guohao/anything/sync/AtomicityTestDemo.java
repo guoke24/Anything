@@ -6,7 +6,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-// 参考：https://www.jb51.net/article/128240.htm
+// 参考：[Java中Volatile关键字详解及代码示例](https://www.jb51.net/article/128240.htm)
+// 参考：刘望舒的《Android进阶之光，P180，4.2.2小节》
 
 /**
  * 先补充一下概念：Java内存模型中的可见性、原子性和有序性。
@@ -38,17 +39,37 @@ import java.util.concurrent.locks.ReentrantLock;
  * 同时具有「可见性」和「原子性」，就认为是「有序性」了吗？
  *
  */
-public class VolatileDemo {
+
+/**
+ * 本demo内容概括：主要做：原子性测试，顺便做一个可见性测试
+ * volatile，synchronized，Lock，AtomicInteger 的原子性测试
+ *
+ * 可见性测试思路：
+ * 一个线程修改了某个非 volatile 修饰的共享变量，另一个线程没有立即可见
+ *
+ * 原子性测试思路：
+ * 多个线程同时引用同一个对象，执行某个非原子性函数
+ * 比如，i 从 0 开始
+ * 10个线程，都执行 i++ 1000次
+ * （i++，非原子操作，可分解为三步原子操作：
+ *   第一：读取 inc 的值（读取到哪？cpu 的缓存中？）；
+ *   第二：值 + 1 ；
+ *   第三：写回工作内存。）
+ * 不保证原子性的情况下，结果可能小于 10000
+ * 保证原子性的情况下，结果等于 10000
+ */
+public class AtomicityTestDemo {
 
     boolean flag = true;
 
 
-    // 指令重排序？导致 t 有一定的小概率无法停止
+    // 测试可见性
     // 每个线程在运行过程中都有自己的工作内存，线程在运行的时候，会将 flag 变量的值拷贝一份放在自己的工作内存当中
-    // 若某个线程修改了 flag 的值，没有即时刷新到主存，则有能导致问题
+    // 此处测试的思路：
+    // 若 t3 线程修改了 flag 的值，有一定的概率没有即时刷新到主存，则对 t1 不可见，导致 t1 无法停止
     public void test(){
 
-        Thread t =new Thread(new Runnable() {
+        Thread t1 =new Thread(new Runnable() {
             @Override
             public void run() {
                 int i = 0;
@@ -63,7 +84,7 @@ public class VolatileDemo {
                 }
             }
         });
-        t.start();
+        t1.start();
 
         // 该写法等同于等价于上面的
         Thread t3 = new Thread(()->{
@@ -85,33 +106,64 @@ public class VolatileDemo {
         t3.start();
     }
 
+    // --------------------- 分割线 ---------------------
+    // 从此处开始都是在测试原子性，
+    // 用同样的测试思路：
+    // 同时启动10个线程，累加同一个数1000次，期望结果是 10000
+
+
     // volatile 只能保证可见性，不能保证原子性
-    static class Test {
+    // 由于 原子性问题，此处可能会导致结果小于 10000
+    static class TestVolatile {
         public volatile int inc = 0;
 
         public void increase() {
             inc++;
         }
 
-        public void exec() {
-            final Test test = new Test();
-            for(int i=0;i<10;i++){ // 新建10个线程
+        public static void exec() {
+            final TestVolatile test = new TestVolatile();
+
+            for(int i=0;i<10;i++){ // 新建10个线程，累加同一个数
                 new Thread(){
                     public void run() {
                         for(int j=0;j<1000;j++)
+                            //System.out.println("" + test.inc);
                             test.increase();
-                    };
+                    }
                 }.start();
             }
 
-            while(Thread.activeCount()>2) //有子线程就让出资源，保证所有子线程都执行完
+            // 此时在主线程执行
+            while(Thread.activeCount() > 2){ //至少有主线程和一个子线程，则让出资源，保证所有子线程先执行完
+                //System.out.println("res = " + test.inc);
+                // System.out.println("Thread.activeCount() = " + Thread.activeCount());
                 Thread.yield();//当前线程，让出cpu，进入就绪状态
-            LogUtil.e("" + test.inc); // 结果小于10000
-        }
+            }
+
+
+            // 到此所有子线程执行完，只剩主线程
+            //LogUtil.e("" + test.inc); // 结果可能小于10000
+            System.out.println("final res = " + test.inc);
+        }// end exec()
     }
+    /**
+     * 自增操作是不具备原子性的！
+     * inc++ 这个操作，可分解为：
+     * 第一：读取 inc 的值（读取到哪？cpu 的缓存中？）；
+     * 第二：值 + 1 ；
+     * 第三：写回工作内存 。
+     *
+     * 出问题的具体过程如下：
+     * 某一个线程之刚执行完的第二步：值 + 1 ，没来执行第三步：写回工作内存；
+     * 另一个线程同时开始第一步：读取 inc 的值，那么这个时候，读到的值是没有完成累加操作的；
+     * 这就必然会出现，有很多次累加操作不算数。
+     *
+     * 所以，这个代码的结果，肯定是会小于 10000
+     */
 
     // synchronized 可以保证原子性
-    static class Test2 {
+    static class TestSynchronized {
         public int inc = 0;
 
         public synchronized void increase() {
@@ -119,7 +171,7 @@ public class VolatileDemo {
         }
 
         public  void exec() {
-            final Test2 test = new Test2();
+            final TestSynchronized test = new TestSynchronized();
             for(int i=0;i<10;i++){
                 new Thread(){
                     public void run() {
@@ -129,17 +181,16 @@ public class VolatileDemo {
                 }.start();
             }
 
-            // 线程数大于1，说明除主线程之外还有子线程
-            // 有子线程就让出资源，保证所有子线程都执行完
-            while(Thread.activeCount()>1)
-                Thread.yield();// 此处是主线程执行的语句，作用就是让出资源给子线程执行
+
+            while(Thread.activeCount()>2)
+                Thread.yield();//
 
             LogUtil.e("" + test.inc); // 结果=10000
         }
     }
 
     // Lock 实现，也可以保证原子性
-    static class Test3 {
+    static class TestReentrantLock {
         public int inc = 0;
         Lock lock = new ReentrantLock();
 
@@ -153,7 +204,7 @@ public class VolatileDemo {
         }
 
         public void exec() {
-            final Test3 test = new Test3();
+            final TestReentrantLock test = new TestReentrantLock();
             for(int i=0;i<10;i++){
                 new Thread(){
                     public void run() {
@@ -165,7 +216,7 @@ public class VolatileDemo {
 
             // 线程数大于1，说明除主线程之外还有子线程
             // 有子线程就让出资源，保证所有子线程都执行完
-            while(Thread.activeCount()>1)
+            while(Thread.activeCount()>2)
                 Thread.yield();// 此处是主线程执行的语句，作用就是让出资源给子线程执行
 
             LogUtil.e("" + test.inc); // 结果=10000
@@ -173,7 +224,7 @@ public class VolatileDemo {
     }
 
     // AtomicInteger 原子性操作
-    static class Test4 {
+    static class TestAtomicInteger {
         // 该类带有很多原子性操作
         public AtomicInteger inc = new AtomicInteger();
 
@@ -182,7 +233,7 @@ public class VolatileDemo {
         }
 
         public void exec() {
-            final Test4 test = new Test4();
+            final TestAtomicInteger test = new TestAtomicInteger();
             for(int i=0;i<10;i++){
                 new Thread(){
                     public void run() {
@@ -194,7 +245,7 @@ public class VolatileDemo {
 
             // 线程数大于1，说明除主线程之外还有子线程
             // 有子线程就让出资源，保证所有子线程都执行完
-            while(Thread.activeCount()>1)
+            while(Thread.activeCount()>2)
                 Thread.yield();// 此处是主线程执行的语句，作用就是让出资源给子线程执行
 
             LogUtil.e("" + test.inc); // 结果=10000
