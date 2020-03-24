@@ -107,7 +107,8 @@ public class NetworkUtil {
     }
 
     /**
-     * 返回一个请求代理
+     * 静态内部类
+     * 用于返回一个请求代理
      *
      * @return RemoteService
      */

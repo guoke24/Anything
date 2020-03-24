@@ -37,6 +37,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 
+/**
+ * 比较基础的 Retrofit 使用 demo
+ *
+ */
 public class RetrofitActivity extends BaseTestActivity {
 
     static String TAG = "guohao-retrofit";
@@ -109,7 +113,7 @@ public class RetrofitActivity extends BaseTestActivity {
 
     /**
      * 对 xtalker 的首页发起GET请求，
-     * 配合 ScalarsConverterFactory 接收String结果
+     * 配合 ScalarsConverterFactory 接收 String 结果
      */
     public void test_3(View v) {
         showMessage("initActivity test_3:");
@@ -146,7 +150,7 @@ public class RetrofitActivity extends BaseTestActivity {
 
     /**
      * 对 xtalker 的注册接口发起POST请求，
-     * 配合 ScalarsConverterFactory 接收String结果
+     * 配合 ScalarsConverterFactory 接收 String 结果
      */
     public void test_4(View v) {
         showMessage("initActivity test_3:");
