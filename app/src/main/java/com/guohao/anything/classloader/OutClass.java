@@ -8,19 +8,19 @@ public class OutClass {
     // 使用到静态成员，或者动态实例化两种方式
     // 引起的类加载的时候调用
     static {
-        System.out.println("外部内加载");
+        System.out.println("外部类静态代码块加载");
     }
 
     // 仅仅创建类实例引起的类加载的时候，调用
     // 先调用 static 的代码块，再调用此处的普通代码块
     {
-        System.out.println("外部内加载2");
+        System.out.println("外部类代码块加载");
     }
 
 
 
-    public static void  say(){
-        System.out.println("外部类说");
+    public static void say(){
+        System.out.println("外部类函数-say");
     }
 
 
@@ -34,11 +34,11 @@ public class OutClass {
 
         //
         static {
-            System.out.println("静态内部类加载");
+            System.out.println("静态内部类的静态代码块加载");
         }
 
         public static void say(){
-            System.out.println("静态内部类说" + i);
+            System.out.println("静态内部类函数-say，外部类变量 i = " + i);
         }
     }
 
@@ -53,7 +53,7 @@ public class OutClass {
         }
 
         public void say(){
-            System.out.println("动态内部类说" + i);
+            System.out.println("动态内部类函数-say，外部类变量 i = " + i);
         }
     }
 
