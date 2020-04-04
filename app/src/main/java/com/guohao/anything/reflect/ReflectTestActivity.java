@@ -215,7 +215,7 @@ public class ReflectTestActivity extends BaseTestActivity {
      */
     public static void Test7() throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Class<?> class1 = null;
-        class1 = Class.forName("com.android.reflect.SuperPerson");
+        class1 = Class.forName("com.android.reflect.Person");
 
         System.out.println("Test7: \n调用无参方法fly()：");
         Method method = class1.getMethod("fly");
@@ -241,7 +241,7 @@ public class ReflectTestActivity extends BaseTestActivity {
      */
     public static void Test8() throws ClassNotFoundException {
         Class<?> class1 = null;
-        class1 = Class.forName("com.android.reflect.SuperPerson");
+        class1 = Class.forName("com.android.reflect.Person");
         String name = class1.getClassLoader().getClass().getName();
 
         System.out.println("Test8: 类加载器类名: " + name);
