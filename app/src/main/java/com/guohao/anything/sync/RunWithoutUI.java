@@ -3,6 +3,16 @@ package com.guohao.anything.sync;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.LinkedTransferQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.TransferQueue;
 
 public class RunWithoutUI {
 
@@ -14,6 +24,30 @@ public class RunWithoutUI {
         //testListCurThreadName(); // 输出当前线程
 
 
+//        JDK7提供了7个阻塞队列，分别是：
+//
+//        ArrayBlockingQueue ：由数组结构组成的有界阻塞队列。
+//        LinkedBlockingQueue ：由链表结构组成的有界阻塞队列。
+//        PriorityBlockingQueue ：支持优先级排序的无界阻塞队列。
+//        DelayQueue：使用优先级队列实现的无界阻塞队列。
+//        SynchronousQueue：不存储元素的阻塞队列。
+//        LinkedTransferQueue：由链表结构组成的无界阻塞队列。
+//        LinkedBlockingDeque：由链表结构组成的双向阻塞队列。
+
+        ArrayBlockingQueue arrayBlockingQueue;
+        LinkedBlockingQueue linkedBlockingQueue;
+        PriorityBlockingQueue priorityBlockingQueue;
+        DelayQueue delayQueue;
+        SynchronousQueue synchronousQueue;
+        LinkedTransferQueue linkedTransferQueue;
+        LinkedBlockingDeque linkedBlockingDeque;
+
+        // 接口
+        BlockingDeque blockingDeque;
+        // 接口
+        TransferQueue transferQueue;
+        // DelayedWorkQueue，在 ScheduledThreadPoolExecutor 的静态内部类，默认缺省修饰符，此处访问不了
+        ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
     }
 
     // 原来我们可以列出：所有活跃的线程，和当前线程组的线程
