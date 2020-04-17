@@ -36,7 +36,7 @@ public class UploadHelper {
         // 明文设置secret的方式建议只在测试时使用，更多鉴权模式请参考后面的`访问控制`章节
         // https://help.aliyun.com/document_detail/32046.html?spm=a2c4g.11186623.6.900.2ff87ca2WzupMX
         OSSCredentialProvider credentialProvider = new OSSPlainTextAKSKCredentialProvider(
-                "LTAI4Fi1AcCy7ADvYKZybae8", "pIqF0cyEFTn1143cwwpHLCHoDAR0iX");
+                "LTAI4Fi1AcCy7ADvYKZxxxx"/*AccessKey ID*/, "pIqF0cyEFTn1143cwwpHLCHoDxxxx"/*AccessKeySecret*/);
         return new OSSClient(Factory.app(), ENDPOINT, credentialProvider);
     }
 
