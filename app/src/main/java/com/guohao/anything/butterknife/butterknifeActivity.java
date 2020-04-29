@@ -8,7 +8,8 @@ import com.guohao.anything.R;
 
 
 import butterknife.BindView;
-
+import butterknife.ButterKnife;
+// 参考：[Android Butterknife使用方法总结](https://www.jianshu.com/p/3678aafdabc7)
 public class butterknifeActivity extends AppCompatActivity {
 
     @BindView(R.id.tx1)
@@ -18,6 +19,8 @@ public class butterknifeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_butterknife);
+        // 必须在setContentView之后
+        ButterKnife.bind(this);
 
     }
 }

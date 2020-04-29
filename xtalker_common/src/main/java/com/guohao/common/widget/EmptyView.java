@@ -47,7 +47,11 @@ public class EmptyView extends LinearLayout implements PlaceHolderView {
     }
 
     private void init(AttributeSet attrs, int defStyle) {
-        inflate(getContext(), R.layout.lay_empty, this);
+        // 委托 LayoutInflater#inflate(resource, root) 函数，
+        // 把 第二个参数，布局文件所描述的 viewtree，作为子类添加到 第三个参数 this，也就是自身
+        // 返回的也是第三个参数
+        // 如果第三个参数为空，则返回 布局文件的根view
+        inflate(getContext(), R.layout.lay_empty, this);//作用？
         mEmptyImg = (ImageView) findViewById(R.id.im_empty);
         mStatusText = (TextView) findViewById(R.id.txt_empty);
         mLoading = (Loading) findViewById(R.id.loading);
@@ -62,7 +66,7 @@ public class EmptyView extends LinearLayout implements PlaceHolderView {
         mTextIds[1] = a.getInt(R.styleable.EmptyView_comErrorText, R.string.prompt_error);
         mTextIds[2] = a.getInt(R.styleable.EmptyView_comLoadingText, R.string.prompt_loading);
 
-        a.recycle();
+        a.recycle();//什么意思？
     }
 
     /**
