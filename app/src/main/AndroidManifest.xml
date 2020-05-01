@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.guohao.anything">
-
     <!-- 安装apk权限 -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" /> <!-- 截屏权限 -->
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" /> <!-- 网络相关的权限 -->
@@ -20,21 +19,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Base">
-        <service
-            android:name=".Hook.HookService.TargetService"
-            android:enabled="false"
-            android:exported="false"></service>
-        <service
-            android:name=".Hook.HookService.ProxyService"
-            android:process=":daemon" />
-
-        <activity android:name=".Hook.HookMain_Activity">
+        <activity android:name=".viewtest.CanvasActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".viewtest.ConstrainLayoutActivity">
+
+        </activity>
+
+        <service
+            android:name=".Hook.HookService.TargetService"
+            android:enabled="false"
+            android:exported="false" />
+        <service
+            android:name=".Hook.HookService.ProxyService"
+            android:process=":daemon" />
+
+        <activity android:name=".Hook.HookMain_Activity"></activity>
         <activity android:name=".Hook.HookActivity.StubActivity" />
         <activity android:name=".Hook.HookSimpleDemo.HookSimpleActivity" />
         <activity android:name=".IntentAndComponent.callTestActivity" />
@@ -69,7 +73,7 @@
         <activity android:name=".jvm.Main2Activity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".viewtest.CusViewActivity" />
-        <activity android:name=".PackagesListActivity" />
+        <activity android:name=".viewtest.scrollConflict.PackagesListActivity" />
         <activity android:name=".classloader.ClassLoaderActivity" />
         <activity android:name=".reflect.ReflectTestActivity" />
         <activity android:name=".signerverify.SignerVerifyActivity" />

@@ -38,7 +38,8 @@
 
 - ViewUtils
 
-     - 主要是一个打印 ViewTree 功能的函数
+     - 主要是一个打印 ViewTree 功能的函数，
+        - MyActivity 中测试类该功能
     
      - 还有 布局参数代码转文字
    
