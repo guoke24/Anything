@@ -8,7 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewStub;
 
-import com.guohao.anything.PackagesListAdapter;
+import com.guohao.anything.viewtest.scrollConflict.PackagesListAdapter;
 import com.guohao.anything.R;
 import com.jaeger.library.StatusBarUtil;
 

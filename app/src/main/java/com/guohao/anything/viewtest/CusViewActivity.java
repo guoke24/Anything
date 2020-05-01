@@ -5,7 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
-import com.guohao.anything.PackagesListActivity;
+
+import com.guohao.anything.viewtest.scrollConflict.PackagesListActivity;
 import com.guohao.anything.R;
 
 
@@ -17,6 +18,7 @@ public class CusViewActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_cus_view);
         //initView();
 

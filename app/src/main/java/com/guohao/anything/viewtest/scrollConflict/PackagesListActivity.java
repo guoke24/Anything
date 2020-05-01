@@ -1,4 +1,4 @@
-package com.guohao.anything;
+package com.guohao.anything.viewtest.scrollConflict;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
