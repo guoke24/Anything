@@ -12,23 +12,26 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
-        android:name=".Hook.MyApplication"
+        android:name=".RootApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Base">
-        <activity android:name=".viewtest.CanvasActivity">
+        <activity android:name=".memory.Main3Activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".viewtest.ConstrainLayoutActivity">
+        <activity android:name=".memory.MemoryLeakActivity">
+        </activity>
+        <activity android:name=".viewtest.CanvasActivity">
 
         </activity>
+        <activity android:name=".viewtest.ConstrainLayoutActivity"></activity>
 
         <service
             android:name=".Hook.HookService.TargetService"
@@ -38,7 +41,7 @@
             android:name=".Hook.HookService.ProxyService"
             android:process=":daemon" />
 
-        <activity android:name=".Hook.HookMain_Activity"></activity>
+        <activity android:name=".Hook.HookMain_Activity" />
         <activity android:name=".Hook.HookActivity.StubActivity" />
         <activity android:name=".Hook.HookSimpleDemo.HookSimpleActivity" />
         <activity android:name=".IntentAndComponent.callTestActivity" />

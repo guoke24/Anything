@@ -85,4 +85,11 @@ dependencies {
     api "com.github.Raizlabs.DBFlow:dbflow-core:${rootProject.ext.dbflowVersion}"
     api "com.github.Raizlabs.DBFlow:dbflow:${rootProject.ext.dbflowVersion}"
 
+    // leakcanary
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.2'
+    //releaseImplementation'com.squareup.leakcanary:leakcanary-android-no-op:2.2'
+
+    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    //releaseImplementation'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+
 }
