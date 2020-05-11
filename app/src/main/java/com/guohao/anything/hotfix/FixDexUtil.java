@@ -96,6 +96,15 @@ public class FixDexUtil {
         return canFix;
     }
 
+    // 实现思路：
+    // 提交把修复好的 class 打包为 dex，手动放到 sd 卡等路径；
+    // 通过 dexclassLoader 加载补丁到自己的 dexElements 字段
+    // 反射提取 dexclassLoader 的 dexElements 字段
+    // 反射提取 PathClassLoader 的 dexElements 字段
+    // 合并上述两个 dexElements 字段（本质是数组）
+    // 合并后的新字段 替换 PathClassLoader 中的 dexElements 字段
+    //
+    //这样做的结果是：PathClassLoader 中的 dexElements 字段的第一个元素就是修复后的补丁了。
     private static void doDexInject(Context appContext, HashSet<File> loadedDex) {
         String optimizeDir = appContext.getFilesDir().getAbsolutePath() +
                 File.separator + OPTIMIZE_DEX_DIR;
