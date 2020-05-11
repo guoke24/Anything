@@ -65,6 +65,9 @@ public class booterCLass {
         // 直接通过「外部类名.内部类名」的声明方式会报错
         //new OutClass.InnerDynamicClass();
 
+        // 非静态内部类实例的创建，依赖外部来实例
+        //new OutClass().new InnerDynamicClass();
+        // 等价于下面的写法：
         // 需要先创建一个外部类实例
         OutClass outClass = new OutClass();
         // 再通过「外部类实例引用名.new 内部类名()」的方式创建内部类
@@ -74,5 +77,7 @@ public class booterCLass {
         // 外部类代码块加载
         // 动态内部类加载
         // 动态内部类函数-say，外部类变量 i = 1
+
+
     }
 }

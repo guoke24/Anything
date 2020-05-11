@@ -55,6 +55,7 @@
 工具类：
 
 - HookHelper：封装了发起 Hook 的静态方法，主要在 MyApplication 中调用
+    - 目前有 hookAMS、hookHandler 两个函数
 
 - FieldUtil：封装了反射得到字段的操作
 

@@ -17,7 +17,9 @@ public class OutClass {
         System.out.println("外部类代码块加载");
     }
 
+    public void doOutter(){
 
+    }
 
     public static void say(){
         System.out.println("外部类函数-say");
@@ -39,6 +41,11 @@ public class OutClass {
 
         public static void say(){
             System.out.println("静态内部类函数-say，外部类变量 i = " + i);
+            //doOutter();
+        }
+
+        public void doInner(){
+            //doOutter();
         }
     }
 

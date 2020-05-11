@@ -33,6 +33,8 @@ public class ClassLoaderActivity extends BaseTestActivity {
         // 主要就是两个类加载其：
         // dalvik.system.PathClassLoader
         // java.lang.BootClassLoader
+        // 为何没有 DexClassLoader，因为 xx..class.getClassLoader() 返回的是 class 的加载器
+        // DexClassLoader 是加载 dex 的
     }
 
 }
