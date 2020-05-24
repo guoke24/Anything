@@ -9,6 +9,7 @@ import com.guohao.anything.Hook.HookHelper;
 
 public class RootApplication extends Application {
 
+
     // 该函数的生命周期在所有组件之前
     @Override
     public void attachBaseContext(Context base) {

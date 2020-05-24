@@ -92,4 +92,7 @@ dependencies {
     //debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     //releaseImplementation'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
 
+    // picasso 框架
+    //
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }

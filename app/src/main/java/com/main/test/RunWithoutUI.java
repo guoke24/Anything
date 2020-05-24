@@ -1,5 +1,6 @@
 package com.main.test;
 
+import java.io.OutputStream;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
@@ -28,6 +29,8 @@ public class RunWithoutUI {
         //testThreadLocalHashCode(); // 测试 ThreadLocal 的 ThreadLocalHashCode 的生成
 
         //testRef(); // 测试四种引用类型
+
+        OutputStream outputStream;
     }
 
 
