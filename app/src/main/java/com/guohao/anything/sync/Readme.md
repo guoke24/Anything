@@ -24,7 +24,7 @@
   
 - class LockDemo
   - 简单的上锁和解锁的例子，确保只有一个人上班
-  - 关于 Lock 和 Condition 的使用
+  - 关于 ReentrantLock 的使用
   
 - class LockCountDemo
   - 本demo内容概括：
