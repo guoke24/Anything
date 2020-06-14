@@ -6,7 +6,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * 关于 Lock 和 Condition 的使用
+ * 关于 ReentrantLock 的使用
  * 参考：
  * [Java并发学习之ReentrantLock的工作原理及使用姿势](https://cloud.tencent.com/developer/article/1038499)
  *
