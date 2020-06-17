@@ -38,7 +38,17 @@ public class Main4Activity extends AppCompatActivity {
             @Override
             public void update(int percent) {
                 Log.e("SquareUtils","percent = " + percent);
-                pieImageView.setProgress(percent);
+                Log.e("SquareUtils","update：" + Thread.currentThread().getName());//这是在子线程哦
+
+                //主线程更新UI
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e("SquareUtils","runOnUiThread：" + Thread.currentThread().getName());//这是在主线程哦
+                        pieImageView.setProgress(percent);
+                    }
+                });
+
             }
 
         },getApplication());

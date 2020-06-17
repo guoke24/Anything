@@ -1,6 +1,7 @@
 package com.guohao.anything.FragmentDemo;
 
 import android.animation.Animator;
+import android.os.Debug;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.FragmentTransaction;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.animation.AnticipateOvershootInterpolator;
 
+import com.guohao.anything.LogUtil;
 import com.guohao.anything.R;
 import com.guohao.xtalker.frags.main.ActiveFragment;
 import com.guohao.xtalker.frags.main.ContactFragment;
@@ -17,6 +19,8 @@ import com.guohao.xtalker.frags.main.GroupFragment;
 
 import net.qiujuer.genius.ui.animation.AnimatorListener;
 import net.qiujuer.genius.ui.widget.FloatActionButton;
+
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -66,12 +70,24 @@ public class Home2Activity extends AppCompatActivity implements BottomNavigation
 
         // 获取fragment的事务
         //FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        LogUtil logUtil;
     }
 
     // 加上此注解，该按钮才可以被点击
     @OnClick(R.id.im_search)
     void onSearchMenuClick() {
         Log.d("guohao", "click search");
+    }
+
+    @OnClick(R.id.btn_action)
+    void onClickFlaButtin(){
+        Log.d("guohao", "click btn_action");
+
+        //FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+        getSupportFragmentManager().popBackStack();
+
+
     }
 
     // 点击「底部导航栏」按钮时，回调的函数
@@ -92,25 +108,57 @@ public class Home2Activity extends AppCompatActivity implements BottomNavigation
         Log.d("guohaox", "click ItemTitle = " + item.getTitle());
         Log.d("guohaox", "click ItemId = " + item.getItemId());//R.id.action_home
 
-        // 获取fragment的事务
+        // 获取fragment的事务，FragmentManagerImpl 实例
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
 
 
+//        if (item.getTitle().equals(getString(R.string.action_home))) {
+//            Log.d("guohaox", "click home");
+//            ft.replace(R.id.lay_container,new ActiveFragment(),"");
+//        } else if (item.getTitle().equals(getString(R.string.action_group))) {
+//            Log.d("guohaox", "click group");
+//            ft.replace(R.id.lay_container,new GroupFragment(),"");
+//        } else {
+//            Log.d("guohaox", "click contact");
+//            ft.replace(R.id.lay_container,new ContactFragment(),"");
+//        }
+
         if (item.getTitle().equals(getString(R.string.action_home))) {
             Log.d("guohaox", "click home");
-            ft.replace(R.id.lay_container,new ActiveFragment(),"");
+            ft.replace(R.id.lay_container,new MyFragment().setFlags(1),"");
+            //ft.addToBackStack("1");
         } else if (item.getTitle().equals(getString(R.string.action_group))) {
             Log.d("guohaox", "click group");
-            ft.replace(R.id.lay_container,new GroupFragment(),"");
+            ft.replace(R.id.lay_container,new MyFragment().setFlags(2),"");
+            ft.addToBackStack("2");
         } else {
             Log.d("guohaox", "click contact");
-            ft.replace(R.id.lay_container,new ContactFragment(),"");
+            ft.replace(R.id.lay_container,new MyFragment().setFlags(3),"");
+            ft.addToBackStack("3");
         }
 
         // 提交事务
         ft.commit();
 
     }
+
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        try {
+            Debug.dumpHprofData("fileName");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+
+    }
+
 
     // 浮动按钮的动画效果小demo
     private void testAnimation() {
