@@ -19,18 +19,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Base">
+        <activity android:name=".handler.IntentServiceActivity"></activity>
         <activity android:name="com.LagouAndroidShare.class17.Main4Activity">
+
+        </activity>
+        <activity android:name=".memory.Main3Activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".memory.Main3Activity">
-
-        </activity>
-        <activity android:name=".memory.MemoryLeakActivity"></activity>
-        <activity android:name=".viewtest.CanvasActivity"></activity>
+        <activity android:name=".memory.MemoryLeakActivity" />
+        <activity android:name=".viewtest.CanvasActivity" />
         <activity android:name=".viewtest.ConstrainLayoutActivity" />
 
         <service
@@ -51,7 +52,9 @@
         <activity android:name=".net.RetrofitActivity" />
         <activity android:name=".CollapsingToolbar.CollapsingActivity" />
         <activity android:name=".FragmentDemo.HomeActivity" />
-        <activity android:name=".FragmentDemo.Home2Activity" />
+        <activity android:name=".FragmentDemo.Home2Activity" >
+
+        </activity>
         <activity android:name=".FragmentDemo.Home3XActivity" />
         <activity android:name="com.guohao.xtalker.MainXActivity" />
         <activity android:name="com.guohao.xtalker.PersonalActivity" />

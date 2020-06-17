@@ -14,3 +14,10 @@
         - 2.0 以后，直接引入就可以生效了
         - debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.2'
         - 不过注意自己 hook 的 ams 的代码要先注释，否则会起冲突
+        
+- MemoryUtils
+    - 五种获取内存信息的方法：
+    - ActivityManager 
+    - Runtime.getRuntime()
+    - Debug.MemoryInfo
+    - 读取 /proc/meminfo 节点
