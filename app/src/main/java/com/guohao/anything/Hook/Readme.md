@@ -19,12 +19,12 @@
 
 ---
 
-主要逻辑：
+主要组件的逻辑：
 
 - MyApplication
     - 自定义的 Application
     - 用于在所有组件的生命周期之前，替换一些组件，以 Hook 的方式
-    - 替换的组件为：IActivityManagerProxy、HCallbackProxy
+    - 本Demo中，要替换的组件为：IActivityManagerProxy、HCallbackProxy
 
 - IActivityManagerProxy： 用于替换 IActivityManager
     - 拦截 startActivity 函数，启动占坑的 StubActivity

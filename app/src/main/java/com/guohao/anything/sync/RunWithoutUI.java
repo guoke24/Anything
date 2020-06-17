@@ -13,6 +13,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TransferQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class RunWithoutUI {
 
@@ -48,6 +49,51 @@ public class RunWithoutUI {
         TransferQueue transferQueue;
         // DelayedWorkQueue，在 ScheduledThreadPoolExecutor 的静态内部类，默认缺省修饰符，此处访问不了
         ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
+
+        //testinterrupt();
+
+        ReentrantLock reentrantLock;
+    }
+
+    // 中断测试
+    public static void testinterrupt(){
+        Thread t = new Thread(){
+            @Override
+            public void run() {
+
+                while(!Thread.currentThread().isInterrupted()){
+
+                    System.out.println("running...");
+
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+
+
+                }
+
+                System.out.println("stop!");
+
+            }
+        };
+
+        t.start();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println();
+
+        // 主线程睡眠5s后，中断 t 线程
+        //t.interrupt();
+        // 若 t 线程在睡眠，会报异常：java.lang.InterruptedException: sleep interrupted
+
     }
 
     // 原来我们可以列出：所有活跃的线程，和当前线程组的线程

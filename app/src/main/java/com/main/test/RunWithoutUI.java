@@ -1,14 +1,23 @@
 package com.main.test;
 
+import android.os.AsyncTask;
+import android.support.v4.content.LocalBroadcastManager;
+
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.OutputStream;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 import okhttp3.internal.Util;
 
@@ -31,6 +40,71 @@ public class RunWithoutUI {
         //testRef(); // 测试四种引用类型
 
         OutputStream outputStream;
+
+        EventBus eventBus;
+
+        LocalBroadcastManager localBroadcastManager;
+
+        ThreadPoolExecutor threadPoolExecutor;
+
+        AtomicInteger atomicInteger;
+
+        ReentrantLock reentrantLock;
+
+        // 缓存线程池
+        Executors.newCachedThreadPool();
+        Executors.newCachedThreadPool(new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return null;
+            }
+        });
+
+        // 固定数量4的线程池
+        Executors.newFixedThreadPool(5);
+        Executors.newFixedThreadPool(5, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return null;
+            }
+        });
+
+        // 单线程的线程池
+        Executors.newSingleThreadExecutor();
+        Executors.newSingleThreadExecutor(new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return null;
+            }
+        });
+
+        // 周期调度线程池
+        Executors.newScheduledThreadPool(5);
+        Executors.newScheduledThreadPool(5, new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return null;
+            }
+        });
+
+        // 周期调度的单线程 线程池
+        Executors.newSingleThreadScheduledExecutor().schedule(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        },1000,TimeUnit.SECONDS);
+        Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return null;
+            }
+        });
+
+
+        AsyncTask asyncTask;
+
+
     }
 
 
