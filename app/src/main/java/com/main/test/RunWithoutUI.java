@@ -1,7 +1,9 @@
 package com.main.test;
 
 import android.os.AsyncTask;
+import android.os.Looper;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.SparseArray;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -10,6 +12,8 @@ import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.WeakHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
@@ -46,6 +50,8 @@ public class RunWithoutUI {
         LocalBroadcastManager localBroadcastManager;
 
         ThreadPoolExecutor threadPoolExecutor;
+
+        AsyncTask asyncTask;
 
         AtomicInteger atomicInteger;
 
@@ -102,12 +108,36 @@ public class RunWithoutUI {
         });
 
 
-        AsyncTask asyncTask;
+//        HashMap hashMap ;
+//        hashMap.put("","");
+//        hashMap.get("");
+//
+//        SparseArray array;
+//        array.put(1,"");
+//        array.get(1);
+
+        WeakHashMap weakHashMap;
+
+        Looper looper;
+
+        TestBuilder testBuilder = new TestBuilder()
+                .setName(1)
+                .setName2(2)
+                .setName3(3);
 
 
     }
 
 
+    public static void testHash(){
+        //Dog i = new Dog();
+        int h;
+        //(h = i.hashCode()) ^ (h >>> 16);
+    }
+
+    class Dog{
+
+    }
 
     // 测试四种引用类型
     private static void testRef(){
