@@ -95,4 +95,13 @@ dependencies {
     // picasso 框架
     //
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    // eventbus
+    implementation 'org.greenrobot:eventbus:3.2.0'
+}
+
+apply plugin: 'com.didichuxing.tools.droidassist'
+droidAssistOptions {
+    enable false
+    config file("droidassist.xml")
 }

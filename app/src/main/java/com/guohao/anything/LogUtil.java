@@ -40,6 +40,11 @@ public class LogUtil {
         writeLog(tag, msg);
     }
 
+    public static int dxx(String msg1, String msg) {
+        Log.i(msg1, msg);
+        return 0;
+    }
+
     public static void d( String msg) {
         String tag=getTag();
         msg=buildMessage(msg);
