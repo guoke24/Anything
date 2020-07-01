@@ -2,6 +2,7 @@ package com.guohao.anything.memory;
 
 import android.app.ActivityManager;
 import android.content.Intent;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,8 @@ import android.view.View;
 
 import com.guohao.anything.LogUtil;
 import com.guohao.anything.R;
+
+import java.io.IOException;
 
 public class Main3Activity extends AppCompatActivity {
 
@@ -67,8 +70,21 @@ public class Main3Activity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        try {
+            Debug.dumpHprofData("fileName");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
-    //
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+
+    }
 
 }

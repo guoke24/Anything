@@ -24,6 +24,9 @@
 
         </activity>
         <activity android:name=".memory.Main3Activity">
+
+        </activity>
+        <activity android:name=".customView.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -108,7 +111,9 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".sync.SyncTestActivity" />
+        <activity android:name=".sync.SyncTestActivity" >
+
+        </activity>
         <activity android:name=".handler.handlerTestActivity" />
         <activity android:name=".initActivity" />
         <activity android:name=".pms.PmsTestActivity" />

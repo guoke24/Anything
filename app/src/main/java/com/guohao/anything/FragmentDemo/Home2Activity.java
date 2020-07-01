@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.os.Debug;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -125,37 +126,25 @@ public class Home2Activity extends AppCompatActivity implements BottomNavigation
 
         if (item.getTitle().equals(getString(R.string.action_home))) {
             Log.d("guohaox", "click home");
-            ft.replace(R.id.lay_container,new MyFragment().setFlags(1),"");
+            //ft.replace(R.id.lay_container,new MyFragment().setFlags(1),"");
+            ft.add(R.id.lay_container,new MyFragment().setFlags(1),"");
             //ft.addToBackStack("1");
         } else if (item.getTitle().equals(getString(R.string.action_group))) {
             Log.d("guohaox", "click group");
-            ft.replace(R.id.lay_container,new MyFragment().setFlags(2),"");
-            ft.addToBackStack("2");
+            ft.add(R.id.lay_container,new MyFragment().setFlags(2),"frag2");
+            //ft.addToBackStack("2");
         } else {
             Log.d("guohaox", "click contact");
-            ft.replace(R.id.lay_container,new MyFragment().setFlags(3),"");
-            ft.addToBackStack("3");
+//            ft.replace(R.id.lay_container,new MyFragment().setFlags(3),"");
+//            ft.addToBackStack("3");
+
+            Fragment fragment = getSupportFragmentManager().findFragmentByTag("frag2");
+            ft.hide(fragment);
+
         }
 
         // 提交事务
         ft.commit();
-
-    }
-
-    @Override
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-        try {
-            Debug.dumpHprofData("fileName");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
 
     }
 

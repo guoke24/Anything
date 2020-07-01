@@ -11,6 +11,7 @@ import com.guohao.anything.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -310,7 +311,95 @@ public class SyncTestActivity extends BaseTestActivity {
         }
     }
 
+    public void test_11(View view){
+        //MyAsyncTask myAsyncTask = new MyAsyncTask();
+        //myAsyncTask.executeOnExecutor(myAsyncTask.getTHREAD_POOL_EXECUTOR(),"1");
+        // 会在执行第二行的时候报错：Cannot execute task: the task is already running.
+        //myAsyncTask.executeOnExecutor(myAsyncTask.getTHREAD_POOL_EXECUTOR(),"2");
+        // 说明 AsyncTask 的重点在于单一异步任务加上 前后和过程进度的回调。
 
+        //MyAsyncTask.THREAD_POOL_EXECUTOR.execute(runnable);
+        //MyAsyncTask.THREAD_POOL_EXECUTOR.execute(runnable);
+        //MyAsyncTask.THREAD_POOL_EXECUTOR.execute(runnable);
+
+        // 可以通过类的静态函数提交任务
+        MyAsyncTask.execute(runnable2);
+        MyAsyncTask.execute(runnable2);
+        MyAsyncTask.execute(runnable2);
+        //MyAsyncTask.SERIAL_EXECUTOR.execute(runnable2);
+    }
+
+    class MyAsyncTask extends AsyncTask<String,Integer,String>{
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            int i = 0;
+
+            while(true){
+
+                try {
+                    Thread.sleep(2000);
+                    ++i;
+                    System.out.println("name = " + Thread.currentThread().getName() + "我是动态的 MyAsyncTask 实例");
+                    if( i == 5) return "-1";
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if(strings[0] == null) return "2";
+
+            }
+
+            //return "2";
+        }
+
+        public Executor getTHREAD_POOL_EXECUTOR(){
+            return THREAD_POOL_EXECUTOR;
+        }
+    }
+
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+
+            int i = 0;
+
+            while(true){
+
+                try {
+                    Thread.sleep(2000);
+                    ++i;
+                    System.out.println("name = " + Thread.currentThread().getName() + " 我是静态 THREAD_POOL_EXECUTOR ");
+                    if(i == 5) return;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+    };
+
+    Runnable runnable2 = new Runnable() {
+        @Override
+        public void run() {
+
+            int i = 0;
+
+            while(true){
+
+                try {
+                    Thread.sleep(2000);
+                    ++i;
+                    System.out.println("name = " + Thread.currentThread().getName() + " 我是静态 SERIAL_EXECUTOR ");
+                    if(i == 5) return;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+    };
 }
 
 

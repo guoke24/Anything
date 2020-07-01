@@ -18,6 +18,8 @@ public class MyFragment extends Fragment {
 
     int flag = -1;
 
+    boolean DEBUG = false;
+
     public MyFragment() {
     }
 
@@ -34,74 +36,74 @@ public class MyFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
+        if(DEBUG) Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
+        if(DEBUG) Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
+        if(DEBUG) Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
+        if(DEBUG) Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
+        if(DEBUG) Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
+        if(DEBUG) Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
+        if(DEBUG) Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
+        if(DEBUG) Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
+        if(DEBUG) Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
+        if(DEBUG) Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
+        if(DEBUG) Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
+        if(DEBUG) Log.i("guohao-fg",Log.getStackTraceString(new Throwable()));
 
         View root = inflater.inflate(R.layout.activity_main3, container, false);
 
