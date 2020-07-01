@@ -3,6 +3,7 @@ package com.LagouAndroidShare.class2;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 // 运行：$ java -Xms4M -Xmx4M -Xmn2M com/LagouAndroidShare/class2/SoftReferenceTest
 public class SoftReferenceTest {
 
+    @SuppressWarnings("unchecked")
     public static class MyBigObject{
         byte[] data = new byte[1024];// 1KB
     }
@@ -20,6 +22,7 @@ public class SoftReferenceTest {
     public static int capacity = 100 * 1024; // 100 * 1MB = 100MB
 
     public static Set<SoftReference<MyBigObject>> cache = new HashSet<>(capacity);
+    public static Set<WeakReference<MyBigObject>> cache2 = new HashSet<>(capacity);
     public static ReferenceQueue<MyBigObject> referenceQueue = new ReferenceQueue<>();
 
     public static void main(String[] args){
@@ -32,10 +35,13 @@ public class SoftReferenceTest {
             MyBigObject obj = new MyBigObject();
             //new SoftReference<>(obj);// 默认队列为空
             cache.add(new SoftReference<>(obj,referenceQueue));
+            // WeakReference 是 unchecked 类型，这样会编译不过
+            //cache2.add(new WeakReference(obj));
             // 每创建一个对象，就会占用 1KB 的内存
             // 10000次就会累计占用 10000KB = 10MB 的内存
             // 如果虚拟机的内存为 4MB，那么这期间肯定会触发多次 GC
-            // 内存不足引起的 GC，会回收软引用所关联的对象，而软引用本身，如果没有强引用，也会变回收
+            // 内存不足引起的 GC，会回收软引用所关联的对象，
+            // 而软引用本身，如果没有强引用，也会变回收，证明，参考这个语句：new SoftReference<>(obj)
             // 上述新建软引用对象的时候，附带了一个引用队列，作用为：
             // 在软引用所关联的对象被 GC 回收的时候，将软引用本身加入该引用队列
 
@@ -43,12 +49,42 @@ public class SoftReferenceTest {
             //cleanUseUselessSoftReferences();// 注释这行会报错
 
          //
-            if(i % 10000 == 0){
+            if(i % 1000 == 0){
+
+                //当前分配的总内存
+                //float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0/ (1024 * 1024));
+                //剩余内存
+                //float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0/ (1024 * 1024));
+                //System.out.println("totalMemory: "+totalMemory);
+                //System.out.println("freeMemory: "+freeMemory);
+
                 System.out.println("size of cache = " +  cache.size());
             }
+
+            if(i > 30000 && i % 100 == 0 ){
+
+                // 通过这个log，可以查看一次 gc 能回收多少内存
+                // 但注意这是在系统自动 gc 的前提下，我们自己触发 gc 看到的数据
+                // 通过这个可以发现，当软引用被强引用而无法回收的时候，每次 gc 能回收的内存越来越少
+                // 3.5 M * 2% = 0.07M
+                // 如果每次回收的小于这个 0.07M，并且 JVM 花费 98% 以上的事件来进行垃圾回收，就会报出异常：
+                // java.lang.OutOfMemoryError: GC overhead limit exceeded
+
+                float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0/ (1024 * 1024));
+                System.out.println("freeMemory: "+freeMemory);
+                System.gc();
+                float freeMemory2 = (float) (Runtime.getRuntime().freeMemory() * 1.0/ (1024 * 1024));
+                System.out.println("freeMemory2: "+freeMemory2);
+
+                System.out.println("size of cache = " +  cache.size());
+
+            }
+
         }
 
-        System.out.println("End，removedSoftRef = " + removedSoftRef );// 移除的软引用对象大约 102361
+        System.out.println("End，removedSoftRef = " + removedSoftRef );
+        // 移除的软引用对象大约 102361
+        // 循环 100 * 1024 = 102400 次（约十万次）
 
     }
 
