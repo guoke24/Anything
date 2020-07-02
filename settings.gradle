@@ -1,1 +1,1 @@
-include ':app', ':xtalker_common'
+include ':app', ':xtalker_common', ':stockchart', ':chartmodule', ':simulateddata'
