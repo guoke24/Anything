@@ -82,19 +82,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
-        switch (checkedId) {
-            case R.id.rbtn_15:
-                initialData("slw_k.json");
-                break;
-            case R.id.rbtn_1h:
-                initialData("geli.json");
-                break;
-            case R.id.rbtn_4h:
-                initialData("maotai.json");
-                break;
-            case R.id.rbtn_1d:
-                initialData("pingan.json");
-                break;
+        if (checkedId == R.id.rbtn_15) {
+            initialData("slw_k.json");
+        } else if (checkedId == R.id.rbtn_1h) {
+            initialData("geli.json");
+        } else if (checkedId == R.id.rbtn_4h) {
+            initialData("maotai.json");
+        } else if (checkedId == R.id.rbtn_1d) {
+            initialData("pingan.json");
         }
     }
 

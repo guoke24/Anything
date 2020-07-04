@@ -1,5 +1,10 @@
 //apply plugin: 'com.android.library'
-apply plugin: 'com.android.application'
+//apply plugin: 'com.android.application'
+if (rootProject.ext.isStockChart) {
+    apply plugin: 'com.android.application'
+} else {
+    apply plugin: 'com.android.library'
+}
 
 android {
     compileSdkVersion 28
@@ -7,7 +12,13 @@ android {
 
 
     defaultConfig {
-        applicationId "com.guohao.stockchart"
+        if (rootProject.ext.isStockChart) {
+            //apply plugin: 'com.android.application'
+            applicationId "com.guohao.stockchart"
+        } else {
+            //apply plugin: 'com.android.library'
+        }
+
         minSdkVersion 24
         targetSdkVersion 28
         versionCode 1

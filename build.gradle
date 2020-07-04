@@ -60,4 +60,6 @@ ext {
     airpanelVersion = "1.4.0"
     lameVersion = "1.2.0"
 
+    /** StockChart模块是否作为App存在*/
+    isStockChart = false
 }
