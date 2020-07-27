@@ -6,6 +6,7 @@ import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.view.GestureDetectorCompat;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -171,6 +172,8 @@ public class ChartTouchHelper
 
   @Override
   public boolean onTouch(View v, MotionEvent event) {
+
+    Log.i("guohao-onTouch",Log.getStackTraceString(new Throwable()));
 
     mDetectorCompat.onTouchEvent(event);
     // 同时处理单指和多指的手势动作

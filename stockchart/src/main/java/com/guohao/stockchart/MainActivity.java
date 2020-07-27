@@ -46,15 +46,18 @@ public class MainActivity extends AppCompatActivity
         // 行情图容器
         mMarketFigureChart = findViewById(R.id.chart_container);
 
-        // 行情图主图（蜡烛线）
+        // 行情图主图（蜡烛线，也叫 k 线图）
+        // 蜡烛图包含了4个信息：高，开，低，收
         mKLineChartView = new KMasterChartView(this);
         mMarketFigureChart.addChildChart(mKLineChartView, 200);
 
         // 行情图附图（成交量）
+        //
         mVolumeView = new KSubChartView(this);
         mMarketFigureChart.addChildChart(mVolumeView, 100);
 
-        // MACD
+        // MACD，异同移动平均线
+        //
         mMacdView = new KSubChartView(this);
         mMarketFigureChart.addChildChart(mMacdView, 100);
 

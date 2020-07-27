@@ -61,5 +61,5 @@ ext {
     lameVersion = "1.2.0"
 
     /** StockChart模块是否作为App存在*/
-    isStockChart = false
+    isStockChart = true
 }

@@ -37,12 +37,22 @@ public class MarketFigureChart extends LinearLayout implements IChartGestureList
   public MarketFigureChart(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
     this.mContext = context;
+    // 垂直
     setOrientation(VERTICAL);
+    // 自身布局参数：横向填满，纵向填充
     setLayoutParams(
         new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
     // 设置容器的手势监听
     ChartTouchHelper chartTouchHelper = new ChartTouchHelper(this);
     chartTouchHelper.setChartGestureListener(this);
+    // 注意，ChartTouchHelper 内的 view 持有该 MarketFigureChart 实例的引用；
+    // 通过设置 OnTouchListener 来拿到触摸事件
+    // view.setOnTouchListener(this);
+
+    // 触摸事件会分发整个 ViewTree，
+    // 每个 View 的 onTouch、onTouchEvent 函数先后都能得到触摸事件
+
   }
 
   /**
