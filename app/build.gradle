@@ -19,14 +19,28 @@ android {
         ]
     }
     buildTypes {
-        release {
+
+        debug {
+            //启用代码混淆
             minifyEnabled false
+            //混淆规则配置文件
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //
+            //signingConfig signingConfigs.debug
+        }
+
+        release {
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
+    }
+
+    dataBinding{
+        enabled true
     }
 }
 
@@ -98,6 +112,11 @@ dependencies {
 
     // eventbus
     implementation 'org.greenrobot:eventbus:3.2.0'
+    implementation 'android.arch.lifecycle:extensions:1.1.1'
+
+    // java-webSocket
+    //implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
+    implementation "org.java-websocket:Java-WebSocket:1.5.1"
 }
 
 apply plugin: 'com.didichuxing.tools.droidassist'

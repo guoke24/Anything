@@ -16,8 +16,29 @@ android {
 
     }
 
+    signingConfigs {
+//        debug {
+//            File strFile = new File("../../Keystore/Debug/debug.jks")
+//            storeFile file(strFile)
+//            storePassword "storeDebug1234567890"
+//            keyAlias "debugkey"
+//            keyPassword "aliasDebug1234567890"
+//
+//            }
+        release {
+            File strFile = new File("/Users/guohao/test.jks")
+            storeFile file(strFile)
+            storePassword "123456"
+            keyPassword "123456"
+            keyAlias "key0"
+
+            }
+    }
+
+
     buildTypes {
         release {
+            //signingConfig  signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
