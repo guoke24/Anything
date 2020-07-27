@@ -2,6 +2,8 @@
 
 该项目是一个测试demo的集合，计划将平时遇到的一些感兴趣的功能，就写一个测试demo提交到这里，便于后续继续跟踪和积累。
 
+这里加一行！
+
 - com.guohao.anything.sync 包
     - 多线程和同步锁相关的demo代码
     - [点击跳转](https://github.com/guoke24/Anything/tree/master/app/src/main/java/com/guohao/anything/sync)
