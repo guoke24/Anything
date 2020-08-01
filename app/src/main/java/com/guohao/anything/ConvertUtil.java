@@ -18,7 +18,38 @@ public class ConvertUtil {
     private static final String DEFAULT_ENCODE = "GBK";
 
     /**
-     * byte 数组转为十六进制字符串，基于 ASCII 编码转换，十进制转二进制再转十六进制
+     * byte 数组转为二进制字符串
+     *
+     * 跟转十六进制的思路一样，利用 位移运算 和 位运算
+     *
+     * @param bytes 待转换 byte 数组
+     * @return 转换后的字符串
+     */
+    public static String bytesToBnryString(byte[] bytes){
+
+        if (bytes == null) {
+            return null;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder(bytes.length * 8);//一个字节有8位
+        for (byte b:bytes) {
+            for(int n = 1;n <= 8;n++){
+                stringBuilder.append(getNBit(b,n));
+                if( n % 4 == 0 ) stringBuilder.append(" ");
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    // 拿到一个 byte 中的第 n 位的值
+    // n 的取值为 1-8，从高到低
+    private static int getNBit(byte b,int n){
+        int bit = 0x1 & (b >> ( 8 - n ));
+        return bit;
+    }
+
+    /**
+     * byte 数组转为十六进制字符串
      *
      * @param srcBytes 待转换 byte 数组
      * @return 转换后的字符串
@@ -46,7 +77,40 @@ public class ConvertUtil {
     }
 
     /**
+     * 十六进制字符串转换成 byte 数组，十六进制转二进制再转十进制
+     *
+     * @param srcHexString 待转换的十六进制字符串
+     * @return 转换后的 byte 数组
+     */
+    public static byte[] hexStringToBytes(String srcHexString) {
+        if (srcHexString == null) {
+            return null;
+        }
+        //过滤掉字符串中不正确的字符
+        srcHexString = srcHexString.replaceAll("[^0-9a-fA-F]", "");
+        int len = (srcHexString.length() / 2);
+        byte[] result = new byte[len];
+        char[] hexCharArray = srcHexString.toCharArray();
+        for (int i = 0; i < len; i++) {
+            int pos = i * 2;
+            result[i] = (byte) (toByte(hexCharArray[pos]) << 4
+                    | toByte(hexCharArray[pos + 1]));
+        }
+        return result;
+    }
+
+    // 巧妙的利用了 indexOf 返回下标为 int 类型
+    private static byte toByte(char c) {
+        return (byte) "0123456789ABCDEF".indexOf(c);
+    }
+
+    // ---------------------
+
+    /**
      * 单个字节 转 16进制的字符
+     *
+     * 这个是没啥意义的，之前以为 bytesToHexString 这个函数至少只能对两个字节以上的字节数组进行转换
+     *
      * @param aByte
      */
     public static String loopLogSingleByteToHexString(byte aByte) {
@@ -77,30 +141,6 @@ public class ConvertUtil {
         return b;
     }
 
-    /**
-     * 十六进制字符串转换成 byte 数组，十六进制转二进制再转十进制
-     *
-     * @param srcHexString 待转换的十六进制字符串
-     * @return 转换后的 byte 数组
-     */
-    public static byte[] hexStringToBytes(String srcHexString) {
-        if (srcHexString == null) {
-            return null;
-        }
-        //过滤掉字符串中不正确的字符
-        srcHexString = srcHexString.replaceAll("[^0-9a-fA-F]", "");
-        int len = (srcHexString.length() / 2);
-        byte[] result = new byte[len];
-        char[] hexCharArray = srcHexString.toCharArray();
-        for (int i = 0; i < len; i++) {
-            int pos = i * 2;
-            result[i] = (byte) (toByte(hexCharArray[pos]) << 4
-                    | toByte(hexCharArray[pos + 1]));
-        }
-        return result;
-    }
-
-
     /**字符串转byte数组，一个字符占一位
      *
      * @param str 要转换的字符串
@@ -116,11 +156,6 @@ public class ConvertUtil {
         }
         return result;
     }
-
-    private static byte toByte(char c) {
-        return (byte) "0123456789ABCDEF".indexOf(c);
-    }
-
 
     /**
      * ASCII 编码转 BCD 编码
