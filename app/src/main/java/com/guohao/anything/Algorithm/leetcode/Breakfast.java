@@ -1,4 +1,4 @@
-package com.guohao.anything.Algorithm;
+package com.guohao.anything.Algorithm.leetcode;
 
 import java.util.Arrays;
 
