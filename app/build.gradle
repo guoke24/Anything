@@ -118,6 +118,9 @@ dependencies {
     // java-webSocket
     //implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
     implementation "org.java-websocket:Java-WebSocket:1.5.1"
+
+    //
+    //implementation 'com.dalong:marqueeview:1.0.1'
 }
 
 apply plugin: 'com.didichuxing.tools.droidassist'

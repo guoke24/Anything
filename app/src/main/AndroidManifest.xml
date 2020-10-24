@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.guohao.anything">
-    <!-- 安装apk权限 -->
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" /> <!-- 截屏权限 -->
+    <!-- 截屏权限 -->
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" /> <!-- 网络相关的权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -10,6 +9,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- 写存储权限，OSS需要 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 录音权限 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name=".RootApplication"
@@ -19,17 +19,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Base">
-        <activity android:name=".ui_sample.PicPublicActivity">
+        <activity android:name=".CustomUI.CustomUIActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ARouter.ARouterTestActivity" />
-        <activity android:name=".MvvmTest.MvvmActivity">
+        <activity android:name=".BitmapTest.BitmapActivity">
 
         </activity>
+        <activity android:name=".ui_sample.PicPublicActivity"></activity>
+        <activity android:name=".ARouter.ARouterTestActivity" />
+        <activity android:name=".MvvmTest.MvvmActivity" />
         <activity android:name=".EnterActivity" />
         <activity android:name=".glideTest.GlideActivity" />
         <activity android:name=".shellTest.Main5Activity" />
@@ -41,15 +43,6 @@
         <activity android:name=".memory.MemoryLeakActivity" />
         <activity android:name=".viewtest.CanvasActivity" />
         <activity android:name=".viewtest.ConstrainLayoutActivity" />
-
-        <service
-            android:name=".Hook.HookService.TargetService"
-            android:enabled="false"
-            android:exported="false" />
-        <service
-            android:name=".Hook.HookService.ProxyService"
-            android:process=":daemon" />
-
         <activity android:name=".Hook.HookMain_Activity" />
         <activity android:name=".Hook.HookActivity.StubActivity" />
         <activity android:name=".Hook.HookSimpleDemo.HookSimpleActivity" />
@@ -68,17 +61,14 @@
         <activity android:name="com.guohao.xtalker.MessageActivity" />
         <activity
             android:name="com.guohao.xtalker.GroupCreateActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Group.Create" />
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity android:name="com.guohao.xtalker.LaunchActivity" />
         <activity
             android:name="com.guohao.xtalker.SearchActivity"
             android:label="@string/title_search"
-            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.TransStatusBar" />
         <activity android:name="com.guohao.xtalker.UserActivity" />
         <activity android:name=".butterknife.butterknifeActivity" />
@@ -89,20 +79,11 @@
         <activity android:name=".classloader.ClassLoaderActivity" />
         <activity android:name=".reflect.ReflectTestActivity" />
         <activity android:name=".signerverify.SignerVerifyActivity" />
-        <activity android:name=".FileOptUtil.FileOptActivity" /> <!-- 个推的Service服务,维持长链接接收消息，process 名字不可更改 -->
-        <service
-            android:name="com.guohao.xtalker.AppPushService"
-            android:enabled="true"
-            android:exported="true"
-            android:label="AppPushService"
-            android:permission="1000"
-            android:process=":pushservice" /> <!-- 个推的消息送达服务，用以接收AppPushService处理后的有效消息接收，类似于之前的广播 -->
-        <service
-            android:name="com.guohao.xtalker.AppMessageReceiverService"
-            android:enabled="true"
-            android:exported="true"
-            android:label="AppMessageReceiverService"
-            android:permission="1000" />
+        <activity android:name=".FileOptUtil.FileOptActivity" />
+        <activity android:name=".sync.SyncTestActivity" />
+        <activity android:name=".handler.handlerTestActivity" /> <!-- 个推的Service服务,维持长链接接收消息，process 名字不可更改 -->
+        <activity android:name=".initActivity" /> <!-- 个推的消息送达服务，用以接收AppPushService处理后的有效消息接收，类似于之前的广播 -->
+        <activity android:name=".pms.PmsTestActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -114,10 +95,26 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".sync.SyncTestActivity" />
-        <activity android:name=".handler.handlerTestActivity" />
-        <activity android:name=".initActivity" />
-        <activity android:name=".pms.PmsTestActivity" />
+        <service
+            android:name=".Hook.HookService.TargetService"
+            android:enabled="false"
+            android:exported="false" />
+        <service
+            android:name=".Hook.HookService.ProxyService"
+            android:process=":daemon" />
+        <service
+            android:name="com.guohao.xtalker.AppPushService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="AppPushService"
+            android:permission="1000"
+            android:process=":pushservice" />
+        <service
+            android:name="com.guohao.xtalker.AppMessageReceiverService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="AppMessageReceiverService"
+            android:permission="1000" />
     </application>
 
 </manifest>
